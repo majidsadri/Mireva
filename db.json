@@ -1,0 +1,37 @@
+{
+  "pantry": [
+    {
+      "id": "4",
+      "name": "Canned Tomatoes",
+      "quantity": "4 cans",
+      "expiryDate": "2024-08-01"
+    },
+    {
+      "id": "5",
+      "name": "Flour",
+      "quantity": "1 kg",
+      "expiryDate": "2025-06-30"
+    },
+    {
+      "id": "1742160024488",
+      "name": "Beef",
+      "amount": "2",
+      "measurement": "unit",
+      "expiryDate": "2025-03-16T21:20:12.484Z"
+    },
+    {
+      "id": "1742160107370",
+      "name": "    rice",
+      "amount": "2",
+      "measurement": "unit",
+      "expiryDate": "2025-03-16T21:20:24.501Z"
+    },
+    {
+      "id": "1742181599024",
+      "name": "Beans",
+      "amount": "2",
+      "measurement": "unit",
+      "expiryDate": "2025-03-17T02:33:26.265Z"
+    }
+  ]
+}
