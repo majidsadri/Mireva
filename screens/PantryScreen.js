@@ -395,7 +395,6 @@ const PantryScreen = () => {
         )}
 
         <View style={styles.addItemContainer}>
-          <Text style={styles.sectionTitle}>Add New Item</Text>
           <View style={styles.inputRow}>
             <TextInput
               style={[styles.input, styles.nameInputFlex]}
