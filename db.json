@@ -1,0 +1,41 @@
+{
+  "pantry": {
+    "Sadri-FAM Pantry": [
+      {
+        "id": "1745610225589",
+        "name": "Beef",
+        "amount": "2",
+        "measurement": "unit",
+        "expiryDate": "2025-04-25T19:43:22.610Z"
+      },
+      {
+        "id": "94f1318b-0e17-45cc-a1c6-d6ffcfb34a5b",
+        "name": "Tomato paste",
+        "amount": "2",
+        "measurement": "unit",
+        "expiryDate": "2025-08-24T02:11:13.000Z"
+      },
+      {
+        "id": "0bf81402-d81f-445a-abc9-6f1ff39c6236",
+        "name": "carrots",
+        "amount": "4",
+        "measurement": "unit",
+        "expiryDate": "2025-06-27T22:35:37.726756"
+      },
+      {
+        "id": "87dd87fd-a3e5-41e4-b5e5-75e5aeb2ba09",
+        "name": "eggs",
+        "amount": "6",
+        "measurement": "unit",
+        "expiryDate": "2025-06-27T22:35:37.726769"
+      },
+      {
+        "id": "9cccc346-428f-4fdb-ac0c-efc69046f910",
+        "name": "bottled water",
+        "amount": "1",
+        "measurement": "unit",
+        "expiryDate": "2025-06-30T22:16:43.710877"
+      }
+    ]
+  }
+}

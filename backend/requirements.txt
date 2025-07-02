@@ -1,0 +1,7 @@
+flask==2.3.3
+flask-cors==4.0.0
+werkzeug==2.3.7
+pillow==10.2.0
+pytesseract==0.3.10
+opencv-python==4.9.0.80
+openai==1.12.0 
