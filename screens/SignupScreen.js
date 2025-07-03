@@ -16,6 +16,7 @@ import BiometricAuth from '../utils/BiometricAuth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SignupScreen({ onSignup, onBackToSignin }) {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -27,7 +28,7 @@ export default function SignupScreen({ onSignup, onBackToSignin }) {
 
   const handleSignup = async () => {
     // Validation
-    if (!email.trim() || !password.trim() || !confirmPassword.trim()) {
+    if (!name.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
@@ -53,6 +54,7 @@ export default function SignupScreen({ onSignup, onBackToSignin }) {
         method: 'POST',
         headers: API_CONFIG.getHeaders(),
         body: JSON.stringify({
+          name: name.trim(),
           email: email.trim().toLowerCase(),
           password: password.trim(),
         }),
@@ -129,7 +131,7 @@ export default function SignupScreen({ onSignup, onBackToSignin }) {
               onPress: async () => {
                 // Create demo account for testing
                 const demoUser = {
-                  name: email.split('@')[0],
+                  name: name.trim() || email.split('@')[0],
                   email: email.trim().toLowerCase(),
                   created_at: new Date().toISOString()
                 };
@@ -165,6 +167,19 @@ export default function SignupScreen({ onSignup, onBackToSignin }) {
 
         {/* Sign up form */}
         <View style={styles.formContainer}>
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>Full Name</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your full name"
+              placeholderTextColor="#999"
+              value={name}
+              onChangeText={setName}
+              autoCapitalize="words"
+              autoCorrect={false}
+            />
+          </View>
+
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>Email Address</Text>
             <TextInput

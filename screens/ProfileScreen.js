@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNFS from 'react-native-fs';
+import { API_CONFIG } from '../config';
 
 const DIET_OPTIONS = [
   'None',
@@ -55,7 +56,7 @@ export default function ProfileScreen({ navigation, route }) {
       const userEmail = await AsyncStorage.getItem('userEmail');
       if (!userEmail) throw new Error('No user email found');
   
-      const response = await fetch('https://37c2-18-215-164-114.ngrok-free.app/users.json');
+      const response = await fetch(`${API_CONFIG.BASE_URL}/users.json`);
       const users = await response.json();
   
       const userProfile = users[userEmail] || {
@@ -84,23 +85,31 @@ export default function ProfileScreen({ navigation, route }) {
       const userEmail = await AsyncStorage.getItem('userEmail');
       if (!userEmail) throw new Error('No user email found');
   
-      const response = await fetch('https://37c2-18-215-164-114.ngrok-free.app/users.json');
-      const users = await response.json();
-  
-      users[userEmail] = {
-        ...users[userEmail],
+      const profileData = {
         name,
         diets: selectedDiets.filter((diet) => diet !== 'None'),
         cuisines: favoriteCuisines,
       };
+
+      // Save to AsyncStorage for intelligent suggestions
+      await AsyncStorage.setItem('userProfile', JSON.stringify(profileData));
+      console.log('✅ User preferences saved locally for intelligent suggestions');
   
-      await fetch('https://37c2-18-215-164-114.ngrok-free.app/users.json', {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/users.json`);
+      const users = await response.json();
+  
+      users[userEmail] = {
+        ...users[userEmail],
+        ...profileData
+      };
+  
+      await fetch(`${API_CONFIG.BASE_URL}/users.json`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(users),
       });
   
-      alert('Profile saved successfully!');
+      alert('Profile saved successfully! Your preferences will now be used for smart shopping suggestions.');
     } catch (error) {
       console.error('Error saving profile:', error);
       alert(`Error saving profile: ${error.message}`);

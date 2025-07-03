@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -15,6 +15,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   Modal,
+  PanResponder,
+  Animated,
+  Vibration,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -53,6 +56,41 @@ const MEASUREMENTS = [
   'lb',
 ];
 
+// Simple Item Component
+const ItemCard = ({ 
+  item, 
+  expiry, 
+  onItemClick, 
+  formatItemAmount
+}) => {
+  
+  return (
+    <View style={styles.modernItemCard}>
+      <TouchableOpacity
+        style={styles.itemTouchable}
+        onPress={onItemClick}
+        activeOpacity={0.7}
+      >
+        <View style={styles.itemContent}>
+          <View style={styles.itemHeader}>
+            <Text style={styles.itemName} numberOfLines={2}>
+              {(item.name || 'Unknown').trim()}
+            </Text>
+          </View>
+          
+          <View style={styles.itemDetails}>
+            <Text style={styles.itemAmount}>{formatItemAmount(item)}</Text>
+            <View style={[styles.statusCircle, { 
+              backgroundColor: expiry.color,
+            }]} />
+          </View>
+        </View>
+      </TouchableOpacity>
+      
+    </View>
+  );
+};
+
 export default function MirevaScreen() {
   const [pantryItems, setPantryItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -67,6 +105,16 @@ export default function MirevaScreen() {
     expiryDate: new Date(),
   });
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
+  const [editedItem, setEditedItem] = useState({
+    name: '',
+    amount: '',
+    measurement: 'unit',
+    expiryDate: new Date(),
+  });
+  const [showEditDatePicker, setShowEditDatePicker] = useState(false);
+  const [showMeasurementPicker, setShowMeasurementPicker] = useState(false);
 
   useEffect(() => {
     // Clear any cached pantry name and force reload
@@ -79,6 +127,7 @@ export default function MirevaScreen() {
   // Refresh pantry name and items when screen comes into focus (e.g., after joining a new pantry)
   useFocusEffect(
     React.useCallback(() => {
+      loadUserInfo();
       loadUserPantryName();
       loadPantryItems();
     }, [])
@@ -88,6 +137,17 @@ export default function MirevaScreen() {
     try {
       const userEmail = await AsyncStorage.getItem('userEmail');
       if (userEmail) {
+        // First try to load from saved user data
+        const userData = await AsyncStorage.getItem('userData');
+        if (userData) {
+          const parsedData = JSON.parse(userData);
+          if (parsedData.name) {
+            setUserName(parsedData.name);
+            return;
+          }
+        }
+        
+        // Fallback to email-based name
         const name = userEmail.split('@')[0];
         setUserName(name.charAt(0).toUpperCase() + name.slice(1));
       }
@@ -360,29 +420,44 @@ export default function MirevaScreen() {
     const now = new Date();
     
     items.forEach(item => {
-      const expiryDate = new Date(item.expiryDate);
-      const itemName = (item.name || '').toLowerCase().trim();
+      // Use backend-assigned category if available, otherwise use frontend fallback
+      let targetCategory = item.category || 'Grains & Pantry';
       
-      // Check if expired first
-      if (expiryDate < now) {
-        categories['Expired'].push(item);
-        return;
+      // Check if expired first (handle null expiry dates properly)
+      if (item.expiryDate && item.expiryDate !== null) {
+        try {
+          const expiryDate = new Date(item.expiryDate);
+          if (!isNaN(expiryDate.getTime()) && expiryDate < now) {
+            categories['Expired'].push(item);
+            return;
+          }
+        } catch (error) {
+          console.warn('Invalid expiry date format:', item.expiryDate);
+        }
       }
+      // If no expiry date (null), item doesn't expire - use normal category
       
-      // Categorize by food type
-      if (itemName.includes('beef') || itemName.includes('chicken') || itemName.includes('fish') || 
-          itemName.includes('meat') || itemName.includes('protein') || itemName.includes('beans') ||
-          itemName.includes('tofu') || itemName.includes('eggs')) {
-        categories['Proteins'].push(item);
-      } else if (itemName.includes('apple') || itemName.includes('banana') || itemName.includes('orange') ||
-                 itemName.includes('vegetable') || itemName.includes('carrot') || itemName.includes('tomato') ||
-                 itemName.includes('lettuce') || itemName.includes('spinach') || itemName.includes('fruit')) {
-        categories['Fruits & Vegetables'].push(item);
-      } else if (itemName.includes('milk') || itemName.includes('cheese') || itemName.includes('yogurt') ||
-                 itemName.includes('butter') || itemName.includes('dairy')) {
-        categories['Dairy'].push(item);
+      // Use backend category if it exists and is valid
+      if (targetCategory && categories.hasOwnProperty(targetCategory)) {
+        categories[targetCategory].push(item);
       } else {
-        categories['Grains & Pantry'].push(item);
+        // Fallback to frontend categorization for legacy items without backend category
+        const itemName = (item.name || '').toLowerCase().trim();
+        
+        if (itemName.includes('beef') || itemName.includes('chicken') || itemName.includes('fish') || 
+            itemName.includes('meat') || itemName.includes('protein') || itemName.includes('beans') ||
+            itemName.includes('tofu') || itemName.includes('eggs')) {
+          categories['Proteins'].push(item);
+        } else if (itemName.includes('apple') || itemName.includes('banana') || itemName.includes('orange') ||
+                   itemName.includes('vegetable') || itemName.includes('carrot') || itemName.includes('tomato') ||
+                   itemName.includes('lettuce') || itemName.includes('spinach') || itemName.includes('fruit')) {
+          categories['Fruits & Vegetables'].push(item);
+        } else if (itemName.includes('milk') || itemName.includes('cheese') || itemName.includes('yogurt') ||
+                   itemName.includes('butter') || itemName.includes('dairy')) {
+          categories['Dairy'].push(item);
+        } else {
+          categories['Grains & Pantry'].push(item);
+        }
       }
     });
     
@@ -404,14 +479,85 @@ export default function MirevaScreen() {
   };
 
   const getExpiryStatus = (expiryDate) => {
-    const now = new Date();
-    const expiry = new Date(expiryDate);
-    const diffDays = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+    // Handle null expiry dates (items that don't expire)
+    if (!expiryDate || expiryDate === null) {
+      return { status: 'no-expiry', color: '#68D391', text: 'No expiry', label: 'No exp' };
+    }
     
-    if (diffDays < 0) return { status: 'expired', color: '#E53E3E', text: 'Expired' };
-    if (diffDays <= 3) return { status: 'warning', color: '#FFA500', text: `${diffDays}d left` };
-    if (diffDays <= 7) return { status: 'soon', color: '#FFD700', text: `${diffDays}d left` };
-    return { status: 'fresh', color: '#68D391', text: `${diffDays}d left` };
+    try {
+      const now = new Date();
+      const expiry = new Date(expiryDate);
+      
+      // Check for invalid date
+      if (isNaN(expiry.getTime())) {
+        return { status: 'unknown', color: '#A0AEC0', text: 'Unknown', label: 'Unknown' };
+      }
+      
+      const diffDays = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+      
+      if (diffDays < 0) return { status: 'expired', color: '#E53E3E', text: 'Expired', label: 'Expired' };
+      if (diffDays <= 3) return { status: 'warning', color: '#FFA500', text: `${diffDays}d left`, label: `${diffDays}d` };
+      if (diffDays <= 7) return { status: 'soon', color: '#FFD700', text: `${diffDays}d left`, label: `${diffDays}d` };
+      return { status: 'fresh', color: '#68D391', text: `${diffDays}d left`, label: `${diffDays}d` };
+    } catch (error) {
+      console.warn('Error parsing expiry date:', expiryDate);
+      return { status: 'unknown', color: '#A0AEC0', text: 'Unknown' };
+    }
+  };
+
+  const handleItemClick = (item) => {
+    setEditingItem(item);
+    setEditedItem({
+      name: item.name || '',
+      amount: item.amount || '1',
+      measurement: item.measurement || 'unit',
+      expiryDate: item.expiryDate ? new Date(item.expiryDate) : new Date(),
+    });
+    setShowEditModal(true);
+  };
+
+  const handleUpdateItem = async () => {
+    try {
+      const email = await AsyncStorage.getItem('userEmail');
+      
+      const updatedItem = {
+        ...editingItem,
+        ...editedItem,
+        expiryDate: editedItem.expiryDate.toISOString(),
+      };
+      
+      // Update locally first
+      setPantryItems(currentItems =>
+        currentItems.map(item =>
+          item.id === editingItem.id ? updatedItem : item
+        )
+      );
+      
+      setShowEditModal(false);
+      
+      // Try to update backend
+      try {
+        const response = await fetch(`${API_CONFIG.BASE_URL}/pantry/${editingItem.id}`, {
+          method: 'PUT',
+          headers: {
+            ...API_CONFIG.getHeaders(),
+            'X-User-Email': email?.trim().toLowerCase() || '',
+          },
+          body: JSON.stringify(updatedItem),
+        });
+        
+        if (response.ok) {
+          Alert.alert('Success', 'Item updated successfully');
+        } else {
+          console.log('Backend update failed, but local update succeeded');
+        }
+      } catch (backendError) {
+        console.log('Backend update error (non-critical):', backendError.message);
+      }
+    } catch (error) {
+      console.error('Error updating item:', error);
+      Alert.alert('Error', 'Failed to update item. Please try again.');
+    }
   };
 
   const handleDeleteItem = async (itemId, itemName) => {
@@ -465,11 +611,12 @@ export default function MirevaScreen() {
     );
   };
 
+
   const renderCategorySection = (categoryName, items, categoryColor) => {
     if (items.length === 0) return null;
     
     return (
-      <View key={categoryName} style={styles.categoryCard}>
+      <View key={categoryName} style={[styles.categoryCard, { backgroundColor: categoryColor }]}>
         <View style={styles.categoryHeader}>
           <View style={styles.categoryTitleContainer}>
             <View style={styles.categoryInfo}>
@@ -479,43 +626,21 @@ export default function MirevaScreen() {
           </View>
         </View>
         
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false} 
-          style={styles.itemsScrollView}
-          contentContainerStyle={styles.itemsScrollContent}
-        >
+        <View style={[styles.itemsScrollView, { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 12 }]}>
           {items.map((item, index) => {
             const expiry = getExpiryStatus(item.expiryDate);
+            
             return (
-              <View key={item.id || index} style={styles.modernItemCard}>
-                <TouchableOpacity 
-                  style={styles.deleteButton}
-                  onPress={() => handleDeleteItem(item.id, item.name)}
-                >
-                  <Icon name="close" size={14} color="#FFFFFF" />
-                </TouchableOpacity>
-                
-                <View style={styles.itemContent}>
-                  <View style={styles.itemHeader}>
-                    <Text style={styles.itemName} numberOfLines={2}>
-                      {(item.name || 'Unknown').trim()}
-                    </Text>
-                  </View>
-                  
-                  <View style={styles.itemDetails}>
-                    <Text style={styles.itemAmount}>{formatItemAmount(item)}</Text>
-                    <View style={[styles.statusIndicator, { 
-                      backgroundColor: expiry.color,
-                    }]}>
-                      <Text style={styles.statusText}>{expiry.text}</Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
+              <ItemCard
+                key={item.id || index}
+                item={item}
+                expiry={expiry}
+                formatItemAmount={formatItemAmount}
+                onItemClick={() => handleItemClick(item)}
+              />
             );
           })}
-        </ScrollView>
+        </View>
       </View>
     );
   };
@@ -544,11 +669,11 @@ export default function MirevaScreen() {
 
   const categorizedItems = categorizeItems(pantryItems);
   const shelfColors = {
-    'Fruits & Vegetables': '#48BB78',
-    'Proteins': '#ED8936', 
-    'Grains & Pantry': '#ECC94B',
-    'Dairy': '#4299E1',
-    'Expired': '#F56565'
+    'Fruits & Vegetables': '#E6FFFA', // Light teal from Mireva palette
+    'Proteins': '#FFF5E6', // Light orange from Mireva palette
+    'Grains & Pantry': '#F0FFF4', // Light green from Mireva palette
+    'Dairy': '#E8F5E8', // Light sage green from Mireva palette
+    'Expired': '#FFEBEE' // Light red for expired items
   };
 
   return (
@@ -738,6 +863,201 @@ export default function MirevaScreen() {
             )}
           </ScrollView>
         </KeyboardAvoidingView>
+      </Modal>
+
+      {/* Edit Item Modal - Professional Design */}
+      <Modal
+        visible={showEditModal}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setShowEditModal(false)}
+      >
+        <TouchableOpacity 
+          style={styles.editModalOverlay} 
+          activeOpacity={1} 
+          onPress={() => setShowEditModal(false)}
+        >
+          <TouchableOpacity 
+            activeOpacity={1} 
+            style={styles.editModalContainer}
+            onPress={(e) => e.stopPropagation()}
+          >
+            {/* Header with Item Name */}
+            <View style={styles.editModalHeader}>
+              <View style={styles.editModalItemPreview}>
+                <Text style={styles.editModalItemName} numberOfLines={1}>
+                  {editingItem?.name || 'Item'}
+                </Text>
+                <Text style={styles.editModalItemSubtitle}>
+                  {editingItem?.amount || '1'} {editingItem?.measurement || 'unit'}
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={styles.editModalCloseButton}
+                onPress={() => setShowEditModal(false)}
+              >
+                <Text style={styles.editModalCloseIcon}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Edit Form */}
+            <View style={styles.editModalBody}>
+              {/* Item Name Input */}
+              <View style={styles.editModalField}>
+                <Text style={styles.editModalLabel}>Name</Text>
+                <TextInput
+                  style={styles.editModalInput}
+                  placeholder="Item name"
+                  placeholderTextColor="#A0AEC0"
+                  value={editedItem.name}
+                  onChangeText={(text) => setEditedItem({ ...editedItem, name: text })}
+                />
+              </View>
+
+              {/* Amount and Measurement Row */}
+              <View style={styles.editModalRow}>
+                <View style={[styles.editModalField, { flex: 1, marginRight: 12 }]}>
+                  <Text style={styles.editModalLabel}>Amount</Text>
+                  <TextInput
+                    style={styles.editModalInput}
+                    placeholder="1"
+                    placeholderTextColor="#A0AEC0"
+                    value={editedItem.amount}
+                    onChangeText={(text) => setEditedItem({ ...editedItem, amount: text })}
+                    keyboardType="numeric"
+                  />
+                </View>
+                
+                <View style={[styles.editModalField, { flex: 1.5 }]}>
+                  <Text style={styles.editModalLabel}>Unit</Text>
+                  <TouchableOpacity
+                    style={styles.editModalSelect}
+                    onPress={() => setShowMeasurementPicker(true)}
+                  >
+                    <Text style={styles.editModalSelectText}>
+                      {editedItem.measurement}
+                    </Text>
+                    <Text style={styles.editModalSelectArrow}>▼</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              {/* Expiry Date */}
+              <View style={styles.editModalField}>
+                <Text style={styles.editModalLabel}>Expiry Date</Text>
+                <TouchableOpacity
+                  style={styles.editModalDateButton}
+                  onPress={() => setShowEditDatePicker(true)}
+                >
+                  <Text style={styles.editModalDateIcon}>📅</Text>
+                  <Text style={styles.editModalDateText}>
+                    {editedItem.expiryDate.toLocaleDateString('en-US', { 
+                      weekday: 'short', 
+                      year: 'numeric', 
+                      month: 'short', 
+                      day: 'numeric' 
+                    })}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Action Buttons */}
+            <View style={styles.editModalActions}>
+              <TouchableOpacity
+                style={[styles.editModalButton, styles.editModalDeleteButton]}
+                onPress={() => {
+                  setShowEditModal(false);
+                  handleDeleteItem(editingItem.id, editingItem.name);
+                }}
+              >
+                <Text style={styles.editModalDeleteText}>Delete Item</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={[styles.editModalButton, styles.editModalSaveButton]}
+                onPress={handleUpdateItem}
+              >
+                <Text style={styles.editModalSaveText}>Save Changes</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Date Picker */}
+            {showEditDatePicker && Platform.OS === 'ios' && (
+              <View style={styles.editModalDatePicker}>
+                <DateTimePicker
+                  value={editedItem.expiryDate}
+                  mode="date"
+                  display="spinner"
+                  onChange={(event, selectedDate) => {
+                    if (selectedDate) {
+                      setEditedItem({ ...editedItem, expiryDate: selectedDate });
+                    }
+                  }}
+                  minimumDate={new Date()}
+                />
+                <TouchableOpacity
+                  style={styles.editModalDateDone}
+                  onPress={() => setShowEditDatePicker(false)}
+                >
+                  <Text style={styles.editModalDateDoneText}>Done</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            
+            {showEditDatePicker && Platform.OS === 'android' && (
+              <DateTimePicker
+                value={editedItem.expiryDate}
+                mode="date"
+                display="default"
+                onChange={(event, selectedDate) => {
+                  setShowEditDatePicker(false);
+                  if (selectedDate) {
+                    setEditedItem({ ...editedItem, expiryDate: selectedDate });
+                  }
+                }}
+                minimumDate={new Date()}
+              />
+            )}
+
+            {/* Measurement Picker Modal */}
+            {showMeasurementPicker && (
+              <View style={styles.editModalMeasurementPicker}>
+                <View style={styles.editModalPickerHeader}>
+                  <TouchableOpacity onPress={() => setShowMeasurementPicker(false)}>
+                    <Text style={styles.editModalPickerCancel}>Cancel</Text>
+                  </TouchableOpacity>
+                  <Text style={styles.editModalPickerTitle}>Select Unit</Text>
+                  <TouchableOpacity onPress={() => setShowMeasurementPicker(false)}>
+                    <Text style={styles.editModalPickerDone}>Done</Text>
+                  </TouchableOpacity>
+                </View>
+                <ScrollView style={styles.editModalPickerList}>
+                  {MEASUREMENTS.map((measurement) => (
+                    <TouchableOpacity
+                      key={measurement}
+                      style={styles.editModalPickerItem}
+                      onPress={() => {
+                        setEditedItem({ ...editedItem, measurement });
+                        setShowMeasurementPicker(false);
+                      }}
+                    >
+                      <Text style={[
+                        styles.editModalPickerItemText,
+                        editedItem.measurement === measurement && styles.editModalPickerItemSelected
+                      ]}>
+                        {measurement}
+                      </Text>
+                      {editedItem.measurement === measurement && (
+                        <Text style={styles.editModalPickerCheck}>✓</Text>
+                      )}
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            )}
+          </TouchableOpacity>
+        </TouchableOpacity>
       </Modal>
     </SafeAreaView>
   );
@@ -934,7 +1254,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   categoryCard: {
-    backgroundColor: '#FFFFFF',
     marginHorizontal: 4,
     marginBottom: 12,
     borderRadius: 12,
@@ -990,7 +1309,7 @@ const styles = StyleSheet.create({
   modernItemCard: {
     backgroundColor: '#F8FAFC',
     borderRadius: 8,
-    marginRight: 8,
+    margin: 4,
     width: 100,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -1022,15 +1341,10 @@ const styles = StyleSheet.create({
     color: '#718096',
     fontWeight: '500',
   },
-  statusIndicator: {
-    paddingHorizontal: 6,
-    paddingVertical: 3,
-    borderRadius: 4,
-  },
-  statusText: {
-    fontSize: 9,
-    fontWeight: '600',
-    color: '#FFFFFF',
+  statusCircle: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
   },
   emptyState: {
     alignItems: 'center',
@@ -1196,5 +1510,260 @@ const styles = StyleSheet.create({
   dateButtonText: {
     fontSize: 16,
     color: '#2D3748',
+  },
+  deleteItemButton: {
+    backgroundColor: '#E53E3E',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 30,
+    marginBottom: 20,
+  },
+  deleteItemButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  
+  // Professional Edit Modal Styles
+  editModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  editModalContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    width: '90%',
+    maxWidth: 400,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
+    elevation: 15,
+  },
+  editModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F4F8',
+  },
+  editModalItemPreview: {
+    flex: 1,
+  },
+  editModalItemName: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1A202C',
+    marginBottom: 4,
+  },
+  editModalItemSubtitle: {
+    fontSize: 14,
+    color: '#718096',
+  },
+  editModalCloseButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F7FAFC',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 16,
+  },
+  editModalCloseIcon: {
+    fontSize: 18,
+    color: '#718096',
+  },
+  editModalBody: {
+    padding: 24,
+  },
+  editModalField: {
+    marginBottom: 20,
+  },
+  editModalLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#718096',
+    marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  editModalInput: {
+    backgroundColor: '#F7FAFC',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 16,
+    color: '#1A202C',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  editModalRow: {
+    flexDirection: 'row',
+    marginBottom: 20,
+  },
+  editModalSelect: {
+    backgroundColor: '#F7FAFC',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  editModalSelectText: {
+    fontSize: 16,
+    color: '#1A202C',
+  },
+  editModalSelectArrow: {
+    fontSize: 12,
+    color: '#718096',
+  },
+  editModalDateButton: {
+    backgroundColor: '#F7FAFC',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  editModalDateIcon: {
+    fontSize: 18,
+    marginRight: 12,
+  },
+  editModalDateText: {
+    fontSize: 16,
+    color: '#1A202C',
+    flex: 1,
+  },
+  editModalActions: {
+    flexDirection: 'row',
+    paddingHorizontal: 24,
+    paddingBottom: 24,
+    gap: 12,
+  },
+  editModalButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  editModalDeleteButton: {
+    backgroundColor: '#FFF5F5',
+    borderWidth: 1,
+    borderColor: '#FEB2B2',
+  },
+  editModalDeleteText: {
+    color: '#E53E3E',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  editModalSaveButton: {
+    backgroundColor: '#48BB78',
+  },
+  editModalSaveText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  editModalDatePicker: {
+    borderTopWidth: 1,
+    borderTopColor: '#E2E8F0',
+    backgroundColor: '#F7FAFC',
+  },
+  editModalDateDone: {
+    alignItems: 'center',
+    paddingVertical: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#E2E8F0',
+  },
+  editModalDateDoneText: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: '#48BB78',
+  },
+  
+  // Measurement Picker Styles
+  editModalMeasurementPicker: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '50%',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: -5,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 10,
+  },
+  editModalPickerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+  },
+  editModalPickerCancel: {
+    fontSize: 16,
+    color: '#E53E3E',
+  },
+  editModalPickerTitle: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: '#1A202C',
+  },
+  editModalPickerDone: {
+    fontSize: 16,
+    color: '#48BB78',
+    fontWeight: '600',
+  },
+  editModalPickerList: {
+    paddingVertical: 8,
+  },
+  editModalPickerItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#F0F4F8',
+  },
+  editModalPickerItemText: {
+    fontSize: 17,
+    color: '#2D3748',
+  },
+  editModalPickerItemSelected: {
+    color: '#48BB78',
+    fontWeight: '600',
+  },
+  editModalPickerCheck: {
+    fontSize: 18,
+    color: '#48BB78',
+    fontWeight: '600',
+  },
+  
+  itemTouchable: {
+    flex: 1,
   },
 });

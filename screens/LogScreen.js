@@ -12,7 +12,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_CONFIG } from '../config';
 
-export default function LogScreen() {
+export default function LogScreen({ navigation }) {
   const [pantryItems, setPantryItems] = useState([]);
   const [shoppingItems, setShoppingItems] = useState([]);
   const [savedRecipes, setSavedRecipes] = useState([]);
@@ -23,12 +23,16 @@ export default function LogScreen() {
   }, []);
 
   const loadActivityData = async () => {
+    console.log('Loading activity data...');
     try {
       const userEmail = await AsyncStorage.getItem('userEmail');
       const headers = {
         ...API_CONFIG.getHeaders(),
-        ...(userEmail && { 'X-User-Email': userEmail.trim().toLowerCase() })
+        ...(userEmail && { 'X-User-Email': userEmail.trim().toLowerCase() }),
       };
+
+      console.log(`🔍 Loading activities for user: ${userEmail}`);
+      console.log('Request headers:', headers);
 
       // Load pantry items
       const pantryResponse = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PANTRY}`, {
@@ -48,8 +52,8 @@ export default function LogScreen() {
 
       // Load saved recipes from AsyncStorage (for saved but not cooked recipes)
       const saved = await AsyncStorage.getItem('savedRecipes');
-      const savedRecipes = saved ? JSON.parse(saved) : [];
-      
+      const localSavedRecipes = saved ? JSON.parse(saved) : [];
+
       // Load logged recipes from backend (for cooked recipes)
       const loggedResponse = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.GET_RECIPE_LOGS}`, {
         method: 'GET',
@@ -57,18 +61,141 @@ export default function LogScreen() {
       });
       const loggedData = await loggedResponse.json();
       const loggedRecipes = loggedData.recipe_logs || [];
-      
+
+      // Load pantry activity logs from backend
+      const pantryActivityResponse = await fetch(`${API_CONFIG.BASE_URL}/pantry-activity-logs`, {
+        method: 'GET',
+        headers,
+      });
+      console.log('Pantry activity response status:', pantryActivityResponse.status);
+      const pantryActivityData = await pantryActivityResponse.json();
+      console.log('Pantry activity data:', pantryActivityData);
+      const pantryActivities = pantryActivityData.activities || [];
+
+      // Load shopping list activity logs from backend
+      const shoppingActivityResponse = await fetch(`${API_CONFIG.BASE_URL}/shopping-activity-logs`, {
+        method: 'GET',
+        headers,
+      });
+      const shoppingActivityData = await shoppingActivityResponse.json();
+      const shoppingActivities = shoppingActivityData.activities || [];
+
+      // Combine all activities
+      const allBackendActivities = [...pantryActivities, ...shoppingActivities];
+
+      // Debug logging for activities
+      console.log(`📊 Activity Logs Debug for user ${userEmail}:`);
+      console.log(`  - Pantry activities: ${pantryActivities.length}`);
+      console.log(`  - Shopping activities: ${shoppingActivities.length}`);
+      console.log(`  - Total backend activities: ${allBackendActivities.length}`);
+
+      if (pantryActivities.length > 0) {
+        console.log('  - Sample pantry activity:', JSON.stringify(pantryActivities[0], null, 2));
+      }
+      if (shoppingActivities.length > 0) {
+        console.log('  - Sample shopping activity:', JSON.stringify(shoppingActivities[0], null, 2));
+      }
+
       // Combine both types of recipes
-      const allRecipes = [...savedRecipes, ...loggedRecipes];
+      const allRecipes = [...localSavedRecipes, ...loggedRecipes];
       setSavedRecipes(allRecipes);
 
       // Create activities array
       const activityList = [];
 
-      // Add recipe activities (both saved and logged)
+      // Filter out view activities before processing
+      const meaningfulActivities = allBackendActivities.filter(activity => 
+        activity.activity_type !== 'pantry_view' && 
+        activity.activity_type !== 'shopping_list_view'
+      );
+
+      // Remove duplicates based on timestamp, activity type, and user
+      const deduplicatedActivities = [];
+      const seen = new Set();
+      
+      meaningfulActivities.forEach(activity => {
+        // Create a unique identifier for each activity
+        const activityKey = `${activity.timestamp}_${activity.activity_type}_${activity.user_email}_${activity.activity_data?.item_name || activity.activity_data?.item_added?.name || 'unknown'}`;
+        
+        if (!seen.has(activityKey)) {
+          seen.add(activityKey);
+          deduplicatedActivities.push(activity);
+        } else {
+          console.log('DEBUG: Removed duplicate activity:', activityKey);
+        }
+      });
+
+      // Debug deduplication results
+      console.log(`  - After filtering views: ${meaningfulActivities.length}`);
+      console.log(`  - After deduplication: ${deduplicatedActivities.length}`);
+      console.log(`  - Duplicates removed: ${meaningfulActivities.length - deduplicatedActivities.length}`);
+
+      // Add all meaningful backend activities (pantry and shopping) with guaranteed unique keys
+      deduplicatedActivities.forEach((activity, index) => {
+        const activityDate = new Date(activity.timestamp);
+        const now = new Date();
+        const daysAgo = Math.floor((now.getTime() - activityDate.getTime()) / (1000 * 60 * 60 * 24));
+
+        // Generate absolutely unique key
+        const uniqueKey = `activity_${index}_${activityDate.getTime()}_${Math.floor(Math.random() * 1000000)}`;
+
+        // Determine activity type and icon
+        let type = 'pantry';
+        let title = activity.description;
+        let description = activity.description;
+
+        // Customize based on activity type
+        const userName = activity.user_name || 'Someone';
+
+        if (activity.activity_type === 'pantry_add_item') {
+          type = 'add';
+          title = `${userName} added item`;
+          const itemName = activity.activity_data?.item_name || 'item';
+          description = `${userName} added ${itemName} to pantry`;
+        } else if (activity.activity_type === 'pantry_scan_add') {
+          type = 'scan';
+          title = `${userName} scanned items`;
+          description = activity.description || `${userName} scanned and added items`;
+        } else if (activity.activity_type === 'pantry_remove_item') {
+          type = 'remove';
+          title = `${userName} removed item`;
+          const itemName = activity.activity_data?.item_deleted?.name || activity.activity_data?.item_name || 'item';
+          description = activity.description || `${userName} removed ${itemName} from pantry`;
+        } else if (activity.activity_type === 'pantry_view') {
+          type = 'view';
+          title = `${userName} viewed pantry`;
+          description = activity.description || `${userName} viewed the pantry`;
+        } else if (activity.activity_type === 'shopping_list_add_item') {
+          type = 'shopping_add';
+          title = `${userName} added to shopping`;
+          const itemName = activity.activity_data?.item_name || activity.activity_data?.item_added?.name || 'item';
+          description = `${userName} added ${itemName} to shopping list`;
+        } else if (activity.activity_type === 'shopping_list_remove_item') {
+          type = 'shopping_remove';
+          title = `${userName} removed from shopping`;
+          const itemName = activity.activity_data?.item_name || 'item';
+          description = `${userName} removed ${itemName} from shopping list`;
+        } else if (activity.activity_type === 'shopping_list_view') {
+          type = 'shopping_view';
+          title = `${userName} viewed shopping list`;
+          description = activity.description || `${userName} viewed shopping list`;
+        }
+
+        activityList.push({
+          id: uniqueKey,
+          type: type,
+          title: title,
+          description: description,
+          time: daysAgo === 0 ? 'Today' : daysAgo < 0 ? 'Today' : `${daysAgo} day${daysAgo > 1 ? 's' : ''} ago`,
+          timestamp: activityDate.getTime(),
+          user: activity.user_name,
+        });
+      });
+
+      // Add recipe activities (both saved and logged) with guaranteed unique keys
       allRecipes.forEach((recipe, index) => {
         let activityDate, title, description;
-        
+
         if (recipe.timestamp) {
           // Logged recipe (cooked)
           activityDate = new Date(recipe.timestamp);
@@ -85,42 +212,24 @@ export default function LogScreen() {
           title = 'recipe activity';
           description = `Recipe: ${recipe.recipe_name || recipe.name}`;
         }
-        
-        const daysAgo = Math.floor((Date.now() - activityDate.getTime()) / (1000 * 60 * 60 * 24));
+
+        // Generate absolutely unique key for recipes
+        const uniqueRecipeKey = `recipe_${index}_${activityDate.getTime()}_${Math.floor(Math.random() * 1000000)}`;
+
+        const recipeNow = new Date();
+        const recipeDaysAgo = Math.floor((recipeNow.getTime() - activityDate.getTime()) / (1000 * 60 * 60 * 24));
         activityList.push({
-          id: `recipe_${recipe.id || index}`,
+          id: uniqueRecipeKey,
           type: 'recipe',
           title: title,
           description: description,
-          time: daysAgo === 0 ? 'Today' : `${daysAgo} day${daysAgo > 1 ? 's' : ''} ago`,
+          time: recipeDaysAgo === 0 ? 'Today' : recipeDaysAgo < 0 ? 'Today' : `${recipeDaysAgo} day${recipeDaysAgo > 1 ? 's' : ''} ago`,
           recipe: recipe,
-          timestamp: activityDate.getTime()
+          timestamp: activityDate.getTime(),
         });
       });
 
-      // Add pantry activity
-      if (pantryData.length > 0) {
-        activityList.push({
-          id: 'pantry_scan',
-          type: 'scan',
-          title: 'items in pantry',
-          description: `You have ${pantryData.length} item${pantryData.length > 1 ? 's' : ''} in your pantry`,
-          time: 'Current',
-          timestamp: Date.now()
-        });
-      }
-
-      // Add shopping activity
-      if (shoppingData.items && shoppingData.items.length > 0) {
-        activityList.push({
-          id: 'shopping_list',
-          type: 'shopping',
-          title: 'shopping list updated',
-          description: `Shopping list has ${shoppingData.items.length} item${shoppingData.items.length > 1 ? 's' : ''}`,
-          time: 'Current',
-          timestamp: Date.now() - 1000 // Slightly earlier than pantry
-        });
-      }
+      // Removed pantry and shopping summary items since they're already shown in stats bar
 
       // Sort by timestamp (newest first)
       activityList.sort((a, b) => b.timestamp - a.timestamp);
@@ -139,6 +248,20 @@ export default function LogScreen() {
     );
   };
 
+  const showAllSavedRecipes = () => {
+    navigation.navigate('SavedRecipes');
+  };
+
+  const navigateToPantry = () => {
+    // Navigate to the parent tab navigator, then to Mireva tab
+    navigation.getParent()?.navigate('Mireva');
+  };
+
+  const navigateToShopping = () => {
+    // Navigate to the parent tab navigator, then to Shop tab
+    navigation.getParent()?.navigate('Shop');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Top Cover Image */}
@@ -155,32 +278,46 @@ export default function LogScreen() {
         </View>
       </View>
 
-      {/* Compact Stats Bar */}
-      <View style={styles.statsBar}>
-        <View style={styles.statItem}>
-          <Text style={styles.statNumber}>{pantryItems.length}</Text>
-          <Text style={styles.statLabel}>Pantry</Text>
-        </View>
-        <View style={styles.statDivider} />
-        <View style={styles.statItem}>
-          <Text style={styles.statNumber}>{savedRecipes.length}</Text>
-          <Text style={styles.statLabel}>Recipes</Text>
-        </View>
-        <View style={styles.statDivider} />
-        <View style={styles.statItem}>
-          <Text style={styles.statNumber}>{shoppingItems.length}</Text>
-          <Text style={styles.statLabel}>Shopping</Text>
-        </View>
+      {/* Circular Action Buttons */}
+      <View style={styles.circularButtonsContainer}>
+        <TouchableOpacity style={styles.circularButtonWrapper} onPress={navigateToPantry}>
+          <View style={[styles.circularButton, styles.pantryButton]}>
+            <Text style={styles.circularButtonNumber}>{pantryItems.length}</Text>
+          </View>
+          <Text style={styles.circularButtonLabel}>Pantry</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={styles.circularButtonWrapper} onPress={showAllSavedRecipes}>
+          <View style={[styles.circularButton, styles.recipesButton]}>
+            <Text style={styles.circularButtonNumber}>{savedRecipes.length}</Text>
+          </View>
+          <Text style={styles.circularButtonLabel}>Recipes</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={styles.circularButtonWrapper} onPress={navigateToShopping}>
+          <View style={[styles.circularButton, styles.shoppingButton]}>
+            <Text style={styles.circularButtonNumber}>{shoppingItems.length}</Text>
+          </View>
+          <Text style={styles.circularButtonLabel}>Shopping</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Recent Activity */}
       <View style={styles.activitySection}>
-        <Text style={styles.sectionTitle}>Recent Activity</Text>
-        
+        <View style={styles.activityHeader}>
+          <Text style={styles.sectionTitle}>Recent Activity</Text>
+          <TouchableOpacity
+            style={styles.refreshButton}
+            onPress={loadActivityData}
+          >
+            <Text style={styles.refreshButtonText}>↻</Text>
+          </TouchableOpacity>
+        </View>
+
         <ScrollView style={styles.activityList}>
           {activities.map((activity) => (
-            <TouchableOpacity 
-              key={activity.id} 
+            <TouchableOpacity
+              key={activity.id}
               style={styles.activityItem}
               onPress={() => {
                 if (activity.type === 'recipe' && activity.recipe) {
@@ -189,15 +326,29 @@ export default function LogScreen() {
               }}
               disabled={activity.type !== 'recipe'}
             >
-              <View style={[styles.activityIcon, 
-                activity.type === 'scan' ? styles.scanIcon : 
-                activity.type === 'recipe' ? styles.recipeIcon : styles.shoppingIcon
+              <View style={[styles.activityIcon,
+                activity.type === 'scan' ? styles.scanIcon :
+                activity.type === 'recipe' ? styles.recipeIcon :
+                activity.type === 'add' ? styles.addIcon :
+                activity.type === 'remove' ? styles.removeIcon :
+                activity.type === 'view' ? styles.viewIcon :
+                activity.type === 'pantry' ? styles.pantryIcon :
+                activity.type === 'shopping_add' ? styles.shoppingAddIcon :
+                activity.type === 'shopping_remove' ? styles.shoppingRemoveIcon :
+                activity.type === 'shopping_view' ? styles.shoppingViewIcon : styles.shoppingIcon,
               ]}>
-                <View style={activity.type === 'scan' ? styles.scanDot : 
-                           activity.type === 'recipe' ? styles.recipeDot : styles.shoppingDot} />
+                <View style={activity.type === 'scan' ? styles.scanDot :
+                           activity.type === 'recipe' ? styles.recipeDot :
+                           activity.type === 'add' ? styles.addDot :
+                           activity.type === 'remove' ? styles.removeDot :
+                           activity.type === 'view' ? styles.viewDot :
+                           activity.type === 'pantry' ? styles.pantryDot :
+                           activity.type === 'shopping_add' ? styles.shoppingAddDot :
+                           activity.type === 'shopping_remove' ? styles.shoppingRemoveDot :
+                           activity.type === 'shopping_view' ? styles.shoppingViewDot : styles.shoppingDot} />
               </View>
               <View style={styles.activityContent}>
-                <View style={styles.activityHeader}>
+                <View style={styles.activityItemHeader}>
                   <Text style={styles.activityTitle}>{activity.title}</Text>
                   <Text style={styles.activityTime}>{activity.time}</Text>
                 </View>
@@ -262,40 +413,50 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 4,
   },
-  // Compact stats bar
-  statsBar: {
+  // Circular buttons similar to shop page
+  circularButtonsContainer: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
-    marginHorizontal: 20,
-    marginBottom: 20,
-    borderRadius: 12,
-    paddingVertical: 16,
+    justifyContent: 'center',
     paddingHorizontal: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    marginTop: 25,
+    marginBottom: 25,
+    gap: 40,
   },
-  statItem: {
-    flex: 1,
+  circularButtonWrapper: {
     alignItems: 'center',
   },
-  statNumber: {
-    fontSize: 24,
+  circularButton: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 6,
+    marginBottom: 8,
+  },
+  pantryButton: {
+    backgroundColor: '#2D6A4F',
+  },
+  recipesButton: {
+    backgroundColor: '#FF6B35',
+  },
+  shoppingButton: {
+    backgroundColor: '#9FD5CD',
+  },
+  circularButtonNumber: {
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#2D6A4F',
-    marginBottom: 4,
+    color: '#FFFFFF',
   },
-  statLabel: {
+  circularButtonLabel: {
     fontSize: 12,
-    color: '#718096',
+    color: '#2D3748',
+    fontWeight: '600',
     textAlign: 'center',
-  },
-  statDivider: {
-    width: 1,
-    backgroundColor: '#E2E8F0',
-    marginHorizontal: 15,
   },
   // Activity section
   activitySection: {
@@ -306,7 +467,25 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#2D6A4F',
+  },
+  activityHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 15,
+  },
+  refreshButton: {
+    backgroundColor: '#2D6A4F',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  refreshButtonText: {
+    color: '#FFFFFF',
+    fontSize: 20,
+    fontWeight: 'bold',
   },
   activityList: {
     flex: 1,
@@ -337,6 +516,27 @@ const styles = StyleSheet.create({
   shoppingIcon: {
     backgroundColor: '#E3F2FD',
   },
+  addIcon: {
+    backgroundColor: '#E8F5E8',
+  },
+  removeIcon: {
+    backgroundColor: '#FFEBEE',
+  },
+  viewIcon: {
+    backgroundColor: '#F3E5F5',
+  },
+  pantryIcon: {
+    backgroundColor: '#FFF8E1',
+  },
+  shoppingAddIcon: {
+    backgroundColor: '#E8F5E8',
+  },
+  shoppingRemoveIcon: {
+    backgroundColor: '#FFEBEE',
+  },
+  shoppingViewIcon: {
+    backgroundColor: '#E3F2FD',
+  },
   scanDot: {
     width: 12,
     height: 12,
@@ -355,10 +555,52 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: '#2196F3',
   },
+  addDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#4CAF50',
+  },
+  removeDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#F44336',
+  },
+  viewDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#9C27B0',
+  },
+  pantryDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#FFC107',
+  },
+  shoppingAddDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#4CAF50',
+  },
+  shoppingRemoveDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#F44336',
+  },
+  shoppingViewDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#2196F3',
+  },
   activityContent: {
     flex: 1,
   },
-  activityHeader: {
+  activityItemHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

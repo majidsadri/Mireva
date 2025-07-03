@@ -12,10 +12,10 @@ import {
   ActivityIndicator,
   Share,
   Linking,
+  Modal,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_CONFIG } from '../config';
-
 
 export default function ShopScreen() {
   const [shoppingItems, setShoppingItems] = useState([]);
@@ -24,14 +24,9 @@ export default function ShopScreen() {
   const [loading, setLoading] = useState(true);
   const [suggestionsLoading, setSuggestionsLoading] = useState(false);
   const [addingItem, setAddingItem] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
   
   const textInputRef = useRef(null);
-
-  // Debug function for text input changes
-  const handleTextChange = (text) => {
-    console.log('🔸 Text input changed:', JSON.stringify(text));
-    setNewItemText(text);
-  };
 
   useEffect(() => {
     loadShoppingList();
@@ -40,13 +35,10 @@ export default function ShopScreen() {
 
   const getUserHeaders = async () => {
     const userEmail = await AsyncStorage.getItem('userEmail');
-    console.log('User email for shopping list:', userEmail);
-    const headers = {
+    return {
       ...API_CONFIG.getHeaders(),
       ...(userEmail && { 'X-User-Email': userEmail.trim().toLowerCase() })
     };
-    console.log('Headers for shopping list request:', headers);
-    return headers;
   };
 
   const loadShoppingList = async () => {
@@ -61,12 +53,8 @@ export default function ShopScreen() {
       
       if (response.ok) {
         const data = await response.json();
-        console.log('Shopping list loaded successfully:', data);
         setShoppingItems(data.items || []);
       } else {
-        console.warn('Failed to load shopping list from backend, status:', response.status);
-        const errorText = await response.text();
-        console.warn('Error response:', errorText);
         setShoppingItems([]);
       }
     } catch (error) {
@@ -80,60 +68,468 @@ export default function ShopScreen() {
   const loadSuggestions = async () => {
     try {
       setSuggestionsLoading(true);
-      const headers = await getUserHeaders();
       
-      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SHOPPING_SUGGESTIONS}`, {
+      // Try to load suggestions from backend first (pantry-based)
+      const headers = await getUserHeaders();
+      const response = await fetch(`${API_CONFIG.BASE_URL}/pantry-suggestions`, {
         method: 'GET',
         headers,
       });
       
       if (response.ok) {
         const data = await response.json();
-        setSuggestions(data.suggestions || []);
+        const pantrySuggestions = data.suggestions || [];
+        setSuggestions(pantrySuggestions);
+        
+        // Cache in AsyncStorage for faster loading
+        await AsyncStorage.setItem('shopping_suggestions', JSON.stringify(pantrySuggestions));
       } else {
-        console.warn('Failed to load suggestions from backend');
-        setSuggestions([]);
+        // Fallback to local suggestions if backend fails
+        const localSuggestions = await AsyncStorage.getItem('shopping_suggestions');
+        if (localSuggestions) {
+          const parsedSuggestions = JSON.parse(localSuggestions);
+          setSuggestions(parsedSuggestions);
+        } else {
+          // Generate new suggestions if none exist
+          await refreshSuggestions();
+        }
       }
     } catch (error) {
       console.error('Error loading suggestions:', error);
+      // Fallback to local suggestions
+      try {
+        const localSuggestions = await AsyncStorage.getItem('shopping_suggestions');
+        if (localSuggestions) {
+          const parsedSuggestions = JSON.parse(localSuggestions);
+          setSuggestions(parsedSuggestions);
+        } else {
+          setSuggestions([]);
+        }
+      } catch (fallbackError) {
+        setSuggestions([]);
+      }
+    } finally {
+      setSuggestionsLoading(false);
+    }
+  };
+
+  const loadPantryData = async () => {
+    try {
+      const headers = await getUserHeaders();
+      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PANTRY}`, {
+        method: 'GET',
+        headers,
+      });
+      
+      if (response.ok) {
+        const pantryData = await response.json();
+        return pantryData;
+      }
+      return [];
+    } catch (error) {
+      console.log('Error loading pantry data:', error);
+      return [];
+    }
+  };
+
+  const refreshSuggestions = async () => {
+    try {
+      setSuggestionsLoading(true);
+      
+      // Get all saved recipes, user preferences, and pantry data
+      const [savedRecipesData, userPreferencesData, pantryData] = await Promise.all([
+        AsyncStorage.getItem('savedRecipes'),
+        AsyncStorage.getItem('userProfile'),
+        loadPantryData()
+      ]);
+      
+      if (!savedRecipesData) {
+        setSuggestions([]);
+        return;
+      }
+      
+      const savedRecipes = JSON.parse(savedRecipesData);
+      const userPreferences = userPreferencesData ? JSON.parse(userPreferencesData) : {};
+      const favoriteCuisines = userPreferences.cuisines || [];
+      const dietaryPreferences = userPreferences.diets || [];
+      
+      // Filter recipes from last 7 days and prioritize
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      
+      const allSuggestions = [];
+      const ingredientScores = new Map();
+      
+      // Essential pantry staples
+      const essentialStaples = [
+        { name: 'salt', category: 'Condiments', priority: 'high' },
+        { name: 'black pepper', category: 'Condiments', priority: 'high' },
+        { name: 'olive oil', category: 'Condiments', priority: 'high' },
+        { name: 'onions', category: 'Produce', priority: 'medium' },
+        { name: 'garlic', category: 'Produce', priority: 'medium' },
+        { name: 'eggs', category: 'Proteins', priority: 'medium' }
+      ];
+      
+      // Check for missing essentials
+      const pantryItemNames = Array.isArray(pantryData) ? pantryData.map(item => item.name?.toLowerCase() || '') : [];
+      const missingStaples = essentialStaples.filter(staple => {
+        const stapleName = staple.name.toLowerCase();
+        return !pantryItemNames.some(pantryItem => pantryItem.includes(stapleName));
+      });
+      
+      // Add missing staples
+      missingStaples.forEach(staple => {
+        const key = staple.name.toLowerCase();
+        let stapleScore = staple.priority === 'high' ? 8 : 6;
+        
+        ingredientScores.set(key, {
+          name: staple.name,
+          score: stapleScore,
+          category: staple.category,
+          sources: new Set(['Kitchen essential']),
+          priority: staple.priority,
+          isEssential: true
+        });
+      });
+
+      // Add expired/expiring items
+      if (Array.isArray(pantryData)) {
+        const expiredItems = pantryData.filter(item => {
+          const expiryDate = item.expiryDate ? new Date(item.expiryDate) : null;
+          const isExpired = expiryDate && expiryDate < new Date();
+          const isExpiringSoon = expiryDate && expiryDate <= new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+          return isExpired || isExpiringSoon;
+        });
+        
+        expiredItems.forEach(item => {
+          const cleanedName = item.name?.trim();
+          if (cleanedName && cleanedName.length > 2) {
+            const key = cleanedName.toLowerCase();
+            const isExpired = new Date(item.expiryDate) < new Date();
+            
+            ingredientScores.set(key, {
+              name: cleanedName,
+              score: isExpired ? 10 : 9,
+              category: item.category || 'Other',
+              sources: new Set([isExpired ? 'Expired in pantry' : 'Expiring soon']),
+              priority: 'high',
+              isExpired: true
+            });
+          }
+        });
+      }
+
+      // Process recent recipes
+      savedRecipes.forEach(recipe => {
+        const recipeDate = recipe.savedAt ? new Date(recipe.savedAt) : new Date();
+        const isRecent = recipeDate >= sevenDaysAgo;
+        
+        const ingredients = recipe.ingredients || [];
+        
+        ingredients.forEach(ingredient => {
+          const parsedIngredients = parseIngredientList(ingredient);
+          
+          parsedIngredients.forEach(cleanedName => {
+            if (cleanedName && cleanedName.length > 2) {
+              const key = cleanedName.toLowerCase();
+              
+              if (!ingredientScores.has(key)) {
+                ingredientScores.set(key, {
+                  name: cleanedName,
+                  score: 0,
+                  recipeCount: 0,
+                  category: getCategoryForIngredient(cleanedName),
+                  sources: new Set(),
+                  isRecent: false,
+                  priority: 'medium'
+                });
+              }
+              
+              const item = ingredientScores.get(key);
+              item.recipeCount += 1;
+              item.sources.add(recipe.name);
+              
+              if (isRecent) {
+                item.isRecent = true;
+                item.score += 3;
+              }
+              
+              // Check cuisine match
+              const recipeCuisines = recipe.cuisines || [];
+              const cuisineMatch = favoriteCuisines.some(cuisine => 
+                recipeCuisines.some(rc => rc.toLowerCase().includes(cuisine.toLowerCase()))
+              );
+              if (cuisineMatch) {
+                item.score += 2;
+              }
+              
+              // Base score
+              item.score += 1;
+            }
+          });
+        });
+      });
+
+      // Filter out existing shopping items
+      const existingItemNames = Array.isArray(shoppingItems) ? shoppingItems.map(item => item.name?.toLowerCase() || '') : [];
+      
+      const prioritizedIngredients = Array.from(ingredientScores.values())
+        .filter(item => {
+          const itemName = item.name.toLowerCase();
+          return !existingItemNames.some(existing => 
+            existing === itemName || existing.includes(itemName) || itemName.includes(existing)
+          );
+        })
+        .sort((a, b) => {
+          if (b.score !== a.score) return b.score - a.score;
+          if (b.recipeCount !== a.recipeCount) return b.recipeCount - a.recipeCount;
+          return a.name.localeCompare(b.name);
+        });
+
+      // Create organized suggestions with specific breakdown
+      const organizedSuggestions = [];
+      
+      // 1. Get 7 suggestions based on expired items and main ingredients from recent recipes
+      const expiredAndRecentItems = prioritizedIngredients.filter(item => 
+        item.isExpired || item.isRecent || item.isEssential
+      ).slice(0, 7);
+      organizedSuggestions.push(...expiredAndRecentItems);
+      
+      // 2. Get remaining 8 suggestions based on dietary preferences
+      const remainingItems = prioritizedIngredients.filter(item => 
+        !organizedSuggestions.includes(item)
+      );
+      
+      // Prioritize items that match user's dietary preferences
+      const dietaryItems = remainingItems.filter(item => {
+        const itemName = item.name.toLowerCase();
+        const itemCategory = item.category.toLowerCase();
+        
+        // Check if item matches dietary preferences
+        return dietaryPreferences.some(diet => {
+          const dietLower = diet.toLowerCase();
+          if (dietLower.includes('keto')) {
+            return ['proteins', 'dairy', 'condiments'].includes(itemCategory) ||
+                   ['avocado', 'cheese', 'butter', 'oil', 'eggs'].some(keyword => itemName.includes(keyword));
+          }
+          if (dietLower.includes('vegan')) {
+            return ['fruits & vegetables', 'grains & pantry', 'produce'].includes(itemCategory) &&
+                   !['dairy', 'proteins'].includes(itemCategory);
+          }
+          if (dietLower.includes('mediterranean')) {
+            return ['olive oil', 'tomato', 'garlic', 'lemon', 'herbs', 'fish'].some(keyword => itemName.includes(keyword));
+          }
+          if (dietLower.includes('vegetarian')) {
+            return !['proteins'].includes(itemCategory) || 
+                   ['eggs', 'cheese', 'milk'].some(keyword => itemName.includes(keyword));
+          }
+          return false;
+        });
+      });
+      
+      // Add dietary preference items (up to 8)
+      const dietarySelection = dietaryItems.slice(0, 8);
+      organizedSuggestions.push(...dietarySelection);
+      
+      // If we don't have enough dietary items, fill with highest scored remaining items
+      if (organizedSuggestions.length < 15) {
+        const fillItems = remainingItems
+          .filter(item => !organizedSuggestions.includes(item))
+          .slice(0, 15 - organizedSuggestions.length);
+        organizedSuggestions.push(...fillItems);
+      }
+      
+      const finalSuggestions = organizedSuggestions.slice(0, 15);
+      
+      // Debug log the suggestion breakdown
+      console.log(`📋 Smart Suggestions Breakdown:`);
+      console.log(`  - Expired/Recent/Essential: ${expiredAndRecentItems.length}`);
+      console.log(`  - Dietary Preferences: ${dietarySelection.length}`);
+      console.log(`  - Total Final: ${finalSuggestions.length}`);
+      console.log(`  - User Dietary Preferences: ${dietaryPreferences.join(', ')}`);
+
+      // Create suggestion objects with priority colors
+      const intelligentSuggestions = finalSuggestions.map((item, index) => {
+        let priority = 'medium';
+        let reason = 'From your recipes';
+        
+        if (item.isExpired) {
+          priority = 'high';
+          reason = item.sources.has('Expired in pantry') ? 'Replace expired item' : 'Replace expiring item';
+        } else if (item.isEssential) {
+          priority = item.priority;
+          reason = item.priority === 'high' ? 'Essential kitchen staple' : 'Important pantry item';
+        } else if (item.isRecent && item.recipeCount > 1) {
+          priority = 'high';
+          reason = `Used in ${item.recipeCount} recent recipes`;
+        } else if (item.isRecent) {
+          priority = 'medium';
+          reason = 'From recent recipes';
+        } else if (item.recipeCount > 2) {
+          priority = 'medium';
+          reason = `Used in ${item.recipeCount} of your recipes`;
+        }
+
+        return {
+          id: `intelligent_${Date.now()}_${index}`,
+          name: item.name,
+          reason: reason,
+          priority,
+          category: item.category,
+          score: item.score,
+          recipeCount: item.recipeCount || 1,
+          isExpired: item.isExpired || false,
+          isEssential: item.isEssential || false
+        };
+      });
+      
+      if (intelligentSuggestions.length > 0) {
+        // Save to backend for pantry-wide sharing
+        try {
+          const headers = await getUserHeaders();
+          const response = await fetch(`${API_CONFIG.BASE_URL}/pantry-suggestions`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ suggestions: intelligentSuggestions }),
+          });
+          
+          if (response.ok) {
+            console.log('Suggestions saved to backend for pantry sharing');
+          } else {
+            console.warn('Failed to save suggestions to backend, using local storage');
+          }
+        } catch (error) {
+          console.error('Error saving suggestions to backend:', error);
+        }
+        
+        // Always cache locally and update state
+        await AsyncStorage.setItem('shopping_suggestions', JSON.stringify(intelligentSuggestions));
+        setSuggestions(intelligentSuggestions);
+      } else {
+        setSuggestions([]);
+      }
+      
+    } catch (error) {
+      console.error('Error generating intelligent suggestions:', error);
       setSuggestions([]);
     } finally {
       setSuggestionsLoading(false);
     }
   };
 
+  const cleanIngredientName = (ingredient) => {
+    let cleaned = String(ingredient).trim();
+    
+    // Remove quantities and measurements
+    cleaned = cleaned.replace(/^\d+(\.\d+)?\s*/, '');
+    cleaned = cleaned.replace(/^\d*\/\d+\s*/, '');
+    cleaned = cleaned.replace(/^\d+\s+\d+\/\d+\s*/, '');
+    
+    const measurements = [
+      'cups?', 'tbsp', 'tsp', 'oz', 'lbs?', 'kg', 'g', 'ml', 'l',
+      'cloves?', 'slices?', 'pieces?', 'cans?', 'bottles?'
+    ];
+    
+    measurements.forEach(measurement => {
+      const regex = new RegExp(`\\b${measurement}\\b`, 'gi');
+      cleaned = cleaned.replace(regex, '');
+    });
+    
+    // Remove common phrases
+    cleaned = cleaned.replace(/\s*to taste\s*$/gi, '');
+    cleaned = cleaned.replace(/\s*as needed\s*$/gi, '');
+    cleaned = cleaned.replace(/\s*for seasoning\s*$/gi, '');
+    
+    return cleaned.trim();
+  };
+
+  const parseIngredientList = (ingredient) => {
+    let cleaned = cleanIngredientName(ingredient);
+    
+    // Handle compound ingredients that should be split
+    const compoundPatterns = [
+      /salt\s+and\s+pepper/gi,
+      /salt\s*&\s*pepper/gi,
+      /salt\s*,\s*pepper/gi
+    ];
+    
+    // Check if this is a compound ingredient that should be split
+    for (const pattern of compoundPatterns) {
+      if (pattern.test(cleaned)) {
+        // Return multiple ingredients
+        if (pattern.source.includes('salt') && pattern.source.includes('pepper')) {
+          return ['salt', 'black pepper'];
+        }
+      }
+    }
+    
+    // Handle other common compound ingredients
+    if (cleaned.toLowerCase().includes('oil and vinegar')) {
+      return ['olive oil', 'vinegar'];
+    }
+    
+    if (cleaned.toLowerCase().includes('flour and water')) {
+      return ['flour', 'water'];
+    }
+    
+    // Return single ingredient if no compound pattern matched
+    return [cleaned];
+  };
+
+  const getCategoryForIngredient = (ingredient) => {
+    const lowercaseName = ingredient.toLowerCase();
+    const categories = {
+      'meat': 'Proteins', 'chicken': 'Proteins', 'beef': 'Proteins', 'fish': 'Proteins',
+      'milk': 'Dairy', 'cheese': 'Dairy', 'yogurt': 'Dairy',
+      'apple': 'Fruits & Vegetables', 'banana': 'Fruits & Vegetables', 'tomato': 'Fruits & Vegetables',
+      'onion': 'Fruits & Vegetables', 'garlic': 'Fruits & Vegetables',
+      'bread': 'Grains & Pantry', 'rice': 'Grains & Pantry', 'pasta': 'Grains & Pantry',
+      'salt': 'Condiments', 'pepper': 'Condiments', 'oil': 'Condiments'
+    };
+    
+    return Object.keys(categories).find(key => lowercaseName.includes(key))
+           ? categories[Object.keys(categories).find(key => lowercaseName.includes(key))]
+           : 'Other';
+  };
+
 
   const getCategoryForItem = (itemName) => {
-    const categories = {
-      'milk': 'Dairy', 'cheese': 'Dairy', 'yogurt': 'Dairy',
-      'bread': 'Grains', 'rice': 'Grains', 'pasta': 'Grains',
-      'chicken': 'Proteins', 'beef': 'Proteins', 'eggs': 'Proteins',
-      'apple': 'Fruits', 'banana': 'Fruits', 'orange': 'Fruits'
-    };
     const lowercaseName = itemName.toLowerCase();
-    return Object.keys(categories).find(key => lowercaseName.includes(key)) ? 
-           categories[Object.keys(categories).find(key => lowercaseName.includes(key))] : 'Other';
+    const categories = {
+      'meat': 'Proteins',
+      'chicken': 'Proteins',
+      'beef': 'Proteins',
+      'fish': 'Proteins',
+      'milk': 'Dairy',
+      'cheese': 'Dairy',
+      'yogurt': 'Dairy',
+      'apple': 'Fruits & Vegetables',
+      'banana': 'Fruits & Vegetables',
+      'tomato': 'Fruits & Vegetables',
+      'onion': 'Fruits & Vegetables',
+      'bread': 'Grains & Pantry',
+      'rice': 'Grains & Pantry',
+      'pasta': 'Grains & Pantry'
+    };
+    
+    return Object.keys(categories).find(key => lowercaseName.includes(key))
+           ? categories[Object.keys(categories).find(key => lowercaseName.includes(key))]
+           : 'Other';
   };
 
   const addItem = async (itemData = null) => {
-    // Get text directly from the TextInput ref
-    const inputText = textInputRef.current?._lastNativeText || newItemText;
-    const itemName = itemData ? itemData.name : inputText.trim();
-    
-    console.log('🔹 Input text from ref:', inputText);
-    console.log('🔹 State text:', newItemText);
-    console.log('🔹 Final item name:', itemName);
+    const itemName = itemData ? itemData.name : newItemText.trim();
     
     if (!itemName) {
-      Alert.alert('Error', `Please enter an item name. Input: "${inputText}", State: "${newItemText}"`);
+      Alert.alert('Error', 'Please enter an item name.');
       return;
     }
 
     try {
       setAddingItem(true);
-      const userEmail = await AsyncStorage.getItem('userEmail');
+      const headers = await getUserHeaders();
       
-      const testItem = {
+      const newItem = {
         name: itemName,
         category: itemData ? itemData.category : getCategoryForItem(itemName),
         completed: false,
@@ -141,32 +537,26 @@ export default function ShopScreen() {
         priority: itemData ? itemData.priority : 'medium'
       };
       
-      const requestBody = JSON.stringify({ item: testItem });
+      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SHOPPING_LIST}`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ item: newItem }),
+      });
       
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', 'https://37c2-18-215-164-114.ngrok-free.app/shopping/list');
-      xhr.setRequestHeader('Content-Type', 'application/json');
-      xhr.setRequestHeader('ngrok-skip-browser-warning', 'true');
-      xhr.setRequestHeader('X-User-Email', userEmail);
-      
-      xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4) {
-          setAddingItem(false);
-          if (xhr.status === 200) {
-            if (!itemData) setNewItemText('');
-            loadShoppingList();
-            Alert.alert('Success', 'Item added to shopping list!');
-          } else {
-            Alert.alert('Error', `Failed to add item: ${xhr.status} - ${xhr.responseText}`);
-          }
+      if (response.ok) {
+        if (!itemData) {
+          setNewItemText('');
+          setShowAddModal(false);
         }
-      };
-      
-      xhr.send(requestBody);
-      
+        await loadShoppingList();
+        Alert.alert('Success', 'Item added to shopping list!');
+      } else {
+        Alert.alert('Error', 'Failed to add item');
+      }
     } catch (error) {
-      setAddingItem(false);
       Alert.alert('Error', error.message);
+    } finally {
+      setAddingItem(false);
     }
   };
 
@@ -190,7 +580,6 @@ export default function ShopScreen() {
   };
 
   const addSuggestionToList = async (suggestion) => {
-    // Check if item already exists in shopping list
     const existingItem = shoppingItems.find(item => 
       item.name.toLowerCase() === suggestion.name.toLowerCase()
     );
@@ -203,105 +592,76 @@ export default function ShopScreen() {
     await addItem(suggestion);
     
     // Remove from suggestions after adding
-    setSuggestions(suggestions.filter(s => s.id !== suggestion.id));
+    const updatedSuggestions = suggestions.filter(s => s.id !== suggestion.id);
+    setSuggestions(updatedSuggestions);
+    
+    // Update backend to remove suggestion for all pantry users
+    try {
+      const headers = await getUserHeaders();
+      const response = await fetch(`${API_CONFIG.BASE_URL}/pantry-suggestions`, {
+        method: 'DELETE',
+        headers,
+        body: JSON.stringify({ suggestionId: suggestion.id }),
+      });
+      
+      if (response.ok) {
+        console.log('Suggestion removed from backend for all pantry users');
+      } else {
+        console.warn('Failed to remove suggestion from backend');
+      }
+    } catch (error) {
+      console.error('Error removing suggestion from backend:', error);
+    }
+    
+    // Update local cache
+    try {
+      await AsyncStorage.setItem('shopping_suggestions', JSON.stringify(updatedSuggestions));
+    } catch (error) {
+      console.error('Error updating suggestions in AsyncStorage:', error);
+    }
   };
 
-  const removeSuggestion = (suggestionId) => {
-    Alert.alert(
-      'Remove Suggestion',
-      'Remove this suggestion? You can refresh to get new suggestions.',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Remove',
-          style: 'destructive',
-          onPress: () => {
-            setSuggestions(suggestions.filter(s => s.id !== suggestionId));
-          },
-        },
-      ]
-    );
-  };
-
-  const toggleCompleted = (itemId) => {
-    setShoppingItems(shoppingItems.map(item => 
-      item.id === itemId ? { ...item, completed: !item.completed } : item
-    ));
-  };
-
-  const clearCompleted = () => {
-    const completedItems = shoppingItems.filter(item => item.completed);
-    completedItems.forEach(item => deleteItem(item.id));
+  const clearAllSuggestions = async () => {
+    try {
+      // Clear from backend for all pantry users
+      const headers = await getUserHeaders();
+      const response = await fetch(`${API_CONFIG.BASE_URL}/pantry-suggestions`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ suggestions: [] }),
+      });
+      
+      if (response.ok) {
+        console.log('Suggestions cleared from backend for all pantry users');
+      } else {
+        console.warn('Failed to clear suggestions from backend');
+      }
+    } catch (error) {
+      console.error('Error clearing suggestions from backend:', error);
+    }
+    
+    // Clear local state and cache
+    setSuggestions([]);
+    await AsyncStorage.removeItem('shopping_suggestions');
   };
 
   const shareShoppingList = async () => {
-    if (shoppingItems.length === 0) {
-      Alert.alert('Empty List', 'Your shopping list is empty. Add some items first!');
-      return;
-    }
-
-    // Separate completed and pending items
-    const pendingItems = shoppingItems.filter(item => !item.completed);
-    const completedItems = shoppingItems.filter(item => item.completed);
-
-    // Create formatted text
-    let message = '🛒 My Shopping List\n\n';
-    
-    if (pendingItems.length > 0) {
-      message += `📝 To Buy (${pendingItems.length} items):\n`;
-      pendingItems.forEach((item, index) => {
-        message += `${index + 1}. ${item.name}\n`;
-      });
-      message += '\n';
-    }
-
-    if (completedItems.length > 0) {
-      message += `✅ Completed (${completedItems.length} items):\n`;
-      completedItems.forEach((item, index) => {
-        message += `${index + 1}. ${item.name}\n`;
-      });
-    }
-
-    message += '\n📱 Created with Mireva';
-
     try {
-      // Try to share via system share sheet
-      const result = await Share.share({
-        message: message,
-        title: 'My Shopping List',
+      const items = shoppingItems.map(item => `• ${item.name}`).join('\n');
+      const message = `My Shopping List:\n\n${items}`;
+      
+      await Share.share({
+        message,
+        title: 'Shopping List',
       });
-
-      if (result.action === Share.dismissedAction) {
-        // User cancelled sharing
-        return;
-      }
     } catch (error) {
-      // Fallback to SMS if sharing fails
-      Alert.alert(
-        'Share Shopping List',
-        'Would you like to send this list via text message?',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Send SMS',
-            onPress: () => {
-              const smsUrl = `sms:?body=${encodeURIComponent(message)}`;
-              Linking.openURL(smsUrl);
-            },
-          },
-        ]
-      );
+      console.error('Error sharing:', error);
     }
   };
 
-  const completedCount = shoppingItems.filter(item => item.completed).length;
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Top Cover Image */}
       <View style={styles.coverContainer}>
         <Image
           source={require('../assets/Mireva-top.png')}
@@ -310,129 +670,173 @@ export default function ShopScreen() {
         <View style={styles.coverOverlay}>
           <Text style={styles.title}>Shopping List</Text>
           <Text style={styles.subtitle}>
-            {shoppingItems.length} item{shoppingItems.length !== 1 ? 's' : ''} to buy • {completedCount} completed
+            Smart shopping • {shoppingItems.length} items
           </Text>
         </View>
       </View>
 
-
-      {/* Action Buttons */}
-      <View style={styles.actionButtons}>
-        <TouchableOpacity style={styles.actionButton} onPress={shareShoppingList}>
-          <View style={styles.actionIcon}>
-            <Text style={styles.iconText}>Share</Text>
+      <View style={styles.circularButtonsContainer}>
+        <TouchableOpacity style={styles.circularButtonWrapper} onPress={shareShoppingList}>
+          <View style={[styles.circularButton, styles.shareButton]}>
+            <Text style={styles.circularButtonText}>Share</Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton} onPress={loadSuggestions}>
-          <View style={styles.actionIcon}>
-            <Text style={styles.iconText}>Ideas</Text>
+        
+        <TouchableOpacity style={styles.circularButtonWrapper} onPress={() => setShowAddModal(true)}>
+          <View style={[styles.circularButton, styles.addButton]}>
+            <Text style={styles.circularButtonText}>Add</Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton} onPress={() => {
-          Alert.prompt(
-            'Add Item',
-            'Enter item name:',
-            [
-              { text: 'Cancel', style: 'cancel' },
-              { 
-                text: 'Add', 
-                onPress: (text) => {
-                  if (text && text.trim()) {
-                    addItem({ name: text.trim() });
-                  }
-                }
-              }
-            ]
-          );
-        }}>
-          <View style={styles.addActionIcon}>
-            <Text style={styles.iconText}>Add</Text>
+        
+        <TouchableOpacity style={styles.circularButtonWrapper} onPress={refreshSuggestions}>
+          <View style={[styles.circularButton, styles.refreshButton]}>
+            <Text style={styles.circularButtonText}>Refresh</Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton} onPress={clearCompleted}>
-          <View style={styles.actionIcon}>
-            <Text style={styles.iconText}>Clear</Text>
+        
+        <TouchableOpacity style={styles.circularButtonWrapper} onPress={clearAllSuggestions}>
+          <View style={[styles.circularButton, styles.clearButton]}>
+            <Text style={styles.circularButtonText}>Clear</Text>
           </View>
         </TouchableOpacity>
       </View>
 
-      {/* Smart Suggestions Section */}
+
       {suggestions.length > 0 && (
-        <View style={styles.suggestionsSection}>
-          <View style={styles.suggestionsHeader}>
-            <Text style={styles.suggestionsTitle}>Smart Suggestions</Text>
-            {suggestionsLoading && <ActivityIndicator size="small" color="#2D6A4F" />}
-          </View>
-          
-          <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false}
-            style={styles.suggestionsScroll}
-            contentContainerStyle={styles.suggestionsContent}
-          >
-            {suggestions.map((suggestion) => (
-              <View 
-                key={suggestion.id} 
-                style={[
-                  styles.suggestionCard,
-                  suggestion.priority === 'high' && styles.highPrioritySuggestion
-                ]}
-              >
-                <View style={styles.suggestionHeader}>
-                  <Text style={styles.suggestionName}>{suggestion.name}</Text>
-                  <TouchableOpacity 
-                    style={styles.dismissButton}
-                    onPress={() => removeSuggestion(suggestion.id)}
-                  >
-                    <Text style={styles.dismissText}>×</Text>
-                  </TouchableOpacity>
-                </View>
-                
-                <Text style={styles.suggestionReason}>{suggestion.reason}</Text>
-                <Text style={styles.suggestionCategory}>{suggestion.category}</Text>
-                
-                
-                <TouchableOpacity 
-                  style={styles.addSuggestionButton}
+        <View style={styles.suggestionsContainer}>
+          <Text style={styles.suggestionsTitle}>Smart Suggestions</Text>
+          {suggestionsLoading ? (
+            <ActivityIndicator size="small" color="#2D6A4F" />
+          ) : (
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false} 
+              style={styles.suggestionsScroll}
+              contentContainerStyle={styles.suggestionsScrollContent}
+            >
+              {suggestions.slice(0, 15).map((suggestion, index) => (
+                <TouchableOpacity
+                  key={suggestion.id}
+                  style={[
+                    styles.suggestionCard,
+                    suggestion.priority === 'high' ? styles.suggestionCardHigh :
+                    suggestion.priority === 'medium' ? styles.suggestionCardMedium :
+                    styles.suggestionCardLow
+                  ]}
                   onPress={() => addSuggestionToList(suggestion)}
                 >
-                  <Text style={styles.addSuggestionText}>+ Add</Text>
+                  <View style={styles.suggestionHeader}>
+                    <View style={[
+                      styles.priorityIndicator,
+                      suggestion.priority === 'high' ? styles.priorityIndicatorHigh :
+                      suggestion.priority === 'medium' ? styles.priorityIndicatorMedium :
+                      styles.priorityIndicatorLow
+                    ]} />
+                  </View>
+                  
+                  <Text style={styles.suggestionName}>{suggestion.name}</Text>
+                  
+                  <View style={styles.suggestionMeta}>
+                    <Text style={styles.suggestionReason}>
+                      {suggestion.reason}
+                    </Text>
+                    {suggestion.recipeCount > 1 && (
+                      <Text style={styles.recipeCount}>
+                        {suggestion.recipeCount} recipes
+                      </Text>
+                    )}
+                  </View>
+                  
+                  <View style={styles.addButton}>
+                    <Text style={styles.addButtonText}>+ Add</Text>
+                  </View>
                 </TouchableOpacity>
-              </View>
-            ))}
-          </ScrollView>
+              ))}
+            </ScrollView>
+          )}
         </View>
       )}
 
-      {/* Items Section */}
-      <View style={styles.itemsSection}>
-        <View style={styles.itemsHeader}>
-          <Text style={styles.itemsTitle}>📋 Items</Text>
-          <Text style={styles.itemsCount}>{shoppingItems.length} total</Text>
-        </View>
-
-        <ScrollView style={styles.itemsList}>
-          {shoppingItems.map((item) => (
-            <View key={item.id} style={[styles.itemRow, item.completed && styles.completedItem]}>
-              <View style={styles.itemLeft}>
-                <TouchableOpacity 
-                  style={[styles.checkbox, item.completed && styles.checkedBox]} 
-                  onPress={() => toggleCompleted(item.id)}
-                >
-                  {item.completed && <Text style={styles.checkmark}>✓</Text>}
-                </TouchableOpacity>
+      <View style={styles.listContainer}>
+        <Text style={styles.listTitle}>Your List ({shoppingItems.length})</Text>
+        {loading ? (
+          <ActivityIndicator size="large" color="#2D6A4F" style={styles.loader} />
+        ) : (
+          <ScrollView style={styles.itemsList}>
+            {shoppingItems.map((item) => (
+              <View key={item.id} style={styles.itemCard}>
                 <View style={styles.itemInfo}>
-                  <Text style={[styles.itemName, item.completed && styles.completedText]}>{item.name}</Text>
+                  <Text style={styles.itemName}>{item.name}</Text>
                   <Text style={styles.itemCategory}>{item.category}</Text>
                 </View>
+                <TouchableOpacity
+                  style={styles.deleteButton}
+                  onPress={() => deleteItem(item.id)}
+                >
+                  <Text style={styles.deleteButtonText}>✕</Text>
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity style={styles.deleteButton} onPress={() => deleteItem(item.id)}>
-                <Text style={styles.deleteButtonText}>✕</Text>
+            ))}
+            {shoppingItems.length === 0 && (
+              <Text style={styles.emptyText}>Your shopping list is empty</Text>
+            )}
+          </ScrollView>
+        )}
+      </View>
+
+      {/* Add Item Modal */}
+      <Modal
+        visible={showAddModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowAddModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Add New Item</Text>
+            
+            <TextInput
+              ref={textInputRef}
+              style={styles.modalInput}
+              placeholder="Enter item name..."
+              value={newItemText}
+              onChangeText={setNewItemText}
+              onSubmitEditing={() => {
+                addItem();
+                setShowAddModal(false);
+              }}
+              autoFocus
+            />
+            
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={styles.modalCancelButton}
+                onPress={() => {
+                  setShowAddModal(false);
+                  setNewItemText('');
+                }}
+              >
+                <Text style={styles.modalCancelText}>Cancel</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={[styles.modalAddButton, addingItem && styles.modalAddButtonDisabled]}
+                onPress={() => {
+                  addItem();
+                  setShowAddModal(false);
+                }}
+                disabled={addingItem}
+              >
+                {addingItem ? (
+                  <ActivityIndicator color="#FFFFFF" size="small" />
+                ) : (
+                  <Text style={styles.modalAddText}>Add</Text>
+                )}
               </TouchableOpacity>
             </View>
-          ))}
-        </ScrollView>
-      </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -461,302 +865,294 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  header: {
-    alignItems: 'center',
-    paddingVertical: 20,
-    paddingHorizontal: 20,
-  },
-  logo: {
-    width: 60,
-    height: 60,
-    resizeMode: 'contain',
-    marginBottom: 10,
   },
   title: {
     fontSize: 22,
     fontWeight: 'bold',
     color: '#FFFFFF',
-    marginBottom: 5,
-    textAlign: 'center',
     textShadowColor: 'rgba(0, 0, 0, 0.8)',
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 4,
   },
   subtitle: {
-    fontSize: 13,
+    fontSize: 14,
     color: '#FFFFFF',
-    textAlign: 'center',
-    fontWeight: '500',
     textShadowColor: 'rgba(0, 0, 0, 0.8)',
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 4,
   },
-  searchContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 20,
-  },
-  addItemContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  searchInput: {
-    flex: 1,
-    backgroundColor: '#fff',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    fontSize: 16,
-  },
-  addButton: {
-    backgroundColor: '#2D6A4F',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 8,
-    minWidth: 60,
-    alignItems: 'center',
-  },
-  addButtonDisabled: {
-    backgroundColor: '#CBD5E0',
-  },
-  addButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  actionButtons: {
+  circularButtonsContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     paddingHorizontal: 20,
     marginTop: 25,
     marginBottom: 25,
-    gap: 20,
+    gap: 25,
   },
-  actionButton: {
+  circularButtonWrapper: {
     alignItems: 'center',
   },
-  actionIcon: {
+  circularButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+    marginBottom: 8,
+  },
+  shareButton: {
     backgroundColor: '#2D6A4F',
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#2D6A4F',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 6,
   },
-  addActionIcon: {
-    backgroundColor: '#FF6B35', // Orange color from Mireva spectrum
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#FF6B35',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 6,
+  addButton: {
+    backgroundColor: '#FF6B35',
   },
-  iconText: {
-    color: '#FFFFFF',
+  refreshButton: {
+    backgroundColor: '#2D6A4F',
+  },
+  clearButton: {
+    backgroundColor: '#2D6A4F',
+  },
+  circularButtonText: {
     fontSize: 11,
-    fontWeight: '600',
+    color: '#FFFFFF',
+    fontWeight: 'bold',
     textAlign: 'center',
   },
-  itemsSection: {
-    flex: 1,
+  suggestionsContainer: {
+    marginHorizontal: 20,
+    marginBottom: 20,
+  },
+  suggestionsTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#1A202C',
+    marginBottom: 16,
+    letterSpacing: -0.5,
+  },
+  suggestionsScroll: {
+    marginHorizontal: -20,
+  },
+  suggestionsScrollContent: {
     paddingHorizontal: 20,
+    gap: 12,
   },
-  itemsHeader: {
+  suggestionCard: {
+    width: 140,
+    padding: 12,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 6,
+    position: 'relative',
+  },
+  suggestionCardHigh: {
+    backgroundColor: '#FFF5F5',
+    borderWidth: 2,
+    borderColor: '#FC8181',
+  },
+  suggestionCardMedium: {
+    backgroundColor: '#FFFAF0',
+    borderWidth: 2,
+    borderColor: '#F6AD55',
+  },
+  suggestionCardLow: {
+    backgroundColor: '#F0FFF4',
+    borderWidth: 2,
+    borderColor: '#68D391',
+  },
+  suggestionHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 15,
+    justifyContent: 'flex-end',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+    height: 12,
   },
-  itemsTitle: {
+  priorityIndicator: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  priorityIndicatorHigh: {
+    backgroundColor: '#E53E3E',
+  },
+  priorityIndicatorMedium: {
+    backgroundColor: '#FF8C00',
+  },
+  priorityIndicatorLow: {
+    backgroundColor: '#38A169',
+  },
+  suggestionName: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#1A202C',
+    marginBottom: 6,
+    lineHeight: 18,
+  },
+  suggestionMeta: {
+    marginBottom: 10,
+  },
+  suggestionReason: {
+    fontSize: 10,
+    color: '#718096',
+    fontWeight: '500',
+    marginBottom: 2,
+    lineHeight: 12,
+  },
+  recipeCount: {
+    fontSize: 9,
+    color: '#A0AEC0',
+    fontWeight: '600',
+  },
+  addButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FF6B35',
+  },
+  addButtonText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.3,
+  },
+  listContainer: {
+    flex: 1,
+    marginHorizontal: 20,
+  },
+  listTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#2D3748',
+    color: '#2D6A4F',
+    marginBottom: 15,
   },
-  itemsCount: {
-    fontSize: 14,
-    color: '#718096',
+  loader: {
+    marginTop: 50,
   },
   itemsList: {
     flex: 1,
   },
-  itemRow: {
+  itemCard: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    paddingHorizontal: 16,
-    paddingVertical: 15,
-    marginBottom: 10,
+    backgroundColor: '#FFFFFF',
+    padding: 15,
     borderRadius: 8,
+    marginBottom: 8,
     borderWidth: 1,
     borderColor: '#E2E8F0',
-  },
-  itemLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#E2E8F0',
-    marginRight: 15,
   },
   itemInfo: {
     flex: 1,
   },
   itemName: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: 'bold',
     color: '#2D3748',
-    marginBottom: 2,
   },
   itemCategory: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#718096',
+    marginTop: 2,
   },
   deleteButton: {
-    padding: 5,
-  },
-  deleteButtonText: {
-    fontSize: 18,
-    color: '#E53E3E',
-  },
-  completedItem: {
-    opacity: 0.6,
-  },
-  checkedBox: {
-    backgroundColor: '#2D6A4F',
-    borderColor: '#2D6A4F',
-  },
-  checkmark: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  completedText: {
-    textDecorationLine: 'line-through',
-    color: '#718096',
-  },
-  // Suggestions Section Styles
-  suggestionsSection: {
-    marginHorizontal: 20,
-    marginBottom: 20,
-  },
-  suggestionsHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    backgroundColor: '#F7FAFC',
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 15,
-  },
-  suggestionsTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2D3748',
-  },
-  suggestionsScroll: {
-    flexGrow: 0,
-  },
-  suggestionsContent: {
-    paddingRight: 20,
-  },
-  suggestionCard: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 10,
-    marginRight: 10,
-    width: 120,
     borderWidth: 1,
     borderColor: '#E2E8F0',
-    position: 'relative',
-    paddingBottom: 35, // Extra space for the add button
   },
-  highPrioritySuggestion: {
-    borderColor: '#F56565',
-    borderWidth: 2,
-    backgroundColor: '#FFF5F5',
-  },
-  suggestionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 6,
-  },
-  suggestionName: {
+  deleteButtonText: {
+    color: '#A0AEC0',
     fontSize: 12,
     fontWeight: '600',
-    color: '#2D3748',
-    flex: 1,
-    marginRight: 4,
   },
-  suggestionReason: {
-    fontSize: 10,
+  emptyText: {
+    textAlign: 'center',
     color: '#718096',
-    marginBottom: 6,
-    fontStyle: 'italic',
-    lineHeight: 12,
+    fontSize: 16,
+    marginTop: 50,
   },
-  suggestionCategory: {
-    fontSize: 9,
-    color: '#4A5568',
-    backgroundColor: '#EDF2F7',
-    paddingHorizontal: 4,
-    paddingVertical: 1,
-    borderRadius: 3,
-    alignSelf: 'flex-start',
-  },
-  priorityBadge: {
-    position: 'absolute',
-    top: -6,
-    right: -6,
-    backgroundColor: '#F56565',
-    borderRadius: 10,
-    width: 20,
-    height: 20,
-    alignItems: 'center',
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
+    alignItems: 'center',
   },
-  priorityText: {
-    fontSize: 10,
+  modalContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 24,
+    margin: 20,
+    width: '80%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 8,
   },
-  // Suggestion Action Buttons
-  dismissButton: {
-    padding: 2,
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#2D3748',
+    marginBottom: 16,
+    textAlign: 'center',
   },
-  dismissText: {
-    color: '#9CA3AF',
+  modalInput: {
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    backgroundColor: '#F7FAFC',
+    marginBottom: 20,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  modalCancelButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    alignItems: 'center',
+  },
+  modalCancelText: {
+    color: '#718096',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  modalAddButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    backgroundColor: '#FF6B35',
+    alignItems: 'center',
+  },
+  modalAddButtonDisabled: {
+    backgroundColor: '#A0AEC0',
+  },
+  modalAddText: {
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  addSuggestionButton: {
-    position: 'absolute',
-    bottom: 6,
-    left: 6,
-    right: 6,
-    backgroundColor: '#2D6A4F',
-    borderRadius: 6,
-    paddingVertical: 6,
-    alignItems: 'center',
-  },
-  addSuggestionText: {
-    color: '#FFFFFF',
-    fontSize: 10,
-    fontWeight: '600',
   },
 });

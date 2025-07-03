@@ -134,7 +134,7 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
       // First check if user already has a pantry in the backend
       const userEmail = await AsyncStorage.getItem('userEmail');
       if (userEmail) {
-        const response = await fetch('https://37c2-18-215-164-114.ngrok-free.app/get-user-pantry', {
+        const response = await fetch(`${API_CONFIG.BASE_URL}/get-user-pantry`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -202,7 +202,7 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
     try {
       const userEmail = await AsyncStorage.getItem('userEmail');
       if (userEmail) {
-        const response = await fetch('https://37c2-18-215-164-114.ngrok-free.app/get-user-pantry', {
+        const response = await fetch(`${API_CONFIG.BASE_URL}/get-user-pantry`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -227,7 +227,7 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
     try {
       const userEmail = await AsyncStorage.getItem('userEmail');
       if (userEmail) {
-        const response = await fetch('https://37c2-18-215-164-114.ngrok-free.app/update-user-preferences', {
+        const response = await fetch(`${API_CONFIG.BASE_URL}/update-user-preferences`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -285,7 +285,7 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
             setAccountActionLoading(true);
             try {
               const userEmail = await AsyncStorage.getItem('userEmail');
-              const response = await fetch('https://37c2-18-215-164-114.ngrok-free.app/suspend-account', {
+              const response = await fetch(`${API_CONFIG.BASE_URL}/suspend-account`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -344,7 +344,7 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
                     setAccountActionLoading(true);
                     try {
                       const userEmail = await AsyncStorage.getItem('userEmail');
-                      const response = await fetch('https://37c2-18-215-164-114.ngrok-free.app/delete-account', {
+                      const response = await fetch(`${API_CONFIG.BASE_URL}/delete-account`, {
                         method: 'POST',
                         headers: {
                           'Content-Type': 'application/json',
@@ -396,7 +396,7 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
         try {
           console.log(`Updating backend user pantry for ${userEmail} with pantry: ${pantryName.trim()}`);
           
-          const response = await fetch('https://37c2-18-215-164-114.ngrok-free.app/update-user-pantry', {
+          const response = await fetch(`${API_CONFIG.BASE_URL}/update-user-pantry`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -457,7 +457,7 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
               const userEmail = await AsyncStorage.getItem('userEmail');
               if (userEmail) {
                 try {
-                  const response = await fetch('https://37c2-18-215-164-114.ngrok-free.app/update-user-pantry', {
+                  const response = await fetch(`${API_CONFIG.BASE_URL}/update-user-pantry`, {
                     method: 'POST',
                     headers: {
                       'Content-Type': 'application/json',
@@ -567,7 +567,11 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
   };
 
   const loadPantryUsers = async () => {
-    if (!joinedPantry) return;
+    console.log('DEBUG: loadPantryUsers called, joinedPantry =', joinedPantry);
+    if (!joinedPantry) {
+      console.log('DEBUG: No joinedPantry, returning early');
+      return;
+    }
     
     try {
       setLoadingPantryUsers(true);
@@ -589,8 +593,10 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
         console.log('DEBUG: joinedPantry =', joinedPantry);
         console.log('DEBUG: allUsers =', Object.keys(allUsers));
         for (const [email, userData] of Object.entries(allUsers)) {
-          console.log(`DEBUG: Checking ${email}, pantryName: "${userData.pantryName}", joinedPantry: "${joinedPantry}", match: ${userData.pantryName === joinedPantry}`);
-          if (userData.pantryName === joinedPantry) {
+          const userPantryName = (userData.pantryName || '').trim();
+          const currentPantryName = (joinedPantry || '').trim();
+          console.log(`DEBUG: Checking ${email}, pantryName: "${userPantryName}", joinedPantry: "${currentPantryName}", match: ${userPantryName === currentPantryName}`);
+          if (userPantryName === currentPantryName && userPantryName !== '') {
             // Get profile image for each user
             try {
               const imageResponse = await fetch(`${API_CONFIG.BASE_URL}/get-profile-image`, {
@@ -643,6 +649,10 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
 
   const showPantryUsersHandler = () => {
     console.log('DEBUG: showPantryUsersHandler called, joinedPantry =', joinedPantry);
+    if (!joinedPantry || joinedPantry.trim() === '') {
+      Alert.alert('Please wait', 'Loading pantry information...');
+      return;
+    }
     setShowPantryUsersModal(true);
     loadPantryUsers();
   };

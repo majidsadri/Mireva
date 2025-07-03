@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 import { View, Text, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -10,13 +11,30 @@ import MirevaScreenSimple from './screens/MirevaScreenSimple';
 import ShopScreen from './screens/ShopScreen';
 import CookScreen from './screens/CookScreen';
 import LogScreen from './screens/LogScreen';
+import SavedRecipesScreen from './screens/SavedRecipesScreen';
 import MeScreen from './screens/MeScreen';
 import ChartsScreen from './screens/ChartsScreen';
 import SigninScreen from './screens/SigninScreen';
 import SignupScreen from './screens/SignupScreen';
 import ErrorBoundary from './ErrorBoundary';
+import { API_CONFIG } from './config';
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
+
+// Log Stack Navigator
+function LogStack() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Stack.Screen name="LogMain" component={LogScreen} />
+      <Stack.Screen name="SavedRecipes" component={SavedRecipesScreen} />
+    </Stack.Navigator>
+  );
+}
 
 // Import icons explicitly
 const icons = {
@@ -31,6 +49,7 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showSignup, setShowSignup] = useState(false);
+  const [userProfileImage, setUserProfileImage] = useState(null);
 
   useEffect(() => {
     checkAuthStatus();
@@ -43,6 +62,7 @@ export default function App() {
       if (userData) {
         const parsedUser = JSON.parse(userData);
         setUser(parsedUser);
+        await loadUserProfileImage(parsedUser.email);
       }
       setIsLoading(false);
     } catch (error) {
@@ -51,14 +71,42 @@ export default function App() {
     }
   };
 
-  const handleSignin = (userData) => {
-    setUser(userData);
-    setShowSignup(false);
+  const loadUserProfileImage = async (email) => {
+    try {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/get-profile-image`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true',
+        },
+        body: JSON.stringify({ email }),
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.profileImage) {
+          setUserProfileImage(data.profileImage);
+        }
+      }
+    } catch (error) {
+      console.log('Error loading user profile image:', error);
+    }
   };
 
-  const handleSignup = (userData) => {
+  const handleSignin = async (userData) => {
     setUser(userData);
     setShowSignup(false);
+    if (userData.email) {
+      await loadUserProfileImage(userData.email);
+    }
+  };
+
+  const handleSignup = async (userData) => {
+    setUser(userData);
+    setShowSignup(false);
+    if (userData.email) {
+      await loadUserProfileImage(userData.email);
+    }
   };
 
   const handleSignout = async () => {
@@ -129,7 +177,7 @@ export default function App() {
               );
             }
 
-            // Special handling for Me tab - custom person icon
+            // Special handling for Me tab - profile image or custom person icon
             if (route.name === 'Me') {
               let iconBackgroundColor = focused ? '#2D6A4F' : '#E2E8F0';
               let iconBorderColor = focused ? '#2D6A4F' : '#9CA3AF';
@@ -139,35 +187,76 @@ export default function App() {
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}>
-                  {/* Person icon - head and shoulders */}
-                  <View style={{
-                    width: 32,
-                    height: 32,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                    {/* Head */}
+                  {userProfileImage ? (
+                    // Show profile image
                     <View style={{
-                      width: 12,
-                      height: 12,
-                      borderRadius: 6,
-                      backgroundColor: iconBackgroundColor,
-                      marginBottom: 2,
-                      borderWidth: 1.5,
+                      width: 32,
+                      height: 32,
+                      borderRadius: 16,
+                      borderWidth: 2,
                       borderColor: iconBorderColor,
-                    }} />
-                    {/* Shoulders/Body */}
+                      overflow: 'hidden',
+                    }}>
+                      <Image
+                        source={{ uri: userProfileImage }}
+                        style={{
+                          width: 28,
+                          height: 28,
+                          borderRadius: 14,
+                        }}
+                      />
+                    </View>
+                  ) : user?.name ? (
+                    // Show first letter of name
                     <View style={{
-                      width: 20,
-                      height: 12,
-                      borderTopLeftRadius: 10,
-                      borderTopRightRadius: 10,
+                      width: 32,
+                      height: 32,
+                      borderRadius: 16,
                       backgroundColor: iconBackgroundColor,
-                      borderWidth: 1.5,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderWidth: 2,
                       borderColor: iconBorderColor,
-                      borderBottomWidth: 0,
-                    }} />
-                  </View>
+                    }}>
+                      <Text style={{
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                        color: focused ? '#FFFFFF' : '#6B7280',
+                      }}>
+                        {user.name.charAt(0).toUpperCase()}
+                      </Text>
+                    </View>
+                  ) : (
+                    // Default person icon
+                    <View style={{
+                      width: 32,
+                      height: 32,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                      {/* Head */}
+                      <View style={{
+                        width: 12,
+                        height: 12,
+                        borderRadius: 6,
+                        backgroundColor: iconBackgroundColor,
+                        marginBottom: 2,
+                        borderWidth: 1.5,
+                        borderColor: iconBorderColor,
+                      }} />
+                      {/* Shoulders/Body */}
+                      <View style={{
+                        width: 20,
+                        height: 12,
+                        borderTopLeftRadius: 10,
+                        borderTopRightRadius: 10,
+                        backgroundColor: iconBackgroundColor,
+                        borderWidth: 1.5,
+                        borderColor: iconBorderColor,
+                        borderBottomWidth: 0,
+                      }} />
+                    </View>
+                  )}
                 </View>
               );
             }
@@ -177,7 +266,7 @@ export default function App() {
             let iconBorderColor = focused ? '#2D6A4F' : '#9CA3AF';
             
             if (route.name === 'Shop') {
-              // Shopping basket icon
+              // Shopping cart icon
               return (
                 <View style={{
                   alignItems: 'center',
@@ -189,51 +278,69 @@ export default function App() {
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}>
-                    {/* Shopping basket */}
+                    {/* Shopping cart body */}
                     <View style={{
-                      width: 22,
-                      height: 14,
+                      width: 20,
+                      height: 12,
                       borderWidth: 1.5,
                       borderColor: iconBorderColor,
-                      borderTopLeftRadius: 4,
-                      borderTopRightRadius: 4,
+                      borderRadius: 2,
                       backgroundColor: iconBackgroundColor,
                       position: 'relative',
                     }}>
-                      {/* Basket handle */}
+                      {/* Cart handle */}
                       <View style={{
                         position: 'absolute',
-                        top: -3,
-                        left: 4,
-                        right: 4,
-                        height: 3,
+                        left: -6,
+                        top: -2,
+                        width: 6,
+                        height: 8,
                         borderWidth: 1.5,
                         borderColor: iconBorderColor,
-                        borderTopLeftRadius: 8,
-                        borderTopRightRadius: 8,
-                        borderBottomWidth: 0,
+                        borderRightWidth: 0,
+                        borderTopLeftRadius: 4,
+                        borderBottomLeftRadius: 4,
                         backgroundColor: 'transparent',
                       }} />
-                      {/* Items in basket */}
+                      {/* Items in cart */}
                       <View style={{
                         position: 'absolute',
-                        top: 3,
-                        left: 3,
-                        width: 4,
-                        height: 4,
-                        borderRadius: 2,
+                        top: 2,
+                        left: 2,
+                        width: 3,
+                        height: 3,
+                        borderRadius: 1.5,
                         backgroundColor: iconBorderColor,
                       }} />
                       <View style={{
                         position: 'absolute',
-                        top: 3,
-                        right: 3,
-                        width: 4,
-                        height: 4,
-                        borderRadius: 2,
+                        top: 2,
+                        right: 2,
+                        width: 3,
+                        height: 3,
+                        borderRadius: 1.5,
                         backgroundColor: iconBorderColor,
                       }} />
                     </View>
+                    {/* Cart wheels */}
+                    <View style={{
+                      position: 'absolute',
+                      bottom: 6,
+                      left: 8,
+                      width: 4,
+                      height: 4,
+                      borderRadius: 2,
+                      backgroundColor: iconBorderColor,
+                    }} />
+                    <View style={{
+                      position: 'absolute',
+                      bottom: 6,
+                      right: 8,
+                      width: 4,
+                      height: 4,
+                      borderRadius: 2,
+                      backgroundColor: iconBorderColor,
+                    }} />
                   </View>
                 </View>
               );
@@ -441,10 +548,10 @@ export default function App() {
         <Tab.Screen name="Mireva" component={MirevaScreen} />
         <Tab.Screen name="Shop" component={ShopScreen} />
         <Tab.Screen name="Cook" component={CookScreen} />
-        <Tab.Screen name="Log" component={LogScreen} />
+        <Tab.Screen name="Log" component={LogStack} />
         <Tab.Screen 
           name="Me" 
-          children={() => <MeScreen user={user} onSignout={handleSignout} />} 
+          children={() => <MeScreen user={user} onSignout={handleSignout} onProfileImageUpdate={setUserProfileImage} />} 
         />
         </Tab.Navigator>
       </NavigationContainer>
