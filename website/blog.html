@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIREVA Blog - Smart Pantry Tips & Insights</title>
+    <meta name="description" content="Discover tips, insights, and stories about smart pantry management, family cooking, and reducing food waste with MIREVA.">
+    
+    <link rel="icon" type="image/png" href="mireva-logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-green: #06362B;
+            --accent-green: #4FB08D;
+            --light-green: #A7D7D1;
+            --surface-green: #f0fdf4;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--surface);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+        
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary-green);
+            letter-spacing: -0.02em;
+        }
+        
+        .logo img {
+            width: 40px;
+            height: 40px;
+        }
+        
+        .back-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .back-link:hover {
+            color: var(--primary-green);
+        }
+        
+        /* Blog Section */
+        .blog-hero {
+            background: linear-gradient(135deg, #ffffff 0%, var(--surface-green) 100%);
+            padding: 80px 0 60px;
+            text-align: center;
+        }
+        
+        .blog-hero h1 {
+            font-size: clamp(36px, 5vw, 56px);
+            font-weight: 800;
+            color: var(--primary-green);
+            margin-bottom: 20px;
+            letter-spacing: -0.02em;
+        }
+        
+        .blog-hero p {
+            font-size: 20px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .blog-content {
+            padding: 80px 0;
+        }
+        
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+        
+        .blog-card {
+            background: var(--surface);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .blog-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--accent-green);
+        }
+        
+        .blog-image {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .blog-card:hover .blog-image {
+            transform: scale(1.05);
+        }
+        
+        .blog-card-content {
+            padding: 32px;
+        }
+        
+        .blog-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-green);
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        
+        .blog-excerpt {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .blog-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        
+        .blog-date {
+            font-weight: 500;
+        }
+        
+        .read-more {
+            color: var(--accent-green);
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        
+        .read-more:hover {
+            color: var(--primary-green);
+        }
+        
+        /* Modal for full-size images */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            cursor: pointer;
+        }
+        
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: var(--radius-lg);
+            cursor: default;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 40px;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+        
+        .modal-close:hover {
+            opacity: 0.7;
+        }
+        
+        /* Coming Soon Section */
+        .coming-soon {
+            background: var(--surface-green);
+            padding: 80px 0;
+            text-align: center;
+            border-radius: var(--radius-xl);
+            margin: 40px 0;
+        }
+        
+        .coming-soon h2 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-green);
+            margin-bottom: 16px;
+        }
+        
+        .coming-soon p {
+            color: var(--text-secondary);
+            font-size: 18px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--text-primary);
+            color: white;
+            padding: 60px 0 40px;
+            margin-top: 80px;
+        }
+        
+        .footer-content {
+            text-align: center;
+        }
+        
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--accent-green);
+        }
+        
+        .footer-logo img {
+            width: 32px;
+            height: 32px;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .footer-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent-green);
+        }
+        
+        .footer-bottom {
+            border-top: 1px solid #334155;
+            padding-top: 30px;
+            color: #94a3b8;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 16px;
+            }
+            
+            .gallery-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+            
+            .blog-hero {
+                padding: 60px 0 40px;
+            }
+            
+            .blog-content {
+                padding: 60px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <a href="index.html" class="logo">
+                <img src="mireva-logo.png" alt="MIREVA Logo">
+                MIREVA
+            </a>
+            <a href="index.html" class="back-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="m15 18-6-6 6-6"/>
+                </svg>
+                Back to Home
+            </a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="blog-hero">
+            <div class="container">
+                <h1>MIREVA Blog</h1>
+                <p>Discover tips, insights, and stories about smart pantry management, family cooking, and reducing food waste.</p>
+            </div>
+        </section>
+
+        <section class="blog-content">
+            <div class="container">
+                <div class="gallery-grid">
+                    <article class="blog-card" onclick="openModal('blog/blog1.png')">
+                        <img src="blog/blog1.png" alt="Smart Pantry Organization Tips" class="blog-image">
+                        <div class="blog-card-content">
+                            <h2 class="blog-title">Smart Pantry Organization for Busy Families</h2>
+                            <p class="blog-excerpt">Learn how to transform your chaotic pantry into an organized system that saves time and reduces food waste. Perfect strategies for families on the go.</p>
+                            <div class="blog-meta">
+                                <span class="blog-date">January 15, 2025</span>
+                                <a href="#" class="read-more">View Full Image</a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="blog-card" onclick="openModal('blog/blog2.png')">
+                        <img src="blog/blog2.png" alt="Family Shopping Lists Made Easy" class="blog-image">
+                        <div class="blog-card-content">
+                            <h2 class="blog-title">Creating Collaborative Shopping Lists That Work</h2>
+                            <p class="blog-excerpt">Discover how MIREVA's shared shopping lists help families coordinate grocery trips, avoid duplicate purchases, and never forget essentials again.</p>
+                            <div class="blog-meta">
+                                <span class="blog-date">January 10, 2025</span>
+                                <a href="#" class="read-more">View Full Image</a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="blog-card" onclick="openModal('blog/blog3.png')">
+                        <img src="blog/blog3.png" alt="Recipe Discovery with MIREVA" class="blog-image">
+                        <div class="blog-card-content">
+                            <h2 class="blog-title">Turn Your Pantry Into a Recipe Goldmine</h2>
+                            <p class="blog-excerpt">Never wonder "what's for dinner?" again. See how MIREVA's AI suggests delicious recipes based on ingredients you already have at home.</p>
+                            <div class="blog-meta">
+                                <span class="blog-date">January 5, 2025</span>
+                                <a href="#" class="read-more">View Full Image</a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="coming-soon">
+                    <h2>More Stories Coming Soon</h2>
+                    <p>We're working on bringing you more insights, tips, and stories about smart kitchen management. Stay tuned for updates!</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Image Modal -->
+    <div class="modal" id="imageModal" onclick="closeModal()">
+        <span class="modal-close">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="mireva-logo.png" alt="MIREVA Logo">
+                    MIREVA
+                </div>
+                <div class="footer-links">
+                    <a href="index.html">Home</a>
+                    <a href="index.html#features">Features</a>
+                    <a href="mailto:majid@mireva.life">Contact</a>
+                    <a href="privacy.html">Privacy</a>
+                    <a href="terms.html">Terms</a>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2025 MIREVA. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function openModal(imageSrc) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            modal.classList.add('active');
+            modalImg.src = imageSrc;
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('active');
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Prevent modal from closing when clicking on the image
+        document.getElementById('modalImage').addEventListener('click', function(event) {
+            event.stopPropagation();
+        });
+    </script>
+</body>
+</html>

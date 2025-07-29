@@ -1,6 +1,6 @@
-// API Configuration for Mireva App
+// API Configuration for Mireva App  
 export const API_CONFIG = {
-  BASE_URL: 'https://51e3-18-215-164-114.ngrok-free.app',
+  BASE_URL: 'https://mireva.life',
   ENDPOINTS: {
     SIGNIN: '/signin',
     SIGNUP: '/signup',
@@ -15,7 +15,13 @@ export const API_CONFIG = {
     LOG_RECIPE: '/log-recipe',
     GET_RECIPE_LOGS: '/get-recipe-logs',
     SEARCH_RECIPES: '/search-recipes',
-    UPDATE_ACCOUNT: '/update-account'
+    UPDATE_ACCOUNT: '/update-account',
+    REQUEST_PANTRY_JOIN: '/request-pantry-join',
+    GET_PANTRY_REQUESTS: '/get-pantry-requests',
+    RESPOND_PANTRY_REQUEST: '/respond-pantry-request',
+    GET_USER_REQUESTS: '/get-user-requests',
+    GET_PANTRY_OWNERSHIP: '/get-pantry-ownership',
+    SET_PANTRY_OWNER: '/set-pantry-owner'
   },
   // Default headers for all API calls
   getHeaders: () => ({

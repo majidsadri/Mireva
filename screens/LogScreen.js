@@ -50,9 +50,40 @@ export default function LogScreen({ navigation }) {
       const shoppingData = await shoppingResponse.json();
       setShoppingItems(shoppingData.items || []);
 
-      // Load saved recipes from AsyncStorage (for saved but not cooked recipes)
-      const saved = await AsyncStorage.getItem('savedRecipes');
-      const localSavedRecipes = saved ? JSON.parse(saved) : [];
+      // Load saved recipes from AsyncStorage (for saved but not cooked recipes) - user-specific
+      const userSpecificKey = `savedRecipes_${userEmail}`;
+      let saved = await AsyncStorage.getItem(userSpecificKey);
+      let localSavedRecipes = saved ? JSON.parse(saved) : [];
+
+      // One-time cleanup: Remove incorrectly migrated data for non-sizarta users
+      if (userEmail !== 'sizarta@gmail.com' && localSavedRecipes.length > 0) {
+        // Check if this looks like incorrectly migrated sizarta data
+        const hasIncorrectData = localSavedRecipes.some(recipe => 
+          recipe.savedBy === 'sizarta@gmail.com' || 
+          !recipe.savedBy || 
+          recipe.savedBy !== userEmail
+        );
+        
+        if (hasIncorrectData) {
+          await AsyncStorage.removeItem(userSpecificKey);
+          localSavedRecipes = [];
+          console.log(`Cleaned up incorrectly migrated data for user ${userEmail}`);
+        }
+      }
+
+      // Migration: Only migrate for sizarta (the original user) to prevent data leakage
+      if (localSavedRecipes.length === 0 && userEmail === 'sizarta@gmail.com') {
+        const oldSaved = await AsyncStorage.getItem('savedRecipes');
+        if (oldSaved) {
+          const oldRecipes = JSON.parse(oldSaved);
+          // Migrate old recipes to user-specific storage
+          await AsyncStorage.setItem(userSpecificKey, oldSaved);
+          localSavedRecipes = oldRecipes;
+          // Clear global storage after migration to prevent future leaks
+          await AsyncStorage.removeItem('savedRecipes');
+          console.log(`Migrated ${oldRecipes.length} recipes for user ${userEmail} and cleared global storage`);
+        }
+      }
 
       // Load logged recipes from backend (for cooked recipes)
       const loggedResponse = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.GET_RECIPE_LOGS}`, {

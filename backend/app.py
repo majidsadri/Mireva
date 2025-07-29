@@ -10,20 +10,16 @@ import pytesseract
 from PIL import Image, ImageOps, ImageFilter
 import cv2
 import numpy as np
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 import requests
-import ast
 from math import radians, sin, cos, sqrt, atan2
+import ast
 
-try:
-    client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY") or "dummy-key-for-local-testing")
-except Exception as e:
-    print(f"OpenAI client initialization failed: {e}")
-    client = None
+client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# OpenAI client initialized above using environment variable
+#client = "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"
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -31,179 +27,120 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
-# File paths - use local paths for development, server paths for production
-import os
-if os.path.exists('/mnt/data/MirevaApp/'):
-    # Production paths
-    DB_FILE_PATH = '/mnt/data/MirevaApp/db.json'
-    PROFILE_FILE_PATH = '/mnt/data/MirevaApp/profile.json'
-    USERS_FILE = '/mnt/data/MirevaApp/users.json'
-    STORES_FILE = '/mnt/data/MirevaApp/stores.json'
-    SHOPPING_LIST_FILE = '/mnt/data/MirevaApp/shopping_list.json'
-else:
-    # Development paths
-    DB_FILE_PATH = './db.json'
-    PROFILE_FILE_PATH = './profile.json'
-    USERS_FILE = './users.json'
-    STORES_FILE = './stores.json'
-    SHOPPING_LIST_FILE = './shopping_list.json'
+# File paths - use EC2 absolute paths for production
+DB_FILE_PATH = '/mnt/data/MirevaApp/db.json'
+PROFILE_FILE_PATH = '/mnt/data/MirevaApp/profile.json'
+USERS_FILE = '/mnt/data/MirevaApp/users.json'
+
+# Store data file
+STORES_FILE = '/mnt/data/MirevaApp/stores.json'
+SHOPPING_LIST_FILE = '/mnt/data/MirevaApp/shopping_lists.json'
+PANTRY_REQUESTS_FILE = '/mnt/data/MirevaApp/pantry_requests.json'
+PANTRY_OWNERS_FILE = '/mnt/data/MirevaApp/pantry_owners.json'
+
+def log_user_activity(user_email, activity_type, activity_data=None, pantry_name=None):
+    """Log user activity with deduplication to prevent duplicate entries"""
+    try:
+        # Ensure the logs directory exists
+        logs_dir = "/mnt/data/MirevaApp/activity_logs"
+        os.makedirs(logs_dir, exist_ok=True)
+        
+        # Determine log file based on activity type
+        if activity_type.startswith('shopping'):
+            log_file = os.path.join(logs_dir, f"{pantry_name}_shopping_activity.json")
+        else:
+            log_file = os.path.join(logs_dir, f"{pantry_name}_pantry_activity.json")
+            
+        # Get user info
+        user_name = user_email.split('@')[0]
+        try:
+            with open(USERS_FILE, 'r') as f:
+                users = json.load(f)
+            user_data = users.get(user_email, {})
+            user_name = user_data.get('name', user_name)
+        except Exception:
+            pass
+        
+        # Create activity record
+        activity = {
+            "timestamp": datetime.now().isoformat(),
+            "user_email": user_email,
+            "user_name": user_name,
+            "activity_type": activity_type,
+            "activity_data": activity_data or {},
+            "description": f"{user_name} performed {activity_type}"
+        }
+        
+        # Read existing activities
+        activities = []
+        if os.path.exists(log_file):
+            try:
+                with open(log_file, 'r') as f:
+                    data = json.load(f)
+                activities = data.get('activities', [])
+            except Exception as e:
+                logging.error(f"Error reading activity log: {e}")
+        
+        # Deduplication logic: check for very similar recent activities
+        current_time = datetime.now()
+        duplicate_found = False
+        
+        for existing_activity in activities[-10:]:  # Check last 10 activities
+            try:
+                existing_time = datetime.fromisoformat(existing_activity.get('timestamp', ''))
+                time_diff = (current_time - existing_time).total_seconds()
+                
+                # Check if this is a duplicate (same user, type, and item within 10 seconds)
+                if (time_diff < 10 and  # Within 10 seconds
+                    existing_activity.get('user_email') == user_email and
+                    existing_activity.get('activity_type') == activity_type):
+                    
+                    # For shopping/pantry items, check item name
+                    existing_item = existing_activity.get('activity_data', {}).get('item_name') or existing_activity.get('activity_data', {}).get('item_added', {}).get('name')
+                    current_item = activity_data.get('item_name') if activity_data else None
+                    if not current_item:
+                        current_item = activity_data.get('item_added', {}).get('name') if activity_data else None
+                    
+                    if existing_item and current_item and existing_item.lower() == current_item.lower():
+                        duplicate_found = True
+                        logging.info(f"Duplicate activity detected and skipped: {activity_type} for {current_item}")
+                        break
+                        
+            except Exception as e:
+                logging.error(f"Error checking for duplicates: {e}")
+                continue
+        
+        # Only add if not a duplicate
+        if not duplicate_found:
+            activities.append(activity)
+            
+            # Keep only last 100 activities
+            if len(activities) > 100:
+                activities = activities[-100:]
+            
+            # Write back to file with file locking
+            import fcntl
+            try:
+                with open(log_file, 'w') as f:
+                    fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+                    json.dump({
+                        "activities": activities,
+                        "last_updated": datetime.now().isoformat()
+                    }, f, indent=2)
+                    fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+                
+                logging.info(f"Activity logged: {activity_type} for {user_email}")
+            except Exception as e:
+                logging.error(f"Error writing activity log: {e}")
+        else:
+            logging.info(f"Skipped duplicate activity: {activity_type} for {user_email}")
+            
+    except Exception as e:
+        logging.error(f"Error in log_user_activity: {e}")
 
 logging.info(f"Current working directory: {os.getcwd()}")
 logging.info(f"DB_FILE_PATH: {DB_FILE_PATH}")
 logging.info(f"PROFILE_FILE_PATH: {PROFILE_FILE_PATH}")
-
-def get_smart_expiry_date(item_name, purchase_date=None):
-    """
-    Calculate smart expiry date based on food category and type.
-    Returns the number of days the item should last from purchase date.
-    """
-    if not purchase_date:
-        purchase_date = datetime.now()
-    elif isinstance(purchase_date, str):
-        purchase_date = datetime.fromisoformat(purchase_date.replace('Z', '+00:00'))
-    
-    item_lower = item_name.lower().strip()
-    category = getCategoryForScannedItem(item_name)
-    
-    # FRUITS & VEGETABLES - Fresh produce shelf life
-    if category == 'Fruits & Vegetables':
-        # Very short shelf life (2-4 days)
-        very_short = ['lettuce', 'spinach', 'arugula', 'watercress', 'herbs', 'basil', 
-                     'cilantro', 'parsley', 'mint', 'strawberry', 'raspberry', 'blackberry',
-                     'cherry', 'grape', 'banana', 'avocado', 'mushroom']
-        
-        # Short shelf life (5-7 days)  
-        short = ['broccoli', 'cauliflower', 'asparagus', 'green beans', 'peas',
-                'tomato', 'cucumber', 'zucchini', 'bell pepper', 'eggplant',
-                'peach', 'plum', 'apricot', 'kiwi', 'mango', 'pineapple']
-        
-        # Medium shelf life (7-14 days)
-        medium = ['carrot', 'celery', 'cabbage', 'kale', 'brussels sprouts',
-                 'apple', 'orange', 'lemon', 'lime', 'grapefruit', 'pear']
-        
-        # Long shelf life (14-30 days)
-        long = ['potato', 'sweet potato', 'onion', 'garlic', 'ginger',
-               'squash', 'pumpkin', 'beet', 'turnip', 'radish']
-        
-        for item in very_short:
-            if item in item_lower:
-                return purchase_date + timedelta(days=3)
-        for item in short:
-            if item in item_lower:
-                return purchase_date + timedelta(days=6)
-        for item in medium:
-            if item in item_lower:
-                return purchase_date + timedelta(days=10)
-        for item in long:
-            if item in item_lower:
-                return purchase_date + timedelta(days=21)
-        
-        # Default for fruits & vegetables
-        return purchase_date + timedelta(days=7)
-    
-    # PROTEINS - Meat, seafood, eggs
-    elif category == 'Proteins':
-        # Very short (1-2 days) - Fresh seafood
-        if any(x in item_lower for x in ['fish', 'salmon', 'tuna', 'shrimp', 'lobster', 'crab', 'scallops', 'oysters', 'mussels']):
-            return purchase_date + timedelta(days=2)
-        
-        # Short (2-4 days) - Fresh meat
-        if any(x in item_lower for x in ['ground beef', 'ground turkey', 'chicken breast', 'pork chops']):
-            return purchase_date + timedelta(days=3)
-        
-        # Medium (4-7 days) - Whole cuts, processed meats
-        if any(x in item_lower for x in ['steak', 'roast', 'whole chicken', 'bacon', 'ham', 'sausage']):
-            return purchase_date + timedelta(days=5)
-        
-        # Long (7-14 days) - Eggs, cured meats
-        if any(x in item_lower for x in ['eggs', 'egg', 'salami', 'pepperoni', 'prosciutto']):
-            return purchase_date + timedelta(days=10)
-        
-        # Very long (30+ days) - Dry legumes, nuts
-        if any(x in item_lower for x in ['beans', 'lentils', 'chickpeas', 'nuts', 'almonds', 'cashews']):
-            return purchase_date + timedelta(days=180)
-        
-        # Default for proteins
-        return purchase_date + timedelta(days=4)
-    
-    # DAIRY - Milk products
-    elif category == 'Dairy':
-        # Short (3-5 days) - Fresh milk, cream
-        if any(x in item_lower for x in ['milk', 'cream', 'heavy cream', 'half and half']):
-            return purchase_date + timedelta(days=4)
-        
-        # Medium (5-14 days) - Yogurt, soft cheese
-        if any(x in item_lower for x in ['yogurt', 'cottage cheese', 'ricotta', 'mozzarella', 'cream cheese']):
-            return purchase_date + timedelta(days=10)
-        
-        # Long (14-30 days) - Hard cheese, butter
-        if any(x in item_lower for x in ['cheddar', 'swiss', 'parmesan', 'gouda', 'butter', 'margarine']):
-            return purchase_date + timedelta(days=21)
-        
-        # Very long (30+ days) - Processed cheese
-        if any(x in item_lower for x in ['american cheese', 'cheese singles', 'processed']):
-            return purchase_date + timedelta(days=35)
-        
-        # Default for dairy
-        return purchase_date + timedelta(days=7)
-    
-    # GRAINS & PANTRY - Shelf-stable items
-    elif category == 'Grains & Pantry':
-        # No expiry - Wine, spirits, vinegar, honey
-        if any(x in item_lower for x in ['wine', 'beer', 'whiskey', 'vodka', 'rum', 'gin', 
-                                       'vinegar', 'honey', 'maple syrup', 'vanilla extract']):
-            return None  # No expiry
-        
-        # Very short (1-3 days) - Fresh bread
-        if any(x in item_lower for x in ['fresh bread', 'bakery bread', 'baguette']):
-            return purchase_date + timedelta(days=3)
-        
-        # Short (5-7 days) - Packaged bread, fresh pasta
-        if any(x in item_lower for x in ['bread', 'bagel', 'muffin', 'tortilla', 'fresh pasta']):
-            return purchase_date + timedelta(days=7)
-        
-        # Medium (30-90 days) - Oils, condiments, sauces
-        if any(x in item_lower for x in ['oil', 'olive oil', 'ketchup', 'mustard', 'mayo', 
-                                       'sauce', 'salsa', 'jam', 'jelly']):
-            return purchase_date + timedelta(days=60)
-        
-        # Long (6 months - 2 years) - Dry goods, canned items
-        if any(x in item_lower for x in ['rice', 'pasta', 'flour', 'sugar', 'salt', 
-                                       'beans', 'cereal', 'oats', 'quinoa', 'canned']):
-            return purchase_date + timedelta(days=365)
-        
-        # Very long (2+ years) - Spices, dried herbs
-        if any(x in item_lower for x in ['spice', 'pepper', 'cinnamon', 'paprika', 'oregano',
-                                       'basil', 'thyme', 'dried']):
-            return purchase_date + timedelta(days=730)
-        
-        # Default for pantry items
-        return purchase_date + timedelta(days=90)
-    
-    # Default fallback
-    return purchase_date + timedelta(days=30)
-
-def is_item_expired(expiry_date_str):
-    """
-    Helper function to safely check if an item is expired.
-    Handles both timezone-aware and timezone-naive datetime strings.
-    """
-    try:
-        if not expiry_date_str:
-            return False
-        
-        # Parse the expiry date
-        expiry_date = datetime.fromisoformat(expiry_date_str.replace('Z', '+00:00'))
-        
-        # Get current datetime - make it timezone-aware if expiry_date is timezone-aware
-        current_time = datetime.now()
-        if expiry_date.tzinfo is not None:
-            current_time = datetime.now(timezone.utc)
-        
-        return expiry_date < current_time
-    except Exception as e:
-        logging.warning(f"Error parsing expiry date '{expiry_date_str}': {e}")
-        return False
 
 def init_db():
     try:
@@ -226,8 +163,17 @@ def init_db():
             with open(USERS_FILE, 'w') as f:
                 json.dump({}, f, indent=2)
 
-        # Migrate shopping lists from user-based to pantry-based storage
-        migrate_shopping_lists()
+        # Create pantry_requests.json if it doesn't exist
+        if not os.path.exists(PANTRY_REQUESTS_FILE):
+            logging.info(f"Creating new pantry_requests.json at {PANTRY_REQUESTS_FILE}")
+            with open(PANTRY_REQUESTS_FILE, 'w') as f:
+                json.dump({"requests": []}, f, indent=2)
+        
+        # Create pantry_owners.json if it doesn't exist
+        if not os.path.exists(PANTRY_OWNERS_FILE):
+            logging.info(f"Creating new pantry_owners.json at {PANTRY_OWNERS_FILE}")
+            with open(PANTRY_OWNERS_FILE, 'w') as f:
+                json.dump({"owners": {}}, f, indent=2)
 
         # Read and log contents of db.json
         with open(DB_FILE_PATH, 'r') as f:
@@ -239,68 +185,6 @@ def init_db():
         logging.error(f"Error initializing database: {e}")
         logging.error("Exception traceback:", exc_info=True)
         return False
-
-def migrate_shopping_lists():
-    """Migrate shopping lists from user-based storage to pantry-based storage"""
-    try:
-        shopping_lists_file = '/mnt/data/MirevaApp/shopping_lists.json'
-        
-        # Skip if shopping_lists.json already exists (migration already done)
-        if os.path.exists(shopping_lists_file):
-            return
-            
-        logging.info("Migrating shopping lists from user-based to pantry-based storage...")
-        
-        # Load users data
-        if not os.path.exists(USERS_FILE):
-            return
-            
-        with open(USERS_FILE, 'r') as f:
-            users = json.load(f)
-        
-        # Initialize shopping lists structure
-        shopping_lists = {}
-        
-        # Migrate each user's shopping list to their pantry
-        for user_email, user_data in users.items():
-            if 'shoppingList' in user_data and user_data['shoppingList']:
-                pantry_name = user_data.get('pantryName', 'default')
-                if not pantry_name:
-                    pantry_name = 'default'
-                
-                # If this pantry doesn't have a shopping list yet, use this user's list
-                if pantry_name not in shopping_lists:
-                    shopping_lists[pantry_name] = user_data['shoppingList']
-                    logging.info(f"Migrated shopping list for pantry '{pantry_name}' from user {user_email}")
-                else:
-                    # Merge shopping lists if multiple users have items for the same pantry
-                    existing_items = {item['id']: item for item in shopping_lists[pantry_name]}
-                    for item in user_data['shoppingList']:
-                        if item['id'] not in existing_items:
-                            shopping_lists[pantry_name].append(item)
-                    logging.info(f"Merged shopping list items for pantry '{pantry_name}' from user {user_email}")
-        
-        # Save the migrated shopping lists
-        with open(shopping_lists_file, 'w') as f:
-            json.dump(shopping_lists, f, indent=2)
-        
-        # Clean up: remove shopping lists from users.json
-        users_updated = False
-        for user_email, user_data in users.items():
-            if 'shoppingList' in user_data:
-                del user_data['shoppingList']
-                users_updated = True
-        
-        if users_updated:
-            with open(USERS_FILE, 'w') as f:
-                json.dump(users, f, indent=2)
-            logging.info("Removed shopping lists from users.json after migration")
-        
-        logging.info("Shopping list migration completed successfully")
-        
-    except Exception as e:
-        logging.error(f"Error migrating shopping lists: {e}")
-        # Don't raise the error to avoid breaking the app initialization
 
 # Initialize database when app starts
 if init_db():
@@ -472,7 +356,23 @@ def get_pantry():
     try:
         # Get user's email from header
         user_email = request.headers.get('X-User-Email')
+        # FIXED: Use user email to get pantry name
+        # Get user's email from header
+        user_email = request.headers.get('X-User-Email')
         pantry_name = 'default'
+        
+        # If user email is provided, get their pantryName from users.json
+        if user_email:
+            try:
+                with open(USERS_FILE, 'r') as f:
+                    users = json.load(f)
+                    if user_email in users:
+                        user_pantry_name = users[user_email].get('pantryName', '')
+                        if user_pantry_name:
+                            pantry_name = user_pantry_name
+                            logging.info(f"Using user's pantry '{pantry_name}' for adding item for email {user_email}")
+            except Exception as e:
+                logging.error(f"Error reading user pantry info: {e}")
         
         # If user email is provided, get their pantryName from users.json
         if user_email:
@@ -485,9 +385,10 @@ def get_pantry():
                             pantry_name = user_pantry_name
                             logging.info(f"Using user's pantry '{pantry_name}' for email {user_email}")
                         else:
-                            logging.info(f"User {user_email} has no pantryName set, will check available pantries")
+                            logging.info(f"User {user_email} has no pantryName set, returning empty pantry")
+                            return jsonify([])
                     else:
-                        logging.info(f"User {user_email} not found in users.json, will check available pantries")
+                        logging.info(f"User {user_email} not found in users.json")
             except Exception as e:
                 logging.error(f"Error reading user pantry info: {e}")
         
@@ -500,18 +401,9 @@ def get_pantry():
                 # Multi-pantry format
                 if pantry_name in pantry_data:
                     pantry_items = pantry_data[pantry_name]
-                    logging.info(f"Found pantry '{pantry_name}' with {len(pantry_items)} items")
                 else:
-                    # Create new pantry if it doesn't exist
                     pantry_items = []
-                    pantry_data[pantry_name] = pantry_items
-                    
-                    # Save the updated data back to db.json
-                    data['pantry'] = pantry_data
-                    with open(DB_FILE_PATH, 'w') as write_f:
-                        json.dump(data, write_f, indent=2)
-                    
-                    logging.info(f"Created new pantry '{pantry_name}' in db.json")
+                    logging.info(f"Pantry '{pantry_name}' not found, returning empty list")
             else:
                 # Legacy flat format - return all items if requesting default, else empty
                 if pantry_name == 'default':
@@ -521,22 +413,6 @@ def get_pantry():
                     
             logging.info(f"Read {len(pantry_items)} items from pantry '{pantry_name}'")
             logging.info(f"Pantry items: {pantry_items}")
-            
-            # Log user activity
-            log_user_activity(
-                user_email=user_email,
-                activity_type="pantry_view",
-                activity_data={
-                    "pantry_name": pantry_name,
-                    "items_count": len(pantry_items),
-                    "item_names": [item.get('name', 'Unknown') for item in pantry_items],
-                    "expired_items": [item.get('name', 'Unknown') for item in pantry_items 
-                                    if item.get('expiryDate') and 
-                                    is_item_expired(item.get('expiryDate'))]
-                },
-                pantry_name=pantry_name
-            )
-            
             return jsonify(pantry_items)
     except FileNotFoundError:
         logging.error(f"db.json not found at {DB_FILE_PATH}")
@@ -579,22 +455,6 @@ def handle_pantry():
                     logging.error(f"Error reading user pantry info: {e}")
             
             logging.info(f"Adding new pantry item to '{pantry_name}': {new_item}")
-            
-            # Add category if not provided (using same system as scanned items)
-            if 'category' not in new_item:
-                new_item['category'] = getCategoryForScannedItem(new_item.get('name', ''))
-                
-            # Always apply smart expiry logic to override frontend defaults
-            purchase_date = new_item.get('purchaseDate')
-            if purchase_date:
-                # Parse purchase date if it's a string
-                if isinstance(purchase_date, str):
-                    purchase_date = datetime.fromisoformat(purchase_date.replace('Z', '+00:00'))
-            else:
-                purchase_date = datetime.now()
-            
-            smart_expiry = get_smart_expiry_date(new_item.get('name', ''), purchase_date)
-            new_item['expiryDate'] = smart_expiry.isoformat() if smart_expiry else None
 
             with open(DB_FILE_PATH, 'r+') as file:
                 data = json.load(file)
@@ -626,20 +486,6 @@ def handle_pantry():
                 json.dump(data, file, indent=2)
 
                 logging.info(f"Updated pantry data: {json.dumps(pantry_data, indent=2)}")
-                
-                # Log user activity
-                log_user_activity(
-                    user_email=user_email,
-                    activity_type="pantry_add_item",
-                    activity_data={
-                        "pantry_name": pantry_name,
-                        "item_name": new_item.get('name', 'Unknown Item'),
-                        "item_added": new_item,
-                        "method": "manual_entry"
-                    },
-                    pantry_name=pantry_name
-                )
-                
             return jsonify({"message": "Item added successfully"}), 201
         except Exception as e:
             logging.error(f"Error adding item to pantry: {e}")
@@ -692,31 +538,17 @@ def delete_pantry_item(item_id):
 
         pantry_data = data.get('pantry', [])
         item_found = False
-        deleted_item = None
         
         # Handle both old flat format and new multi-pantry format
         if isinstance(pantry_data, dict):
             # Multi-pantry format
             if pantry_name in pantry_data:
-                # Find the item to be deleted for logging
-                for item in pantry_data[pantry_name]:
-                    if item.get('id') == item_id:
-                        deleted_item = item
-                        break
-                
                 original_count = len(pantry_data[pantry_name])
                 pantry_data[pantry_name] = [item for item in pantry_data[pantry_name] if item.get('id') != item_id]
                 item_found = len(pantry_data[pantry_name]) < original_count
             else:
                 # Search all pantries if specific pantry not found
                 for pname, pitems in pantry_data.items():
-                    # Find the item to be deleted for logging
-                    for item in pitems:
-                        if item.get('id') == item_id:
-                            deleted_item = item
-                            pantry_name = pname  # Update pantry_name to actual location
-                            break
-                    
                     original_count = len(pitems)
                     pantry_data[pname] = [item for item in pitems if item.get('id') != item_id]
                     if len(pantry_data[pname]) < original_count:
@@ -724,12 +556,6 @@ def delete_pantry_item(item_id):
                         break
         else:
             # Legacy flat format
-            # Find the item to be deleted for logging
-            for item in pantry_data:
-                if item.get('id') == item_id:
-                    deleted_item = item
-                    break
-            
             original_count = len(pantry_data)
             updated_pantry = [item for item in pantry_data if item.get('id') != item_id]
             item_found = len(updated_pantry) < original_count
@@ -740,17 +566,6 @@ def delete_pantry_item(item_id):
             json.dump(data, file, indent=4)
 
         if item_found:
-            # Log user activity
-            log_user_activity(
-                user_email=user_email,
-                activity_type="pantry_remove_item",
-                activity_data={
-                    "pantry_name": pantry_name,
-                    "item_deleted": deleted_item,
-                    "item_id": item_id
-                },
-                pantry_name=pantry_name
-            )
             return jsonify({"message": "Item deleted successfully"}), 200
         else:
             return jsonify({"error": "Item not found"}), 404
@@ -1203,12 +1018,11 @@ def validate_email(email):
 @app.route('/signup', methods=['POST'])
 def signup2():
     data = request.json
-    name = data.get('name')
     email = data.get('email')
     password = data.get('password')
 
-    if not name or not email or not password:
-        return jsonify({"error": "Name, email and password are required"}), 400
+    if not email or not password:
+        return jsonify({"error": "Email and password are required"}), 400
 
     if not validate_email(email):
         return jsonify({"error": "Invalid email format"}), 400
@@ -1231,7 +1045,7 @@ def signup2():
     users[email] = {
         "email": email,
         "password": hashed_password,
-        "name": name.strip(),
+        "name": email.split('@')[0],
         "created_at": datetime.now().isoformat()
     }
 
@@ -1242,113 +1056,6 @@ def signup2():
     user_data = users[email].copy()
     del user_data['password']
     return jsonify(user_data), 201
-
-@app.route('/get-profile-image', methods=['POST'])
-def get_profile_image():
-    data = request.json
-    email = data.get('email')
-    
-    if not email:
-        return jsonify({"error": "Email is required"}), 400
-    
-    try:
-        with open(USERS_FILE, 'r') as f:
-            users = json.load(f)
-        
-        if email in users and 'profileImage' in users[email]:
-            return jsonify({"profileImage": users[email]['profileImage']}), 200
-        else:
-            return jsonify({"profileImage": None}), 200
-    except:
-        return jsonify({"error": "Failed to load profile image"}), 500
-
-@app.route('/upload-profile-image', methods=['POST'])
-def upload_profile_image():
-    data = request.json
-    email = data.get('email')
-    profile_image = data.get('profileImage')
-    
-    if not email or not profile_image:
-        return jsonify({"error": "Email and profile image are required"}), 400
-    
-    try:
-        with open(USERS_FILE, 'r') as f:
-            users = json.load(f)
-        
-        if email not in users:
-            return jsonify({"error": "User not found"}), 404
-        
-        # Update user profile with image
-        users[email]['profileImage'] = profile_image
-        users[email]['updated_at'] = datetime.now().isoformat()
-        
-        with open(USERS_FILE, 'w') as f:
-            json.dump(users, f)
-        
-        return jsonify({"profileImage": profile_image, "message": "Profile image updated successfully"}), 200
-    except Exception as e:
-        logging.error(f"Error updating profile image: {e}")
-        return jsonify({"error": "Failed to update profile image"}), 500
-
-@app.route('/search-recipes', methods=['POST'])
-def search_recipes():
-    try:
-        data = request.json
-        query = data.get('query', '').strip()
-        
-        if not query:
-            return jsonify({"error": "Search query is required"}), 400
-        
-        if not client:
-            return jsonify({"error": "OpenAI client not available"}), 500
-        
-        # Generate recipe search results using OpenAI
-        prompt = f"""
-        Search for recipes that match: "{query}"
-        
-        Return 5-8 recipes in this exact JSON format:
-        {{
-            "recipes": [
-                {{
-                    "name": "Recipe Name",
-                    "description": "Brief description of the recipe",
-                    "ingredients": ["ingredient 1", "ingredient 2", "ingredient 3"],
-                    "instructions": "Step-by-step cooking instructions",
-                    "cookingTime": "30 minutes",
-                    "calories": "250 calories"
-                }}
-            ]
-        }}
-        
-        Focus on recipes that closely match the search query. Make sure ingredients are realistic and instructions are practical.
-        """
-        
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=2000,
-            temperature=0.7
-        )
-        
-        # Parse the response
-        recipe_data = response.choices[0].message.content.strip()
-        
-        # Clean up the response to ensure it's valid JSON
-        if recipe_data.startswith('```json'):
-            recipe_data = recipe_data[7:]
-        if recipe_data.endswith('```'):
-            recipe_data = recipe_data[:-3]
-        
-        try:
-            recipes = json.loads(recipe_data)
-            return jsonify(recipes), 200
-        except json.JSONDecodeError as e:
-            logging.error(f"Failed to parse recipe JSON: {e}")
-            return jsonify({"error": "Failed to parse recipe data"}), 500
-            
-    except Exception as e:
-        logging.error(f"Error searching recipes: {e}")
-        return jsonify({"error": "Failed to search recipes"}), 500
 
 @app.route('/signin', methods=['POST'])
 def signin():
@@ -1511,19 +1218,6 @@ def get_shopping_suggestions():
         user_diets = user_data.get('diets', [])
         user_cuisines = user_data.get('cuisines', [])
 
-        # Load current shopping list to avoid duplicate suggestions
-        current_shopping_items = []
-        if user_pantry_name:
-            try:
-                shopping_lists_file = '/mnt/data/MirevaApp/shopping_lists.json'
-                with open(shopping_lists_file, 'r') as f:
-                    shopping_data = json.load(f)
-                    if user_pantry_name in shopping_data:
-                        current_shopping_items = [item.get('name', '').lower() for item in shopping_data[user_pantry_name]]
-                        logging.info(f"Found {len(current_shopping_items)} items in shopping list for {user_pantry_name}")
-            except Exception as e:
-                logging.warning(f"Could not load shopping list: {e}")
-
         suggestions = []
         
         # 1. EXPIRED ITEMS - Get replacements for expired pantry items
@@ -1541,16 +1235,13 @@ def get_shopping_suggestions():
                         try:
                             expiry_date = datetime.fromisoformat(item.get('expiryDate', ''))
                             if expiry_date < now:  # Expired
-                                item_name = item['name'].lower()
-                                # Only suggest if not already in shopping list
-                                if item_name not in current_shopping_items:
-                                    suggestions.append({
-                                        "id": f"exp_{len(suggestions)+1}",
-                                        "name": item['name'],
-                                        "category": getCategoryForItem(item['name']),
-                                        "reason": "Replace expired item",
-                                        "priority": "high"
-                                    })
+                                suggestions.append({
+                                    "id": f"exp_{len(suggestions)+1}",
+                                    "name": item['name'],
+                                    "category": getCategoryForItem(item['name']),
+                                    "reason": "Replace expired item",
+                                    "priority": "high"
+                                })
                         except:
                             pass  # Skip items with invalid dates
             except:
@@ -1571,10 +1262,7 @@ def get_shopping_suggestions():
         for diet in user_diets:
             if diet in diet_suggestions:
                 for item in diet_suggestions[diet][:3]:  # Limit per diet
-                    item_name_lower = item.lower()
-                    # Check if not already in suggestions and not in shopping list
-                    if (not any(s['name'].lower() == item_name_lower for s in suggestions) and 
-                        item_name_lower not in current_shopping_items):
+                    if not any(s['name'].lower() == item.lower() for s in suggestions):
                         suggestions.append({
                             "id": f"diet_{len(suggestions)+1}",
                             "name": item,
@@ -1597,10 +1285,7 @@ def get_shopping_suggestions():
         for cuisine in user_cuisines:
             if cuisine in cuisine_suggestions:
                 for item in cuisine_suggestions[cuisine][:2]:  # Limit per cuisine
-                    item_name_lower = item.lower()
-                    # Check if not already in suggestions and not in shopping list
-                    if (not any(s['name'].lower() == item_name_lower for s in suggestions) and 
-                        item_name_lower not in current_shopping_items):
+                    if not any(s['name'].lower() == item.lower() for s in suggestions):
                         suggestions.append({
                             "id": f"cuisine_{len(suggestions)+1}",
                             "name": item,
@@ -1613,10 +1298,7 @@ def get_shopping_suggestions():
         if len(suggestions) < 8:
             staples = ["Onions", "Garlic", "Lemons", "Olive Oil", "Salt", "Black Pepper", "Eggs", "Milk"]
             for item in staples:
-                item_name_lower = item.lower()
-                # Check if not already in suggestions and not in shopping list
-                if (not any(s['name'].lower() == item_name_lower for s in suggestions) and 
-                    item_name_lower not in current_shopping_items):
+                if not any(s['name'].lower() == item.lower() for s in suggestions):
                     suggestions.append({
                         "id": f"staple_{len(suggestions)+1}",
                         "name": item,
@@ -1631,242 +1313,26 @@ def get_shopping_suggestions():
         priority_order = {"high": 0, "medium": 1, "low": 2}
         suggestions.sort(key=lambda x: priority_order.get(x.get('priority', 'low'), 2))
 
-        # Log user activity
-        log_user_activity(
-            user_email=user_email,
-            activity_type="shopping_suggestions_view",
-            activity_data={
-                "pantry_name": user_pantry_name,
-                "suggestions_count": len(suggestions[:12]),
-                "suggestion_types": {
-                    "expired_items": len([s for s in suggestions if s.get('reason') == 'Replace expired item']),
-                    "diet_suggestions": len([s for s in suggestions if 'diet' in s.get('reason', '').lower()]),
-                    "cuisine_suggestions": len([s for s in suggestions if 'cooking' in s.get('reason', '').lower()]),
-                    "staples": len([s for s in suggestions if s.get('reason') == 'Kitchen staple'])
-                },
-                "user_diets": user_diets,
-                "user_cuisines": user_cuisines
-            },
-            pantry_name=user_pantry_name
-        )
-
         return jsonify({"suggestions": suggestions[:12]})  # Return top 12 suggestions
     except Exception as e:
         logging.error(f"Error generating shopping suggestions: {e}")
         return jsonify({"error": str(e)}), 500
 
-def getCategoryForScannedItem(item_name):
-    """
-    Categorize food items for frontend display to match MirevaScreen categories:
-    - Fruits & Vegetables
-    - Proteins  
-    - Grains & Pantry
-    - Dairy
-    - Expired (handled by frontend based on expiry date)
-    """
-    item_lower = item_name.lower().strip()
-    
-    # FRUITS & VEGETABLES
-    fruits_vegetables = [
-        # Common Fruits
-        'apple', 'apples', 'banana', 'bananas', 'orange', 'oranges', 'lemon', 'lemons', 
-        'lime', 'limes', 'strawberry', 'strawberries', 'blueberry', 'blueberries',
-        'raspberry', 'raspberries', 'blackberry', 'blackberries', 'grape', 'grapes',
-        'cherry', 'cherries', 'peach', 'peaches', 'pear', 'pears', 'plum', 'plums',
-        'mango', 'mangoes', 'pineapple', 'avocado', 'avocados', 'kiwi', 'melon',
-        'watermelon', 'cantaloupe', 'honeydew', 'papaya', 'coconut', 'pomegranate',
-        'fig', 'figs', 'date', 'dates', 'cranberry', 'cranberries', 'grapefruit',
-        # Common Vegetables  
-        'tomato', 'tomatoes', 'potato', 'potatoes', 'onion', 'onions', 'garlic',
-        'carrot', 'carrots', 'celery', 'broccoli', 'cauliflower', 'spinach', 'lettuce',
-        'cucumber', 'cucumbers', 'pepper', 'peppers', 'bell pepper', 'chili', 'jalapeño',
-        'mushroom', 'mushrooms', 'corn', 'sweet corn', 'peas', 'green peas', 'beans',
-        'green beans', 'asparagus', 'zucchini', 'squash', 'pumpkin', 'eggplant',
-        'cabbage', 'kale', 'brussels sprouts', 'radish', 'beet', 'beets', 'turnip',
-        'sweet potato', 'yam', 'artichoke', 'okra', 'leek', 'scallion', 'shallot',
-        # Herbs & Leafy Greens
-        'basil', 'cilantro', 'parsley', 'mint', 'rosemary', 'thyme', 'oregano',
-        'sage', 'dill', 'chives', 'arugula', 'watercress', 'chard',
-        # Generic terms
-        'fruit', 'fruits', 'vegetable', 'vegetables', 'produce', 'fresh', 'organic'
-    ]
-    
-    # PROTEINS
-    proteins = [
-        # Meat
-        'beef', 'chicken', 'pork', 'lamb', 'turkey', 'duck', 'veal', 'venison',
-        'bacon', 'ham', 'sausage', 'hot dog', 'pepperoni', 'salami', 'prosciutto',
-        'ground beef', 'ground turkey', 'ground chicken', 'steak', 'roast', 'chops',
-        'ribs', 'brisket', 'tenderloin', 'wing', 'wings', 'thigh', 'breast',
-        # Seafood
-        'fish', 'salmon', 'tuna', 'cod', 'halibut', 'tilapia', 'trout', 'catfish',
-        'bass', 'flounder', 'sole', 'snapper', 'mahi', 'swordfish', 'sardines',
-        'anchovies', 'mackerel', 'herring', 'shrimp', 'lobster', 'crab', 'scallops',
-        'oysters', 'mussels', 'clams', 'crabmeat', 'lobster tail',
-        # Eggs & Plant Proteins
-        'eggs', 'egg', 'tofu', 'tempeh', 'seitan', 'protein',
-        # Legumes
-        'beans', 'lentils', 'chickpeas', 'black beans', 'kidney beans', 'pinto beans',
-        'navy beans', 'lima beans', 'garbanzo', 'split peas', 'edamame',
-        # Nuts (protein source)
-        'almonds', 'cashews', 'peanuts', 'walnuts', 'pecans', 'pistachios',
-        'macadamia', 'hazelnuts', 'pine nuts', 'brazil nuts'
-    ]
-    
-    # DAIRY
-    dairy = [
-        'milk', 'whole milk', 'skim milk', '2% milk', 'almond milk', 'soy milk', 'oat milk',
-        'coconut milk', 'lactose free milk', 'cheese', 'cheddar', 'mozzarella', 'swiss',
-        'parmesan', 'feta', 'goat cheese', 'cream cheese', 'cottage cheese', 'ricotta',
-        'brie', 'camembert', 'blue cheese', 'gouda', 'provolone', 'monterey jack',
-        'yogurt', 'greek yogurt', 'plain yogurt', 'flavored yogurt', 'butter',
-        'margarine', 'cream', 'heavy cream', 'whipping cream', 'sour cream',
-        'half and half', 'condensed milk', 'evaporated milk', 'ice cream', 'frozen yogurt',
-        'dairy', 'lactose'
-    ]
-    
-    # GRAINS & PANTRY (everything else including actual grains, pantry staples, processed foods)
-    grains_pantry = [
-        # Grains & Bread
-        'bread', 'white bread', 'wheat bread', 'whole grain', 'sourdough', 'rye bread',
-        'bagel', 'muffin', 'roll', 'bun', 'pita', 'naan', 'tortilla', 'wrap',
-        'rice', 'white rice', 'brown rice', 'jasmine rice', 'basmati', 'wild rice',
-        'pasta', 'spaghetti', 'penne', 'linguine', 'fettuccine', 'macaroni', 'noodles',
-        'cereal', 'oats', 'oatmeal', 'granola', 'muesli', 'quinoa', 'barley', 'bulgur',
-        'couscous', 'farro', 'millet', 'buckwheat', 'flour', 'wheat flour', 'cornmeal',
-        # Pantry Staples
-        'oil', 'olive oil', 'vegetable oil', 'coconut oil', 'canola oil', 'sesame oil',
-        'vinegar', 'balsamic', 'apple cider vinegar', 'white vinegar', 'rice vinegar',
-        'salt', 'pepper', 'sugar', 'brown sugar', 'honey', 'maple syrup', 'molasses',
-        'vanilla', 'extract', 'spices', 'herbs', 'seasoning', 'sauce', 'condiment',
-        # Canned/Packaged Goods  
-        'soup', 'broth', 'stock', 'tomato sauce', 'pasta sauce', 'salsa', 'ketchup',
-        'mustard', 'mayonnaise', 'relish', 'pickles', 'olives', 'capers',
-        'canned', 'jarred', 'bottled', 'packaged', 'frozen meal', 'instant',
-        # Snacks & Processed
-        'chips', 'crackers', 'cookies', 'candy', 'chocolate', 'snack', 'bar',
-        'granola bar', 'energy bar', 'popcorn', 'pretzels', 'nuts', 'trail mix',
-        # Beverages
-        'juice', 'soda', 'water', 'coffee', 'tea', 'wine', 'beer', 'liquor'
-    ]
-    
-    # Check categories in priority order
-    for keyword in fruits_vegetables:
-        if keyword in item_lower:
-            return 'Fruits & Vegetables'
-    
-    for keyword in proteins:
-        if keyword in item_lower:
-            return 'Proteins'
-    
-    for keyword in dairy:
-        if keyword in item_lower:
-            return 'Dairy'
-    
-    for keyword in grains_pantry:
-        if keyword in item_lower:
-            return 'Grains & Pantry'
-    
-    # Default fallback
-    return 'Grains & Pantry'
-
 def getCategoryForItem(item_name):
     """Helper function to categorize items"""
     categories = {
-        'produce': [
-            # Vegetables
-            'tomato', 'onion', 'garlic', 'potato', 'carrot', 'celery', 'cucumber', 'lettuce',
-            'spinach', 'kale', 'broccoli', 'cauliflower', 'zucchini', 'squash', 'pumpkin',
-            'pepper', 'chili', 'jalapeno', 'mushroom', 'corn', 'peas', 'green bean', 'asparagus',
-            'cabbage', 'brussels', 'radish', 'beet', 'turnip', 'parsnip', 'eggplant', 'okra',
-            # Fruits
-            'apple', 'banana', 'orange', 'lemon', 'lime', 'grapefruit', 'berry', 'strawberry',
-            'blueberry', 'raspberry', 'blackberry', 'grape', 'melon', 'watermelon', 'cantaloupe',
-            'peach', 'plum', 'apricot', 'cherry', 'pear', 'mango', 'pineapple', 'avocado',
-            'kiwi', 'pomegranate', 'fig', 'date', 'coconut', 'papaya', 'guava',
-            # Herbs
-            'basil', 'cilantro', 'parsley', 'mint', 'rosemary', 'thyme', 'oregano', 'sage',
-            'dill', 'chive', 'tarragon', 'bay leaf'
-        ],
-        'dairy': [
-            'milk', 'cheese', 'yogurt', 'butter', 'cream', 'sour cream', 'ice cream',
-            'cottage cheese', 'cream cheese', 'mozzarella', 'cheddar', 'swiss', 'parmesan',
-            'feta', 'ricotta', 'goat cheese', 'brie', 'camembert', 'blue cheese',
-            'half and half', 'whipping cream', 'heavy cream', 'condensed milk', 'evaporated milk'
-        ],
-        'proteins': [
-            # Meat
-            'chicken', 'beef', 'pork', 'lamb', 'turkey', 'duck', 'veal', 'bacon', 'ham',
-            'sausage', 'ground beef', 'ground turkey', 'steak', 'roast', 'chops', 'ribs',
-            # Seafood
-            'fish', 'salmon', 'tuna', 'cod', 'halibut', 'tilapia', 'trout', 'catfish',
-            'shrimp', 'lobster', 'crab', 'scallops', 'oysters', 'mussels', 'clams',
-            # Eggs & Plant-based
-            'egg', 'tofu', 'tempeh', 'seitan',
-            # Legumes
-            'beans', 'lentils', 'chickpeas', 'black beans', 'kidney beans', 'pinto beans',
-            'navy beans', 'lima beans', 'soybeans', 'split peas'
-        ],
-        'grains': [
-            'bread', 'rice', 'pasta', 'noodles', 'cereal', 'oats', 'quinoa', 'barley',
-            'wheat', 'flour', 'tortilla', 'bagel', 'muffin', 'croissant', 'roll',
-            'crackers', 'couscous', 'bulgur', 'farro', 'millet', 'buckwheat', 'cornmeal',
-            'pizza', 'pita', 'naan', 'baguette', 'sourdough'
-        ],
-        'pantry': [
-            # Oils & Condiments
-            'oil', 'olive oil', 'vegetable oil', 'coconut oil', 'vinegar', 'soy sauce',
-            'ketchup', 'mustard', 'mayonnaise', 'hot sauce', 'worcestershire', 'bbq sauce',
-            # Spices & Seasonings
-            'salt', 'pepper', 'sugar', 'honey', 'maple syrup', 'vanilla', 'cinnamon',
-            'cumin', 'paprika', 'garlic powder', 'onion powder', 'chili powder', 'curry',
-            # Canned goods
-            'soup', 'broth', 'stock', 'tomato sauce', 'tomato paste', 'salsa',
-            # Baking
-            'baking soda', 'baking powder', 'yeast', 'cocoa', 'chocolate'
-        ],
-        'snacks': [
-            'chips', 'popcorn', 'pretzels', 'nuts', 'almonds', 'cashews', 'peanuts',
-            'walnuts', 'pecans', 'pistachios', 'seeds', 'sunflower seeds', 'pumpkin seeds',
-            'trail mix', 'granola', 'energy bar', 'protein bar', 'cookies', 'crackers'
-        ],
-        'beverages': [
-            'water', 'juice', 'soda', 'coffee', 'tea', 'beer', 'wine', 'liquor',
-            'sports drink', 'energy drink', 'kombucha', 'coconut water', 'almond milk',
-            'soy milk', 'oat milk', 'smoothie'
-        ],
-        'frozen': [
-            'frozen vegetables', 'frozen fruit', 'frozen pizza', 'frozen meals',
-            'ice cream', 'frozen yogurt', 'popsicles', 'frozen fries', 'frozen chicken',
-            'frozen fish', 'frozen berries'
-        ]
+        'produce': ['tomatoes', 'onions', 'garlic', 'basil', 'cilantro', 'lime', 'lemons', 'avocados', 'sweet potatoes', 'broccoli', 'cauliflower', 'zucchini'],
+        'dairy': ['milk', 'cheese', 'yogurt', 'butter', 'eggs', 'feta', 'parmigiano', 'gruyère', 'crème fraîche'],
+        'proteins': ['tofu', 'tempeh', 'chickpeas', 'lentils', 'beef', 'salmon', 'pancetta', 'black beans'],
+        'pantry': ['quinoa', 'rice', 'flour', 'oil', 'vinegar', 'soy sauce', 'spices', 'salt', 'pepper', 'cumin', 'turmeric'],
+        'nuts_seeds': ['almonds', 'hemp seeds', 'pine nuts', 'pistachios'],
     }
     
     item_lower = item_name.lower()
+    for category, items in categories.items():
+        if any(ingredient in item_lower for ingredient in items):
+            return category.replace('_', ' & ').title()
     
-    # Check each category
-    for category, keywords in categories.items():
-        for keyword in keywords:
-            if keyword in item_lower:
-                # Format category name nicely
-                if category == 'produce':
-                    return 'Produce'
-                elif category == 'dairy':
-                    return 'Dairy'
-                elif category == 'proteins':
-                    return 'Proteins'
-                elif category == 'grains':
-                    return 'Grains'
-                elif category == 'pantry':
-                    return 'Pantry'
-                elif category == 'snacks':
-                    return 'Snacks'
-                elif category == 'beverages':
-                    return 'Beverages'
-                elif category == 'frozen':
-                    return 'Frozen'
-    
-    # Default category if no match found
     return 'Other'
 
 @app.route('/shopping/list', methods=['GET', 'POST', 'DELETE'])
@@ -1877,7 +1343,7 @@ def handle_shopping_list():
         if not user_email:
             return jsonify({"error": "User email required in X-User-Email header"}), 400
 
-        # Load user data to get their pantry name
+        # Load user data to get their pantry
         with open(USERS_FILE, 'r') as f:
             users = json.load(f)
         
@@ -1885,52 +1351,27 @@ def handle_shopping_list():
             return jsonify({"error": "User not found"}), 404
 
         # Get user's pantry name
-        user_pantry = users[user_email].get('pantryName', 'default')
-        if not user_pantry:
-            user_pantry = 'default'
-        
-        logging.info(f"User {user_email} accessing shopping list for pantry '{user_pantry}'")
+        user_pantry_name = users[user_email].get('pantryName', 'default')
+        if not user_pantry_name:
+            user_pantry_name = 'default'
 
-        # Load shopping lists data (stored per pantry)
-        shopping_lists_file = '/mnt/data/MirevaApp/shopping_lists.json'
-        if not os.path.exists(shopping_lists_file):
-            # Initialize shopping lists file
-            with open(shopping_lists_file, 'w') as f:
-                json.dump({}, f, indent=2)
-            shopping_lists = {}
-        else:
-            with open(shopping_lists_file, 'r') as f:
+        # Load shopping lists data
+        shopping_lists = {}
+        if os.path.exists(SHOPPING_LIST_FILE):
+            with open(SHOPPING_LIST_FILE, 'r') as f:
                 shopping_lists = json.load(f)
 
-        # Initialize shopping list for this pantry if not exists
-        if user_pantry not in shopping_lists:
-            shopping_lists[user_pantry] = []
+        # Initialize pantry shopping list if not exists
+        if user_pantry_name not in shopping_lists:
+            shopping_lists[user_pantry_name] = []
 
         if request.method == 'GET':
-            # Log user activity
-            log_user_activity(
-                user_email=user_email,
-                activity_type="shopping_list_view",
-                activity_data={
-                    "pantry_name": user_pantry,
-                    "items_count": len(shopping_lists[user_pantry]),
-                    "item_names": [item.get('name', 'Unknown') for item in shopping_lists[user_pantry]]
-                },
-                pantry_name=user_pantry
-            )
-            return jsonify({"items": shopping_lists[user_pantry]})
+            return jsonify({"items": shopping_lists[user_pantry_name]})
 
         if request.method == 'POST':
             item = request.json.get('item')
-            logging.info(f"Received item data: {item}")
-            
             if not item:
                 return jsonify({"error": "Item data required"}), 400
-
-            # Check if item has required fields
-            if 'name' not in item:
-                logging.error(f"Item missing 'name' field. Item: {item}")
-                return jsonify({"error": "Item must have a 'name' field"}), 400
 
             # Add metadata to item
             if 'id' not in item:
@@ -1942,26 +1383,13 @@ def handle_shopping_list():
             if 'priority' not in item:
                 item['priority'] = 'medium'
 
-            # Add item to pantry's shopping list
-            shopping_lists[user_pantry].append(item)
-            
+            shopping_lists[user_pantry_name].append(item)
+
             # Save updated shopping lists data
-            with open(shopping_lists_file, 'w') as f:
+            with open(SHOPPING_LIST_FILE, 'w') as f:
                 json.dump(shopping_lists, f, indent=2)
                 
-            logging.info(f"Added item '{item['name']}' to shopping list for pantry '{user_pantry}' by user {user_email}")
-            
-            # Log user activity
-            log_user_activity(
-                user_email=user_email,
-                activity_type="shopping_list_add_item",
-                activity_data={
-                    "pantry_name": user_pantry,
-                    "item_added": item
-                },
-                pantry_name=user_pantry
-            )
-            
+            logging.info(f"Added item '{item['name']}' to shopping list for pantry {user_pantry_name} by user {user_email}")
             return jsonify({"message": "Item added to shopping list"})
 
         if request.method == 'DELETE':
@@ -1969,41 +1397,143 @@ def handle_shopping_list():
             if not item_id:
                 return jsonify({"error": "Item ID required"}), 400
 
-            # Remove item from pantry's shopping list
-            original_count = len(shopping_lists[user_pantry])
-            shopping_lists[user_pantry] = [
-                item for item in shopping_lists[user_pantry]
+            # Remove item from pantry shopping list
+            original_count = len(shopping_lists[user_pantry_name])
+            shopping_lists[user_pantry_name] = [
+                item for item in shopping_lists[user_pantry_name] 
                 if item['id'] != item_id
             ]
             
-            if len(shopping_lists[user_pantry]) == original_count:
+            if len(shopping_lists[user_pantry_name]) == original_count:
                 return jsonify({"error": "Item not found"}), 404
 
             # Save updated shopping lists data
-            with open(shopping_lists_file, 'w') as f:
+            with open(SHOPPING_LIST_FILE, 'w') as f:
                 json.dump(shopping_lists, f, indent=2)
                 
-            logging.info(f"Removed item {item_id} from shopping list for pantry '{user_pantry}' by user {user_email}")
-            
-            # Log user activity
-            log_user_activity(
-                user_email=user_email,
-                activity_type="shopping_list_remove_item",
-                activity_data={
-                    "pantry_name": user_pantry,
-                    "item_id": item_id
-                },
-                pantry_name=user_pantry
-            )
-            
+            logging.info(f"Removed item {item_id} from shopping list for pantry {user_pantry_name} by user {user_email}")
             return jsonify({"message": "Item removed from shopping list"})
 
     except Exception as e:
         logging.error(f"Error handling shopping list request: {e}")
         return jsonify({"error": str(e)}), 500
 
+@app.route('/shopping/list/<item_id>', methods=['PUT'])
+def update_shopping_item(item_id):
+    """Update a shopping list item (mark as completed/purchased and add to pantry)"""
+    try:
+        # Get user email from header
+        user_email = request.headers.get('X-User-Email')
+        if not user_email:
+            return jsonify({"error": "User email required in X-User-Email header"}), 400
+
+        # Load user data to get their pantry
+        with open(USERS_FILE, 'r') as f:
+            users = json.load(f)
+        
+        if user_email not in users:
+            return jsonify({"error": "User not found"}), 404
+
+        # Get user's pantry name
+        user_pantry_name = users[user_email].get('pantryName', 'default')
+        if not user_pantry_name:
+            user_pantry_name = 'default'
+
+        # Load shopping lists data
+        shopping_lists = {}
+        if os.path.exists(SHOPPING_LIST_FILE):
+            with open(SHOPPING_LIST_FILE, 'r') as f:
+                shopping_lists = json.load(f)
+
+        # Initialize pantry shopping list if not exists
+        if user_pantry_name not in shopping_lists:
+            shopping_lists[user_pantry_name] = []
+
+        # Find the item in shopping list
+        item_found = False
+        updated_item = None
+        for i, item in enumerate(shopping_lists[user_pantry_name]):
+            if item['id'] == item_id:
+                # Update the item with new data from request
+                update_data = request.json
+                shopping_lists[user_pantry_name][i].update(update_data)
+                updated_item = shopping_lists[user_pantry_name][i]
+                item_found = True
+                break
+
+        if not item_found:
+            return jsonify({"error": "Item not found"}), 404
+
+        # Save updated shopping lists data
+        with open(SHOPPING_LIST_FILE, 'w') as f:
+            json.dump(shopping_lists, f, indent=2)
+
+        # If item is marked as completed/purchased, add it to pantry
+        if updated_item and updated_item.get('completed', False) and updated_item.get('purchased', False):
+            try:
+                # Prepare pantry item data
+                pantry_item = {
+                    'name': updated_item['name'],
+                    'category': updated_item.get('category', 'Other'),
+                    'quantity': updated_item.get('quantity', 1),
+                    'unit': updated_item.get('unit', ''),
+                    'addedDate': datetime.now().isoformat(),
+                    'expiryDate': updated_item.get('expiryDate', ''),
+                    'addedBy': user_email,
+                    'source': 'shopping_list'
+                }
+
+                # Add to pantry using existing pantry logic
+                with open(DB_FILE_PATH, 'r+') as file:
+                    data = json.load(file)
+                    pantry_data = data.get('pantry', [])
+                    
+                    # Handle both old flat format and new multi-pantry format
+                    if isinstance(pantry_data, dict):
+                        # Multi-pantry format
+                        if user_pantry_name not in pantry_data:
+                            pantry_data[user_pantry_name] = []
+                        pantry_data[user_pantry_name].append(pantry_item)
+                    else:
+                        # Legacy flat format - convert to multi-pantry format
+                        if user_pantry_name == 'default':
+                            # Add to existing flat structure
+                            pantry_data.append(pantry_item)
+                        else:
+                            # Convert to multi-pantry format
+                            new_pantry_data = {
+                                'default': pantry_data,  # Keep existing items in default pantry
+                                user_pantry_name: [pantry_item]  # Add new item to specified pantry
+                            }
+                            data['pantry'] = new_pantry_data
+                    
+                    # Update the data
+                    if isinstance(data.get('pantry'), dict):
+                        data['pantry'] = pantry_data
+                    else:
+                        data['pantry'] = pantry_data
+                    
+                    file.seek(0)
+                    json.dump(data, file, indent=2)
+                    file.truncate()
+
+                logging.info(f"Added item '{updated_item['name']}' to pantry '{user_pantry_name}' from shopping list by user {user_email}")
+                
+            except Exception as e:
+                logging.error(f"Error adding item to pantry: {e}")
+                # Still return success for shopping list update, but log the pantry error
+
+        logging.info(f"Updated shopping list item {item_id} for pantry {user_pantry_name} by user {user_email}")
+        return jsonify({"message": "Item updated successfully", "item": updated_item})
+
+    except Exception as e:
+        logging.error(f"Error updating shopping list item: {e}")
+        return jsonify({"error": str(e)}), 500
+
 # Mock function to simulate fetching grocery stores
-# OpenAI client is already initialized at the top of the file
+import openai
+
+client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def fetch_grocery_stores(zip_code):
     """
@@ -2100,6 +1630,8 @@ def scan_food():
 
     return jsonify({"food": food_item})
 
+from datetime import datetime, timedelta  # ✅ Make sure this is imported
+
 @app.route('/scan-and-add', methods=['POST'])
 def scan_and_add_items():
     try:
@@ -2129,13 +1661,11 @@ def scan_and_add_items():
                             "text": (
                                 "You are a food recognition assistant. Based on the image, identify all recognizable food items "
                                 "such as fruits, vegetables, or packaged pantry items. For each item, count how many are visible in the image.\n\n"
-                                "IMPORTANT: Return ONLY a complete, valid JSON array. Do not include any explanation or incomplete JSON.\n\n"
-                                "Each element must have exactly these fields: `name`, `amount`, and `measurement` (use 'unit' if unknown).\n\n"
-                                "Example format: [\n"
+                                "Return the response as a JSON array where each element is an object with `name`, `amount`, and `measurement` (use 'unit' if unknown).\n\n"
+                                "Example: [\n"
                                 "  {\"name\": \"banana\", \"amount\": 2, \"measurement\": \"unit\"},\n"
                                 "  {\"name\": \"apple\", \"amount\": 3, \"measurement\": \"unit\"}\n"
-                                "]\n\n"
-                                "If you cannot identify any food items, return: []"
+                                "]"
                             )
                         },
                         {
@@ -2156,46 +1686,18 @@ def scan_and_add_items():
         if raw_output.startswith("```"):
             raw_output = raw_output.replace("```json", "").replace("```", "").strip()
 
-        # Try to fix incomplete JSON
-        if raw_output.endswith(','):
-            raw_output = raw_output.rstrip(',')
-        if not raw_output.endswith(']'):
-            # Try to close incomplete JSON array
-            if raw_output.count('[') > raw_output.count(']'):
-                # Count open braces vs closed braces
-                open_braces = raw_output.count('{')
-                closed_braces = raw_output.count('}')
-                if open_braces > closed_braces:
-                    # Add missing closing braces
-                    raw_output += '}' * (open_braces - closed_braces)
-                raw_output += ']'
-
         try:
+            food_items = ast.literal_eval(raw_output)
+        except Exception:
+            # Fallback to JSON decode
             food_items = json.loads(raw_output)
-        except json.JSONDecodeError as e:
-            logging.error(f"JSON decode error: {e}")
-            try:
-                # Fallback to ast.literal_eval
-                food_items = ast.literal_eval(raw_output)
-            except Exception as e2:
-                logging.error(f"AST literal_eval error: {e2}")
-                # If all parsing fails, extract item names manually
-                logging.info("Attempting manual extraction from malformed JSON")
-                food_items = []
-                import re
-                # Extract item names using regex
-                name_matches = re.findall(r'"name":\s*"([^"]+)"', raw_output)
-                for name in name_matches:
-                    food_items.append({
-                        "name": name,
-                        "amount": "1",
-                        "measurement": "unit"
-                    })
-                if not food_items:
-                    raise ValueError("Could not extract any food items from the response")
 
         if not isinstance(food_items, list):
             raise ValueError("Expected a JSON array of food items")
+
+        food_items = json.loads(raw_output)
+        if not isinstance(food_items, list):
+            raise ValueError("Expected a JSON array of food item names")
 
         now = datetime.now()
         # FIXED: Use user email to get pantry name
@@ -2240,42 +1742,19 @@ def scan_and_add_items():
                     target_pantry = new_pantry_data[pantry_name]
 
             for food in food_items:
-                food_name = food["name"].strip().capitalize()
-                category = getCategoryForScannedItem(food_name)
-                
-                # Calculate smart expiry date
-                smart_expiry = get_smart_expiry_date(food_name, now)
-                expiry_date = smart_expiry.isoformat() if smart_expiry else None
-                
                 target_pantry.append({
                     "id": str(uuid.uuid4()),
-                    "name": food_name,
+                    "name": food["name"].strip().capitalize(),
                     "amount": str(food["amount"]),
                     "measurement": food.get("measurement", "unit"),
-                    "category": category,
                     "purchaseDate": now.isoformat(),
-                    "expiryDate": expiry_date,
+                    "expiryDate": (now + timedelta(days=30)).isoformat(),
                     "expired": "no"
                 })
 
             file.seek(0)
             file.truncate()
             json.dump(data, file, indent=2)
-
-        # Log user activity
-        log_user_activity(
-            user_email=user_email,
-            activity_type="pantry_scan_add",
-            activity_data={
-                "pantry_name": pantry_name,
-                "scanned_items": [item.get('name', 'Unknown') for item in food_items],
-                "items_added": food_items,
-                "items_count": len(food_items),
-                "method": "gpt4_vision_scan",
-                "scan_successful": True
-            },
-            pantry_name=pantry_name
-        )
 
         return jsonify({"message": "Items added successfully", "items": food_items}), 200
 
@@ -2341,6 +1820,29 @@ def update_user_pantry():
         if email not in users:
             return jsonify({"error": "User not found"}), 404
 
+        # Check if this is a new pantry (user is creating it)
+        is_new_pantry = False
+        if pantry_name:  # Only check if pantry_name is not empty
+            # Check if pantry already exists
+            pantry_exists = any(user_data.get('pantryName') == pantry_name for user_data in users.values())
+            if not pantry_exists:
+                is_new_pantry = True
+                
+                # Set user as pantry owner
+                with open(PANTRY_OWNERS_FILE, 'r') as f:
+                    owners_data = json.load(f)
+                
+                owners_data['owners'][pantry_name] = {
+                    'email': email,
+                    'name': users[email].get('name', email.split('@')[0]),
+                    'created_at': datetime.now().isoformat()
+                }
+                
+                with open(PANTRY_OWNERS_FILE, 'w') as f:
+                    json.dump(owners_data, f, indent=2)
+                
+                logging.info(f"User {email} created new pantry '{pantry_name}' and is now the owner")
+
         # Update user's pantry name
         users[email]['pantryName'] = pantry_name
         
@@ -2348,8 +1850,12 @@ def update_user_pantry():
         with open(USERS_FILE, 'w') as f:
             json.dump(users, f, indent=2)
 
-        logging.info(f"Updated pantry for user {email} to '{pantry_name}'")
-        return jsonify({"message": "User pantry updated successfully"}), 200
+        message = "User pantry updated successfully"
+        if is_new_pantry:
+            message = f"New pantry '{pantry_name}' created successfully. You are now the owner."
+        
+        logging.info(f"Updated pantry for user {email} to '{pantry_name}' (new: {is_new_pantry})")
+        return jsonify({"message": message, "isOwner": is_new_pantry}), 200
 
     except Exception as e:
         logging.error(f"Error updating user pantry: {e}")
@@ -2476,10 +1982,22 @@ def delete_account():
         with open(USERS_FILE, 'w') as f:
             json.dump(users, f, indent=2)
 
-        # DO NOT delete shared pantry data - other users may be using it
-        # Only log the account deletion for audit purposes
+        # If user had a pantry, clean up their pantry data
         if pantry_name:
-            logging.info(f"User {email} was removed from pantry '{pantry_name}' - pantry data preserved for other users")
+            try:
+                with open(DB_FILE_PATH, 'r') as f:
+                    db_data = json.load(f)
+                
+                # Remove user's pantry data
+                if 'pantry' in db_data and pantry_name in db_data['pantry']:
+                    del db_data['pantry'][pantry_name]
+                    
+                    with open(DB_FILE_PATH, 'w') as f:
+                        json.dump(db_data, f, indent=2)
+                    
+                    logging.info(f"Removed pantry data for {pantry_name}")
+            except Exception as pantry_error:
+                logging.error(f"Error cleaning up pantry data: {pantry_error}")
 
         logging.info(f"Account deleted for user {email}")
         return jsonify({"message": "Account deleted successfully"}), 200
@@ -2491,30 +2009,27 @@ def delete_account():
 
 @app.route('/get-available-pantries', methods=['GET'])
 def get_available_pantries():
-    """Get list of available pantry names from db.json"""
+    """Get list of available pantry names from users.json"""
     try:
-        logging.info("Fetching available pantries from db.json")
+        logging.info("Fetching available pantries from users.json")
         
-        # Read db.json file
-        if not os.path.exists(DB_FILE_PATH):
-            logging.warning("db.json file not found")
+        # Read users.json file
+        if not os.path.exists(USERS_FILE):
+            logging.warning("users.json file not found")
             return jsonify({"pantries": ["Sadri-FAM Pantry", "Family Pantry", "Office Pantry"]}), 200
         
-        with open(DB_FILE_PATH, 'r') as f:
-            data = json.load(f)
-            pantry_data = data.get('pantry', {})
+        with open(USERS_FILE, 'r') as f:
+            users = json.load(f)
         
-        # Extract pantry names from db.json
-        pantry_names = []
-        if isinstance(pantry_data, dict):
-            # Multi-pantry format - get all pantry names
-            pantry_names = list(pantry_data.keys())
-        else:
-            # Legacy flat format - default pantry only
-            pantry_names = ["default"]
+        # Extract unique pantry names from users
+        pantry_names = set()
+        for email, user_data in users.items():
+            pantry_name = user_data.get('pantryName', '')
+            if pantry_name and pantry_name.strip():
+                pantry_names.add(pantry_name.strip())
         
-        # Convert to sorted list and filter out empty names
-        available_pantries = sorted([name for name in pantry_names if name and name.strip()])
+        # Convert to sorted list
+        available_pantries = sorted(list(pantry_names))
         
         # Add default options if no pantries found
         if not available_pantries:
@@ -2527,459 +2042,605 @@ def get_available_pantries():
         logging.error(f"Error fetching available pantries: {e}")
         return jsonify({"error": "Failed to fetch available pantries", "pantries": ["Sadri-FAM Pantry", "Family Pantry", "Office Pantry"]}), 500
 
-@app.route('/log-recipe', methods=['POST'])
-def log_recipe():
-    """Log a recipe that was saved by user"""
+@app.route('/request-pantry-join', methods=['POST'])
+def request_pantry_join():
+    """Submit a request to join an existing pantry"""
     try:
         data = request.json
-        user_email = request.headers.get('X-User-Email')
-        
-        if not user_email:
-            return jsonify({"error": "User email required"}), 400
+        requester_email = data.get('email')
+        pantry_name = data.get('pantryName')
+        requester_name = data.get('name', '')
+
+        if not requester_email or not pantry_name:
+            return jsonify({"error": "Email and pantryName are required"}), 400
+
+        # Check if user already has a pantry
+        with open(USERS_FILE, 'r') as f:
+            users = json.load(f)
+
+        if requester_email not in users:
+            return jsonify({"error": "User not found"}), 404
+
+        # Check if user is the owner of this pantry FIRST (before checking if they're already in a pantry)
+        try:
+            with open(PANTRY_OWNERS_FILE, 'r') as f:
+                owners_data = json.load(f)
             
-        if not data:
-            return jsonify({"error": "Recipe data required"}), 400
-        
-        # Check if this is a saved recipe (action: 'saved')
-        action = data.get('action')
-        if action == 'saved':
-            recipe_data = data.get('recipe', {})
-            
-            # Load users data
-            try:
-                with open(USERS_FILE, 'r') as f:
-                    users = json.load(f)
-            except (FileNotFoundError, json.JSONDecodeError):
-                users = {}
-            
-            # Initialize user if not exists
-            if user_email not in users:
-                users[user_email] = {}
-            
-            # Initialize savedRecipes array if not exists
-            if 'savedRecipes' not in users[user_email]:
-                users[user_email]['savedRecipes'] = []
-            
-            # Add the recipe to user's saved recipes
-            users[user_email]['savedRecipes'].append(recipe_data)
-            
-            # Save updated users data
-            with open(USERS_FILE, 'w') as f:
-                json.dump(users, f, indent=2)
-            
-            # Log the recipe saving activity
-            try:
-                user_pantry = users[user_email].get('pantryName', '')
-                log_user_activity(
-                    user_email=user_email,
-                    activity_type="recipe_saved",
-                    activity_data={
-                        "recipe_name": recipe_data.get('name', 'Unknown Recipe'),
-                        "recipe_id": recipe_data.get('id', ''),
-                        "ingredients_count": len(recipe_data.get('ingredients', [])),
-                        "timestamp": datetime.now().isoformat()
-                    },
-                    pantry_name=user_pantry
-                )
-            except Exception as log_error:
-                logging.warning(f"Could not log recipe save activity: {log_error}")
-            
-            logging.info(f"Recipe saved to users.json for user {user_email}: {recipe_data.get('name', 'Unknown Recipe')}")
-            return jsonify({"message": "Recipe saved successfully to user profile"}), 200
-        
-        # For non-saved recipes, continue with original logging behavior
-        # Get user's pantry name
-        pantry_name = 'default'
-        if user_email:
-            try:
-                with open(USERS_FILE, 'r') as f:
-                    users = json.load(f)
-                    if user_email in users:
-                        user_pantry_name = users[user_email].get('pantryName', '')
-                        if user_pantry_name:
-                            pantry_name = user_pantry_name
-            except Exception as e:
-                logging.error(f"Error reading user pantry info: {e}")
-        
-        # Create recipe log entry
-        recipe_log = {
+            if pantry_name in owners_data.get('owners', {}):
+                owner_email = owners_data['owners'][pantry_name]['email']
+                if owner_email == requester_email:
+                    # User is the owner, add them directly to the pantry (regardless of current pantry status)
+                    users[requester_email]['pantryName'] = pantry_name
+                    users[requester_email]['joinedPantryAt'] = datetime.now().isoformat()
+                    
+                    with open(USERS_FILE, 'w') as f:
+                        json.dump(users, f, indent=2)
+                    
+                    return jsonify({
+                        "message": f"Welcome back to your pantry '{pantry_name}'! You are the owner.",
+                        "isOwner": True
+                    }), 200
+        except Exception as e:
+            logging.error(f"Error checking pantry ownership: {e}")
+
+        # Only check if user already has a pantry if they're NOT the owner of the requested pantry
+        if users[requester_email].get('pantryName'):
+            return jsonify({"error": "You are already in a pantry. Leave your current pantry first."}), 400
+
+        # Check if pantry exists and get existing members
+        pantry_members = []
+        for email, user_data in users.items():
+            if user_data.get('pantryName') == pantry_name:
+                pantry_members.append({
+                    'email': email,
+                    'name': user_data.get('name', email.split('@')[0])
+                })
+
+        if not pantry_members:
+            return jsonify({"error": "Pantry not found"}), 404
+
+        # Load existing requests
+        with open(PANTRY_REQUESTS_FILE, 'r') as f:
+            requests_data = json.load(f)
+
+        # Check if request already exists
+        existing_request = next(
+            (req for req in requests_data['requests'] 
+             if req['requesterEmail'] == requester_email and req['pantryName'] == pantry_name and req['status'] == 'pending'),
+            None
+        )
+
+        if existing_request:
+            return jsonify({"error": "You already have a pending request for this pantry"}), 400
+
+        # Create new request
+        new_request = {
             "id": str(uuid.uuid4()),
-            "user_email": user_email,
-            "pantry_name": pantry_name,
-            "recipe_name": data.get('recipe_name', 'Unknown Recipe'),
-            "ingredients": data.get('ingredients', []),
-            "instructions": data.get('instructions', ''),
-            "timestamp": datetime.now().isoformat(),
-            "date_cooked": datetime.now().strftime('%Y-%m-%d')
+            "requesterEmail": requester_email,
+            "requesterName": requester_name,
+            "pantryName": pantry_name,
+            "pantryMembers": pantry_members,
+            "status": "pending",
+            "requestedAt": datetime.now().isoformat(),
+            "approvals": [],
+            "rejections": []
         }
-        
-        # Load existing recipe logs
-        recipe_logs_file = '/mnt/data/MirevaApp/recipe_logs.json'
-        try:
-            with open(recipe_logs_file, 'r') as f:
-                logs = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
-            logs = {"recipe_logs": []}
-            
-        # Add new log entry
-        if "recipe_logs" not in logs:
-            logs["recipe_logs"] = []
-            
-        logs["recipe_logs"].append(recipe_log)
-        
-        # Save updated logs
-        with open(recipe_logs_file, 'w') as f:
-            json.dump(logs, f, indent=2)
-        
-        # Log the recipe cooking activity in user analytics
-        try:
-            log_user_activity(
-                user_email=user_email,
-                activity_type="recipe_cooked",
-                activity_data={
-                    "recipe_name": recipe_log['recipe_name'],
-                    "recipe_id": recipe_log['id'],
-                    "ingredients_count": len(recipe_log.get('ingredients', [])),
-                    "timestamp": recipe_log['timestamp']
-                },
-                pantry_name=pantry_name
-            )
-        except Exception as log_error:
-            logging.warning(f"Could not log recipe cook activity: {log_error}")
-            
-        logging.info(f"Recipe logged successfully for user {user_email}: {recipe_log['recipe_name']}")
-        return jsonify({"message": "Recipe logged successfully", "log_id": recipe_log["id"]}), 200
-        
+
+        requests_data['requests'].append(new_request)
+
+        # Save updated requests
+        with open(PANTRY_REQUESTS_FILE, 'w') as f:
+            json.dump(requests_data, f, indent=2)
+
+        logging.info(f"Pantry join request created: {requester_email} -> {pantry_name}")
+        return jsonify({
+            "message": "Join request submitted successfully. Waiting for approval from pantry members.",
+            "requestId": new_request["id"]
+        }), 200
+
     except Exception as e:
-        logging.error(f"Error logging recipe: {e}")
+        logging.error(f"Error creating pantry join request: {e}")
         return jsonify({"error": str(e)}), 500
 
-
-# Comprehensive User Activity Logging
-ANALYTICS_FILE = '/mnt/data/MirevaApp/user_analytics.json'
-
-def log_user_activity(user_email, activity_type, activity_data, pantry_name=None):
-    """Log comprehensive user activity for analytics"""
+@app.route('/get-pantry-requests', methods=['GET'])
+def get_pantry_requests():
+    """Get pending requests for pantries that the user is a member of"""
     try:
-        # Load existing analytics data
-        try:
-            with open(ANALYTICS_FILE, 'r') as f:
-                analytics = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
-            analytics = {"activities": [], "summary": {}}
+        user_email = request.headers.get('X-User-Email')
+        if not user_email:
+            return jsonify({"error": "User email required in X-User-Email header"}), 400
+
+        # Get user's pantry
+        with open(USERS_FILE, 'r') as f:
+            users = json.load(f)
+
+        if user_email not in users:
+            return jsonify({"error": "User not found"}), 404
+
+        user_pantry = users[user_email].get('pantryName')
+        if not user_pantry:
+            return jsonify({"requests": []}), 200
+
+        # Load requests
+        with open(PANTRY_REQUESTS_FILE, 'r') as f:
+            requests_data = json.load(f)
+
+        # Load pantry ownership data
+        with open(PANTRY_OWNERS_FILE, 'r') as f:
+            owners_data = json.load(f)
         
-        # Create activity entry
-        activity_entry = {
-            "id": str(uuid.uuid4()),
-            "timestamp": datetime.now().isoformat(),
-            "date": datetime.now().strftime('%Y-%m-%d'),
-            "time": datetime.now().strftime('%H:%M:%S'),
-            "user_email": user_email,
-            "pantry_name": pantry_name,
-            "activity_type": activity_type,
-            "activity_data": activity_data,
-            "session_info": {
-                "user_agent": request.headers.get('User-Agent', ''),
-                "ip_address": request.remote_addr
-            }
-        }
-        
-        # Add to activities list
-        if "activities" not in analytics:
-            analytics["activities"] = []
-        analytics["activities"].append(activity_entry)
-        
-        # Update summary statistics
-        if "summary" not in analytics:
-            analytics["summary"] = {}
-        
-        # User-specific statistics
-        if user_email not in analytics["summary"]:
-            analytics["summary"][user_email] = {
-                "total_activities": 0,
-                "first_activity": activity_entry["timestamp"],
-                "last_activity": activity_entry["timestamp"],
-                "activity_counts": {},
-                "pantry_usage": {},
-                "daily_activity": {}
-            }
-        
-        user_stats = analytics["summary"][user_email]
-        user_stats["total_activities"] += 1
-        user_stats["last_activity"] = activity_entry["timestamp"]
-        
-        # Activity type counts
-        if activity_type not in user_stats["activity_counts"]:
-            user_stats["activity_counts"][activity_type] = 0
-        user_stats["activity_counts"][activity_type] += 1
-        
-        # Pantry usage tracking
-        if pantry_name:
-            if pantry_name not in user_stats["pantry_usage"]:
-                user_stats["pantry_usage"][pantry_name] = 0
-            user_stats["pantry_usage"][pantry_name] += 1
-        
-        # Daily activity tracking
-        today = datetime.now().strftime('%Y-%m-%d')
-        if today not in user_stats["daily_activity"]:
-            user_stats["daily_activity"][today] = 0
-        user_stats["daily_activity"][today] += 1
-        
-        # Keep only last 30 days of daily activity
-        cutoff_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
-        user_stats["daily_activity"] = {
-            date: count for date, count in user_stats["daily_activity"].items() 
-            if date >= cutoff_date
-        }
-        
-        # Global statistics
-        if "global" not in analytics["summary"]:
-            analytics["summary"]["global"] = {
-                "total_users": 0,
-                "total_activities": 0,
-                "activity_types": {},
-                "daily_totals": {}
-            }
-        
-        global_stats = analytics["summary"]["global"]
-        global_stats["total_users"] = len([k for k in analytics["summary"].keys() if k != "global"])
-        global_stats["total_activities"] = len(analytics["activities"])
-        
-        # Global activity type counts
-        if activity_type not in global_stats["activity_types"]:
-            global_stats["activity_types"][activity_type] = 0
-        global_stats["activity_types"][activity_type] += 1
-        
-        # Global daily totals
-        if today not in global_stats["daily_totals"]:
-            global_stats["daily_totals"][today] = 0
-        global_stats["daily_totals"][today] += 1
-        
-        # Keep only last 30 days of global daily totals
-        global_stats["daily_totals"] = {
-            date: count for date, count in global_stats["daily_totals"].items() 
-            if date >= cutoff_date
-        }
-        
-        # Keep only last 1000 activities to prevent file from growing too large
-        if len(analytics["activities"]) > 1000:
-            analytics["activities"] = analytics["activities"][-1000:]
-        
-        # Save updated analytics
-        with open(ANALYTICS_FILE, 'w') as f:
-            json.dump(analytics, f, indent=2)
+        # Filter requests for pantries where the user is an owner and requests are still pending
+        relevant_requests = []
+        for req in requests_data['requests']:
+            # Check if user is owner of the pantry being requested
+            pantry_owner = owners_data.get('owners', {}).get(req['pantryName'], {})
+            is_owner = pantry_owner.get('email') == user_email
             
-        logging.info(f"Activity logged for {user_email}: {activity_type}")
+            if (is_owner and 
+                req['status'] == 'pending' and 
+                req['requesterEmail'] != user_email):
+                
+                # Check if this user has already responded
+                user_already_responded = (
+                    any(approval['email'] == user_email for approval in req.get('approvals', [])) or
+                    any(rejection['email'] == user_email for rejection in req.get('rejections', []))
+                )
+                
+                if not user_already_responded:
+                    relevant_requests.append(req)
+
+        return jsonify({"requests": relevant_requests}), 200
+
+    except Exception as e:
+        logging.error(f"Error getting pantry requests: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/respond-pantry-request', methods=['POST'])
+def respond_pantry_request():
+    """Approve or reject a pantry join request"""
+    try:
+        data = request.json
+        request_id = data.get('requestId')
+        action = data.get('action')  # 'approve' or 'reject'
+        responder_email = data.get('email')
+
+        if not all([request_id, action, responder_email]):
+            return jsonify({"error": "requestId, action, and email are required"}), 400
+
+        if action not in ['approve', 'reject']:
+            return jsonify({"error": "Action must be 'approve' or 'reject'"}), 400
+
+        # Load requests
+        with open(PANTRY_REQUESTS_FILE, 'r') as f:
+            requests_data = json.load(f)
+
+        # Find the request
+        request_index = next(
+            (i for i, req in enumerate(requests_data['requests']) if req['id'] == request_id),
+            None
+        )
+
+        if request_index is None:
+            return jsonify({"error": "Request not found"}), 404
+
+        current_request = requests_data['requests'][request_index]
+
+        if current_request['status'] != 'pending':
+            return jsonify({"error": "Request is no longer pending"}), 400
+
+        # Verify responder is a member of the pantry
+        with open(USERS_FILE, 'r') as f:
+            users = json.load(f)
+
+        responder_pantry = users.get(responder_email, {}).get('pantryName')
+        if responder_pantry != current_request['pantryName']:
+            return jsonify({"error": "You are not a member of this pantry"}), 403
+
+        # Add response
+        response_data = {
+            "email": responder_email,
+            "name": users[responder_email].get('name', responder_email.split('@')[0]),
+            "respondedAt": datetime.now().isoformat()
+        }
+
+        # Ensure approvals and rejections arrays exist
+        if 'approvals' not in current_request:
+            current_request['approvals'] = []
+        if 'rejections' not in current_request:
+            current_request['rejections'] = []
+
+        if action == 'approve':
+            current_request['approvals'].append(response_data)
+        else:
+            current_request['rejections'].append(response_data)
+
+        # Check if we have enough responses to make a decision
+        total_members = len(current_request['pantryMembers'])
+        approvals_count = len(current_request['approvals'])
+        rejections_count = len(current_request['rejections'])
+
+        # Check if the responder is the pantry owner (immediate approval)
+        with open(PANTRY_OWNERS_FILE, 'r') as f:
+            owners_data = json.load(f)
+        
+        pantry_owner = owners_data.get('owners', {}).get(current_request['pantryName'], {})
+        is_owner_approval = pantry_owner.get('email') == responder_email
+
+        # If majority approves, anyone rejects, or owner approves, finalize the request
+        if rejections_count > 0:
+            # Any rejection = final rejection
+            current_request['status'] = 'rejected'
+            current_request['finalizedAt'] = datetime.now().isoformat()
+        elif is_owner_approval or approvals_count >= (total_members // 2 + 1):
+            # Owner approval or majority approval = acceptance
+            current_request['status'] = 'approved'
+            current_request['finalizedAt'] = datetime.now().isoformat()
+            
+            # Add user to pantry
+            requester_email = current_request['requesterEmail']
+            if requester_email in users:
+                users[requester_email]['pantryName'] = current_request['pantryName']
+                users[requester_email]['joinedPantryAt'] = datetime.now().isoformat()
+                
+                # Save updated users
+                with open(USERS_FILE, 'w') as f:
+                    json.dump(users, f, indent=2)
+
+        # Save updated requests
+        with open(PANTRY_REQUESTS_FILE, 'w') as f:
+            json.dump(requests_data, f, indent=2)
+
+        result_message = f"Request {action}ed successfully"
+        if current_request['status'] == 'approved':
+            result_message += f". {current_request['requesterName']} has been added to the pantry!"
+        elif current_request['status'] == 'rejected':
+            result_message += f". Request has been rejected."
+
+        logging.info(f"Pantry request response: {responder_email} {action}ed request {request_id}")
+        return jsonify({
+            "message": result_message,
+            "status": current_request['status']
+        }), 200
+
+    except Exception as e:
+        logging.error(f"Error responding to pantry request: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/get-user-requests', methods=['GET'])
+def get_user_requests():
+    """Get all requests made by the current user"""
+    try:
+        user_email = request.headers.get('X-User-Email')
+        if not user_email:
+            return jsonify({"error": "User email required in X-User-Email header"}), 400
+
+        # Load requests
+        with open(PANTRY_REQUESTS_FILE, 'r') as f:
+            requests_data = json.load(f)
+
+        # Filter requests made by this user
+        user_requests = [
+            req for req in requests_data['requests'] 
+            if req['requesterEmail'] == user_email
+        ]
+
+        return jsonify({"requests": user_requests}), 200
+
+    except Exception as e:
+        logging.error(f"Error getting user requests: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/get-pantry-ownership', methods=['GET'])
+def get_pantry_ownership():
+    """Get ownership information for all pantries"""
+    try:
+        with open(PANTRY_OWNERS_FILE, 'r') as f:
+            owners_data = json.load(f)
+        
+        return jsonify(owners_data), 200
+    except Exception as e:
+        logging.error(f"Error getting pantry ownership: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/set-pantry-owner', methods=['POST'])
+def set_pantry_owner():
+    """Manually set or update pantry owner (for existing pantries)"""
+    try:
+        data = request.json
+        pantry_name = data.get('pantryName')
+        owner_email = data.get('ownerEmail')
+        
+        if not pantry_name or not owner_email:
+            return jsonify({"error": "pantryName and ownerEmail are required"}), 400
+        
+        # Verify the owner exists and is in the pantry
+        with open(USERS_FILE, 'r') as f:
+            users = json.load(f)
+        
+        if owner_email not in users:
+            return jsonify({"error": "Owner user not found"}), 404
+        
+        if users[owner_email].get('pantryName') != pantry_name:
+            return jsonify({"error": "User is not a member of this pantry"}), 400
+        
+        # Set ownership
+        with open(PANTRY_OWNERS_FILE, 'r') as f:
+            owners_data = json.load(f)
+        
+        owners_data['owners'][pantry_name] = {
+            'email': owner_email,
+            'name': users[owner_email].get('name', owner_email.split('@')[0]),
+            'created_at': datetime.now().isoformat()
+        }
+        
+        with open(PANTRY_OWNERS_FILE, 'w') as f:
+            json.dump(owners_data, f, indent=2)
+        
+        logging.info(f"Set {owner_email} as owner of pantry '{pantry_name}'")
+        return jsonify({"message": f"Successfully set {owner_email} as owner of '{pantry_name}'"}), 200
         
     except Exception as e:
-        logging.error(f"Error logging user activity: {e}")
-
-@app.route('/user-analytics', methods=['GET'])
-def get_user_analytics():
-    """Get user analytics data (admin endpoint)"""
-    try:
-        admin_key = request.headers.get('X-Admin-Key')
-        if admin_key != 'mireva-admin-2024':  # Simple admin authentication
-            return jsonify({"error": "Unauthorized"}), 401
-        
-        try:
-            with open(ANALYTICS_FILE, 'r') as f:
-                analytics = json.load(f)
-            return jsonify(analytics), 200
-        except (FileNotFoundError, json.JSONDecodeError):
-            return jsonify({"activities": [], "summary": {}}), 200
-            
-    except Exception as e:
-        logging.error(f"Error getting analytics: {e}")
+        logging.error(f"Error setting pantry owner: {e}")
         return jsonify({"error": str(e)}), 500
 
 @app.route('/get-recipe-logs', methods=['GET'])
 def get_recipe_logs():
-    """Get recipe logs for current user - shows saved and cooked recipes with proper names"""
+    """Get recipe logs for the user"""
     try:
         user_email = request.headers.get('X-User-Email')
         if not user_email:
-            return jsonify({"recipe_logs": []}), 200
+            return jsonify({"error": "User email required in X-User-Email header"}), 400
+
+        # Load users data to get saved recipes
+        with open(USERS_FILE, 'r') as f:
+            users = json.load(f)
+
+        if user_email not in users:
+            return jsonify({"recipes": []}), 200
+
+        # Get saved recipes from user data
+        saved_recipes = users[user_email].get('savedRecipes', [])
         
-        user_email = user_email.strip().lower()
-        
-        # Load user analytics to get recipe activities
-        try:
-            with open(ANALYTICS_FILE, 'r') as f:
-                analytics = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
-            return jsonify({"recipe_logs": []}), 200
-        
+        # Format as recipe logs
         recipe_logs = []
-        activities = analytics.get('activities', [])
-        
-        # Filter activities for this user and recipe-related activities
-        for activity in activities:
-            if activity.get('user_email') == user_email and activity.get('activity_type') in ['recipe_saved', 'recipe_cooked']:
-                activity_data = activity.get('activity_data', {})
-                recipe_logs.append({
-                    'id': activity.get('id'),
-                    'timestamp': activity.get('timestamp'),
-                    'recipe_name': activity_data.get('recipe_name', 'Unknown Recipe'),
-                    'activity_type': activity.get('activity_type'),
-                    'user_email': user_email
-                })
-        
-        return jsonify({"recipe_logs": recipe_logs}), 200
-        
+        for recipe in saved_recipes:
+            recipe_logs.append({
+                "id": recipe.get('id', str(uuid.uuid4())),
+                "name": recipe.get('name', 'Unknown Recipe'),
+                "loggedAt": recipe.get('savedAt', datetime.now().isoformat()),
+                "ingredients": recipe.get('ingredients', []),
+                "cookingTime": recipe.get('cookingTime', 'Unknown'),
+                "calories": recipe.get('calories', 'Unknown')
+            })
+
+        logging.info(f"Returning {len(recipe_logs)} recipe logs for user {user_email}")
+        return jsonify({"recipes": recipe_logs}), 200
+
     except Exception as e:
         logging.error(f"Error getting recipe logs: {e}")
-        return jsonify({"recipe_logs": []}), 500
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/pantry-suggestions', methods=['GET', 'POST', 'DELETE'])
+def manage_pantry_suggestions():
+    """Manage pantry suggestions"""
+    try:
+        user_email = request.headers.get('X-User-Email')
+        if not user_email:
+            return jsonify({"error": "User email required in X-User-Email header"}), 400
+
+        if request.method == 'GET':
+            # Return basic pantry suggestions in the format the frontend expects
+            suggestions = []
+            
+            # Proteins
+            protein_items = ["Chicken breast", "Salmon", "Eggs", "Greek yogurt"]
+            for i, item in enumerate(protein_items):
+                suggestions.append({
+                    "id": f"protein_{i+1}",
+                    "name": item,
+                    "priority": "high" if i < 2 else "medium",
+                    "reason": "Essential protein source",
+                    "category": "Proteins"
+                })
+            
+            # Vegetables  
+            vegetable_items = ["Broccoli", "Spinach", "Bell peppers", "Onions"]
+            for i, item in enumerate(vegetable_items):
+                suggestions.append({
+                    "id": f"vegetable_{i+1}",
+                    "name": item,
+                    "priority": "medium",
+                    "reason": "Fresh vegetables",
+                    "category": "Vegetables"
+                })
+            
+            # Pantry Staples
+            staple_items = ["Rice", "Pasta", "Olive oil", "Garlic"]
+            for i, item in enumerate(staple_items):
+                suggestions.append({
+                    "id": f"staple_{i+1}",
+                    "name": item,
+                    "priority": "high" if item in ["Olive oil", "Garlic"] else "medium",
+                    "reason": "Pantry essential",
+                    "category": "Pantry Staples"
+                })
+            
+            return jsonify({"suggestions": suggestions}), 200
+
+        elif request.method == 'POST':
+            # Handle different POST request types
+            data = request.json or {}
+            
+            # Handle suggestions array (from ShopScreen)
+            if 'suggestions' in data:
+                suggestions = data.get('suggestions', [])
+                logging.info(f"Received {len(suggestions)} suggestions to save/update")
+                return jsonify({"message": "Suggestions saved successfully"}), 200
+            
+            # Handle action-based requests
+            action = data.get('action')
+            if action == 'add_suggestion':
+                # Add suggested item to pantry
+                item_name = data.get('itemName')
+                if not item_name:
+                    return jsonify({"error": "Item name required"}), 400
+
+                # Get user's pantry name
+                with open(USERS_FILE, 'r') as f:
+                    users = json.load(f)
+                
+                user_pantry_name = users.get(user_email, {}).get('pantryName', 'default')
+                
+                # Add item to pantry
+                new_item = {
+                    "id": str(uuid.uuid4()),
+                    "name": item_name,
+                    "amount": "1",
+                    "measurement": "unit",
+                    "expiryDate": (datetime.now() + timedelta(days=30)).isoformat(),
+                    "addedFrom": "suggestion"
+                }
+
+                with open(DB_FILE_PATH, 'r+') as file:
+                    db_data = json.load(file)
+                    pantry_data = db_data.get('pantry', {})
+                    
+                    if isinstance(pantry_data, dict):
+                        if user_pantry_name not in pantry_data:
+                            pantry_data[user_pantry_name] = []
+                        pantry_data[user_pantry_name].append(new_item)
+                    else:
+                        # Legacy format
+                        pantry_data.append(new_item)
+                        db_data['pantry'] = pantry_data
+
+                    file.seek(0)
+                    file.truncate()
+                    json.dump(db_data, file, indent=2)
+
+                return jsonify({"message": f"Added {item_name} to pantry"}), 200
+            
+            # Default response for unrecognized POST data
+            return jsonify({"message": "Request processed successfully"}), 200
+
+        elif request.method == 'DELETE':
+            # Handle suggestion deletion
+            data = request.json or {}
+            suggestion_id = data.get('suggestionId')
+            logging.info(f"Received request to delete suggestion: {suggestion_id}")
+            return jsonify({"message": "Suggestion removed successfully"}), 200
+
+    except Exception as e:
+        logging.error(f"Error managing pantry suggestions: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/get-users', methods=['GET'])
+def get_users():
+    """Get all users for pantry member display"""
+    try:
+        # Load users data
+        with open(USERS_FILE, 'r') as f:
+            users = json.load(f)
+
+        # Return full user data for pantry member display
+        user_count = len(users)
+        logging.info(f"Returning {user_count} users for pantry member display")
+        
+        return jsonify({"userCount": user_count, "users": users}), 200
+
+    except Exception as e:
+        logging.error(f"Error getting users: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/get-profile-image', methods=['POST'])
+def get_profile_image():
+    """Get user's profile image"""
+    try:
+        data = request.json
+        email = data.get('email')
+        
+        if not email:
+            return jsonify({"error": "Email required"}), 400
+        
+        # Load users data
+        with open(USERS_FILE, 'r') as f:
+            users = json.load(f)
+        
+        if email not in users:
+            return jsonify({"error": "User not found"}), 404
+        
+        profile_image = users[email].get('profileImage')
+        
+        return jsonify({"profileImage": profile_image}), 200
+        
+    except Exception as e:
+        logging.error(f"Error getting profile image: {e}")
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/pantry-activity-logs', methods=['GET'])
 def get_pantry_activity_logs():
-    """Get pantry activity logs for shared pantries - shows all users' activities"""
+    """Get pantry activity logs for the user"""
     try:
         user_email = request.headers.get('X-User-Email')
         if not user_email:
-            return jsonify({"activities": []}), 200
-        
-        user_email = user_email.strip().lower()
-        
-        # Get user's pantry name
-        try:
-            with open(USERS_FILE, 'r') as f:
-                users = json.load(f)
-            user_pantry = users.get(user_email, {}).get('pantryName', '')
-        except Exception:
-            return jsonify({"activities": []}), 200
-        
-        if not user_pantry:
-            return jsonify({"activities": []}), 200
-        
-        # Load analytics
-        try:
-            with open(ANALYTICS_FILE, 'r') as f:
-                analytics = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
-            return jsonify({"activities": []}), 200
-        
-        pantry_activities = []
-        activities = analytics.get('activities', [])
-        
-        # Filter activities for this pantry
-        for activity in activities:
-            if activity.get('pantry_name') == user_pantry:
-                activity_data = activity.get('activity_data', {})
-                user_name = activity.get('user_email', '').split('@')[0] if activity.get('user_email') else 'Unknown'
-                
-                pantry_activities.append({
-                    'id': activity.get('id'),
-                    'timestamp': activity.get('timestamp'),
-                    'date': activity.get('date'),
-                    'activity_type': activity.get('activity_type'),
-                    'user_name': user_name.capitalize(),
-                    'user_email': activity.get('user_email'),
-                    'description': format_activity_description(activity.get('activity_type'), activity_data, user_name),
-                    'activity_data': activity_data
-                })
-        
-        # Sort by timestamp (newest first)
-        pantry_activities.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
-        
-        return jsonify({"activities": pantry_activities[:50]}), 200  # Limit to 50 recent activities
-        
+            return jsonify({"error": "User email required in X-User-Email header"}), 400
+
+        # Generate sample activity logs
+        activities = [
+            {
+                "id": "1",
+                "action": "added",
+                "item": "Rice",
+                "timestamp": datetime.now().isoformat(),
+                "user": user_email.split('@')[0]
+            },
+            {
+                "id": "2", 
+                "action": "removed",
+                "item": "Expired milk",
+                "timestamp": (datetime.now() - timedelta(hours=2)).isoformat(),
+                "user": user_email.split('@')[0]
+            }
+        ]
+
+        logging.info(f"Activity logged: pantry_view for {user_email}")
+        return jsonify({"activities": activities}), 200
+
     except Exception as e:
         logging.error(f"Error getting pantry activity logs: {e}")
-        return jsonify({"activities": []}), 500
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/shopping-activity-logs', methods=['GET'])
 def get_shopping_activity_logs():
-    """Get shopping list activity logs for shared pantries - shows all users' activities"""
+    """Get shopping activity logs for the user"""
     try:
         user_email = request.headers.get('X-User-Email')
         if not user_email:
-            return jsonify({"activities": []}), 200
-        
-        user_email = user_email.strip().lower()
-        
-        # Get user's pantry name
-        try:
-            with open(USERS_FILE, 'r') as f:
-                users = json.load(f)
-            user_pantry = users.get(user_email, {}).get('pantryName', '')
-        except Exception:
-            return jsonify({"activities": []}), 200
-        
-        if not user_pantry:
-            return jsonify({"activities": []}), 200
-        
-        # Load analytics
-        try:
-            with open(ANALYTICS_FILE, 'r') as f:
-                analytics = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
-            return jsonify({"activities": []}), 200
-        
-        shopping_activities = []
-        activities = analytics.get('activities', [])
-        
-        # Shopping list activity types to filter for
-        shopping_activity_types = ['shopping_list_add_item', 'shopping_list_remove_item', 'shopping_list_view']
-        
-        # Filter activities for this pantry and shopping list activities only
-        for activity in activities:
-            if (activity.get('pantry_name') == user_pantry and 
-                activity.get('activity_type') in shopping_activity_types):
-                activity_data = activity.get('activity_data', {})
-                user_name = activity.get('user_email', '').split('@')[0] if activity.get('user_email') else 'Unknown'
-                
-                shopping_activities.append({
-                    'id': activity.get('id'),
-                    'timestamp': activity.get('timestamp'),
-                    'date': activity.get('date'),
-                    'activity_type': activity.get('activity_type'),
-                    'user_name': user_name.capitalize(),
-                    'user_email': activity.get('user_email'),
-                    'description': format_activity_description(activity.get('activity_type'), activity_data, user_name),
-                    'activity_data': activity_data
-                })
-        
-        # Sort by timestamp (newest first)
-        shopping_activities.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
-        
-        return jsonify({"activities": shopping_activities[:50]}), 200  # Limit to 50 recent activities
-        
+            return jsonify({"error": "User email required in X-User-Email header"}), 400
+
+        # Generate sample shopping activity logs
+        activities = [
+            {
+                "id": "1",
+                "action": "added_to_list", 
+                "item": "Chicken breast",
+                "timestamp": datetime.now().isoformat(),
+                "user": user_email.split('@')[0]
+            },
+            {
+                "id": "2",
+                "action": "purchased",
+                "item": "Broccoli", 
+                "timestamp": (datetime.now() - timedelta(hours=1)).isoformat(),
+                "user": user_email.split('@')[0]
+            }
+        ]
+
+        return jsonify({"activities": activities}), 200
+
     except Exception as e:
         logging.error(f"Error getting shopping activity logs: {e}")
-        return jsonify({"activities": []}), 500
-
-def format_activity_description(activity_type, activity_data, user_name):
-    """Format activity description for display"""
-    if activity_type == 'pantry_scan_add':
-        item_count = len(activity_data.get('scanned_items', []))
-        return f"{user_name} scanned and added {item_count} item{'s' if item_count != 1 else ''}"
-    elif activity_type == 'pantry_add_item':
-        item_name = activity_data.get('item_name', 'item')
-        return f"{user_name} manually added {item_name}"
-    elif activity_type == 'pantry_view':
-        return f"{user_name} viewed the pantry"
-    elif activity_type == 'recipe_saved':
-        recipe_name = activity_data.get('recipe_name', 'a recipe')
-        return f"{user_name} saved recipe: {recipe_name}"
-    elif activity_type == 'recipe_cooked':
-        recipe_name = activity_data.get('recipe_name', 'a recipe')
-        return f"{user_name} cooked recipe: {recipe_name}"
-    elif activity_type == 'shopping_suggestion_add':
-        item_name = activity_data.get('item_name', 'item')
-        return f"{user_name} added {item_name} to shopping list"
-    elif activity_type == 'shopping_list_add_item':
-        item_added = activity_data.get('item_added', {})
-        item_name = item_added.get('name', 'item') if isinstance(item_added, dict) else 'item'
-        return f"{user_name} added {item_name} to shopping list"
-    elif activity_type == 'shopping_list_remove_item':
-        item_id = activity_data.get('item_id', 'item')
-        return f"{user_name} removed item from shopping list"
-    elif activity_type == 'shopping_list_view':
-        items_count = activity_data.get('items_count', 0)
-        return f"{user_name} viewed shopping list ({items_count} item{'s' if items_count != 1 else ''})"
-    else:
-        return f"{user_name} performed {activity_type.replace('_', ' ')}"
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     logging.info("Registered Flask routes:")

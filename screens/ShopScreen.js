@@ -53,7 +53,12 @@ export default function ShopScreen() {
       
       if (response.ok) {
         const data = await response.json();
-        setShoppingItems(data.items || []);
+        // Map backend 'completed' field to frontend 'purchased' field
+        const mappedItems = (data.items || []).map(item => ({
+          ...item,
+          purchased: item.completed || item.purchased || false
+        }));
+        setShoppingItems(mappedItems);
       } else {
         setShoppingItems([]);
       }
@@ -137,8 +142,25 @@ export default function ShopScreen() {
       setSuggestionsLoading(true);
       
       // Get all saved recipes, user preferences, and pantry data
-      const [savedRecipesData, userPreferencesData, pantryData] = await Promise.all([
-        AsyncStorage.getItem('savedRecipes'),
+      const userEmail = await AsyncStorage.getItem('userEmail');
+      const userSpecificKey = `savedRecipes_${userEmail}`;
+      
+      // Load user-specific saved recipes with migration
+      let savedRecipesData = await AsyncStorage.getItem(userSpecificKey);
+      
+      // Migration: Only migrate for sizarta (the original user) to prevent data leakage
+      if (!savedRecipesData && userEmail === 'sizarta@gmail.com') {
+        const oldSaved = await AsyncStorage.getItem('savedRecipes');
+        if (oldSaved) {
+          const oldRecipes = JSON.parse(oldSaved);
+          // Migrate old recipes to user-specific storage
+          await AsyncStorage.setItem(userSpecificKey, oldSaved);
+          savedRecipesData = oldSaved;
+          console.log(`Migrated ${oldRecipes.length} recipes for user ${userEmail} in ShopScreen`);
+        }
+      }
+      
+      const [userPreferencesData, pantryData] = await Promise.all([
         AsyncStorage.getItem('userProfile'),
         loadPantryData()
       ]);
@@ -270,15 +292,22 @@ export default function ShopScreen() {
         });
       });
 
-      // Filter out existing shopping items
+      // Filter out existing shopping items and pantry items
       const existingItemNames = Array.isArray(shoppingItems) ? shoppingItems.map(item => item.name?.toLowerCase() || '') : [];
+      const pantryItemNamesLower = Array.isArray(pantryData) ? pantryData.map(item => item.name?.toLowerCase().trim() || '') : [];
       
       const prioritizedIngredients = Array.from(ingredientScores.values())
         .filter(item => {
-          const itemName = item.name.toLowerCase();
-          return !existingItemNames.some(existing => 
+          const itemName = item.name.toLowerCase().trim();
+          // Skip if already in shopping list
+          const inShoppingList = existingItemNames.some(existing => 
             existing === itemName || existing.includes(itemName) || itemName.includes(existing)
           );
+          // Skip if already in pantry (unless it's expired)
+          const inPantry = !item.isExpired && pantryItemNamesLower.some(pantryItem => 
+            pantryItem === itemName || pantryItem.includes(itemName) || itemName.includes(pantryItem)
+          );
+          return !inShoppingList && !inPantry;
         })
         .sort((a, b) => {
           if (b.score !== a.score) return b.score - a.score;
@@ -579,6 +608,64 @@ export default function ShopScreen() {
     }
   };
 
+  const togglePurchased = async (itemId) => {
+    try {
+      // Find the current item to get its current purchased state
+      const currentItem = shoppingItems.find(item => item.id === itemId);
+      const newPurchasedState = !currentItem?.purchased;
+      
+      // Update local state immediately for better UX
+      setShoppingItems(prevItems => 
+        prevItems.map(item => 
+          item.id === itemId 
+            ? { ...item, purchased: newPurchasedState, completed: newPurchasedState }
+            : item
+        )
+      );
+      
+      // Update backend
+      const headers = await getUserHeaders();
+      const response = await fetch(`${API_CONFIG.BASE_URL}/shopping/list/${itemId}`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({
+          purchased: newPurchasedState,
+          completed: newPurchasedState
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update item on server');
+      }
+      
+      console.log(`Item ${itemId} marked as ${newPurchasedState ? 'purchased' : 'not purchased'}`);
+      
+    } catch (error) {
+      console.error('Error toggling purchased state:', error);
+      // Revert the change if there's an error
+      setShoppingItems(prevItems => 
+        prevItems.map(item => 
+          item.id === itemId 
+            ? { ...item, purchased: !item.purchased, completed: !item.completed }
+            : item
+        )
+      );
+    }
+  };
+
+  const removeSuggestion = async (suggestionId) => {
+    try {
+      // Filter out the suggestion from the list
+      const updatedSuggestions = suggestions.filter(s => s.id !== suggestionId);
+      setSuggestions(updatedSuggestions);
+      
+      // Update AsyncStorage cache
+      await AsyncStorage.setItem('shopping_suggestions', JSON.stringify(updatedSuggestions));
+    } catch (error) {
+      console.error('Error removing suggestion:', error);
+    }
+  };
+
   const addSuggestionToList = async (suggestion) => {
     const existingItem = shoppingItems.find(item => 
       item.name.toLowerCase() === suggestion.name.toLowerCase()
@@ -647,17 +734,26 @@ export default function ShopScreen() {
 
   const shareShoppingList = async () => {
     try {
-      const items = shoppingItems.map(item => `• ${item.name}`).join('\n');
-      const message = `My Shopping List:\n\n${items}`;
+      let message = `Mireva Shopping List\n`;
+      message += `${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}\n\n`;
+
+      shoppingItems.forEach(item => {
+        message += `• ${item.name}\n`;
+      });
+
+      message += `\nTotal items: ${shoppingItems.length}\n\n`;
+      message += `Shared from Mireva Smart Pantry`;
       
       await Share.share({
         message,
-        title: 'Shopping List',
+        title: 'Mireva Shopping List',
       });
     } catch (error) {
       console.error('Error sharing:', error);
     }
   };
+
+
 
 
   return (
@@ -683,8 +779,8 @@ export default function ShopScreen() {
         </TouchableOpacity>
         
         <TouchableOpacity style={styles.circularButtonWrapper} onPress={() => setShowAddModal(true)}>
-          <View style={[styles.circularButton, styles.addButton]}>
-            <Text style={styles.circularButtonText}>Add</Text>
+          <View style={[styles.squareButton, styles.addSquareButton]}>
+            <Text style={styles.squareButtonText}>Add</Text>
           </View>
         </TouchableOpacity>
         
@@ -715,7 +811,7 @@ export default function ShopScreen() {
               contentContainerStyle={styles.suggestionsScrollContent}
             >
               {suggestions.slice(0, 15).map((suggestion, index) => (
-                <TouchableOpacity
+                <View
                   key={suggestion.id}
                   style={[
                     styles.suggestionCard,
@@ -723,34 +819,35 @@ export default function ShopScreen() {
                     suggestion.priority === 'medium' ? styles.suggestionCardMedium :
                     styles.suggestionCardLow
                   ]}
-                  onPress={() => addSuggestionToList(suggestion)}
                 >
-                  <View style={styles.suggestionHeader}>
-                    <View style={[
-                      styles.priorityIndicator,
-                      suggestion.priority === 'high' ? styles.priorityIndicatorHigh :
-                      suggestion.priority === 'medium' ? styles.priorityIndicatorMedium :
-                      styles.priorityIndicatorLow
-                    ]} />
-                  </View>
-                  
-                  <Text style={styles.suggestionName}>{suggestion.name}</Text>
-                  
-                  <View style={styles.suggestionMeta}>
-                    <Text style={styles.suggestionReason}>
-                      {suggestion.reason}
-                    </Text>
-                    {suggestion.recipeCount > 1 && (
-                      <Text style={styles.recipeCount}>
-                        {suggestion.recipeCount} recipes
+                  <View style={styles.suggestionContent}>
+                    <View style={styles.suggestionInfo}>
+                      <Text style={styles.suggestionName} numberOfLines={2}>
+                        {suggestion.name}
                       </Text>
-                    )}
+                      
+                      <Text style={styles.suggestionReason} numberOfLines={2}>
+                        {suggestion.reason}
+                      </Text>
+                    </View>
+                    
+                    <View style={styles.suggestionButtonsContainer}>
+                      <TouchableOpacity 
+                        style={styles.suggestionAddButton}
+                        onPress={() => addSuggestionToList(suggestion)}
+                      >
+                        <Text style={styles.suggestionButtonText}>+</Text>
+                      </TouchableOpacity>
+                      
+                      <TouchableOpacity
+                        style={styles.suggestionRemoveButton}
+                        onPress={() => removeSuggestion(suggestion.id)}
+                      >
+                        <Text style={styles.suggestionButtonText}>×</Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                  
-                  <View style={styles.addButton}>
-                    <Text style={styles.addButtonText}>+ Add</Text>
-                  </View>
-                </TouchableOpacity>
+                </View>
               ))}
             </ScrollView>
           )}
@@ -764,10 +861,37 @@ export default function ShopScreen() {
         ) : (
           <ScrollView style={styles.itemsList}>
             {shoppingItems.map((item) => (
-              <View key={item.id} style={styles.itemCard}>
+              <View key={item.id} style={[
+                styles.itemCard,
+                item.purchased && styles.purchasedItemCard
+              ]}>
+                <TouchableOpacity
+                  style={styles.purchaseCheckbox}
+                  onPress={() => togglePurchased(item.id)}
+                >
+                  <View style={[
+                    styles.checkbox,
+                    item.purchased && styles.checkedBox
+                  ]}>
+                    {item.purchased && (
+                      <Text style={styles.checkmark}>✓</Text>
+                    )}
+                  </View>
+                </TouchableOpacity>
+                
                 <View style={styles.itemInfo}>
-                  <Text style={styles.itemName}>{item.name}</Text>
-                  <Text style={styles.itemCategory}>{item.category}</Text>
+                  <Text style={[
+                    styles.itemName,
+                    item.purchased && styles.purchasedText
+                  ]}>
+                    {item.name}
+                  </Text>
+                  <Text style={[
+                    styles.itemCategory,
+                    item.purchased && styles.purchasedText
+                  ]}>
+                    {item.category}
+                  </Text>
                 </View>
                 <TouchableOpacity
                   style={styles.deleteButton}
@@ -908,8 +1032,30 @@ const styles = StyleSheet.create({
   shareButton: {
     backgroundColor: '#2D6A4F',
   },
-  addButton: {
+  addCircularButton: {
     backgroundColor: '#FF6B35',
+  },
+  squareButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+    marginBottom: 8,
+  },
+  addSquareButton: {
+    backgroundColor: '#FF6B35',
+  },
+  squareButtonText: {
+    fontSize: 14,
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
   refreshButton: {
     backgroundColor: '#2D6A4F',
@@ -943,85 +1089,92 @@ const styles = StyleSheet.create({
   },
   suggestionCard: {
     width: 140,
-    padding: 12,
+    minHeight: 160,
+    padding: 0,
     borderRadius: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 4,
     position: 'relative',
+    overflow: 'hidden',
   },
   suggestionCardHigh: {
     backgroundColor: '#FFF5F5',
-    borderWidth: 2,
+    borderWidth: 1.5,
     borderColor: '#FC8181',
   },
   suggestionCardMedium: {
     backgroundColor: '#FFFAF0',
-    borderWidth: 2,
+    borderWidth: 1.5,
     borderColor: '#F6AD55',
   },
   suggestionCardLow: {
-    backgroundColor: '#F0FFF4',
-    borderWidth: 2,
-    borderColor: '#68D391',
+    backgroundColor: '#FFF5F0',
+    borderWidth: 1.5,
+    borderColor: '#FFB088',
   },
-  suggestionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'flex-start',
-    marginBottom: 8,
-    height: 12,
+  suggestionContent: {
+    flex: 1,
+    padding: 12,
+    paddingTop: 8,
+    justifyContent: 'space-between',
   },
-  priorityIndicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  priorityIndicatorHigh: {
-    backgroundColor: '#E53E3E',
-  },
-  priorityIndicatorMedium: {
-    backgroundColor: '#FF8C00',
-  },
-  priorityIndicatorLow: {
-    backgroundColor: '#38A169',
+  suggestionInfo: {
+    flex: 1,
   },
   suggestionName: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '700',
     color: '#1A202C',
-    marginBottom: 6,
-    lineHeight: 18,
-  },
-  suggestionMeta: {
-    marginBottom: 10,
+    marginBottom: 8,
+    lineHeight: 20,
   },
   suggestionReason: {
-    fontSize: 10,
-    color: '#718096',
-    fontWeight: '500',
-    marginBottom: 2,
-    lineHeight: 12,
-  },
-  recipeCount: {
-    fontSize: 9,
-    color: '#A0AEC0',
-    fontWeight: '600',
-  },
-  addButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FF6B35',
-  },
-  addButtonText: {
-    color: '#FFFFFF',
     fontSize: 11,
-    fontWeight: '700',
+    color: '#64748B',
+    fontWeight: '500',
+    marginBottom: 8,
+    lineHeight: 14,
+  },
+  suggestionButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 15,
+    marginTop: 10,
+  },
+  suggestionAddButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#FF6B35',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  suggestionRemoveButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#E53E3E',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  suggestionButtonText: {
+    color: '#FFFFFF',
+    fontSize: 20,
+    fontWeight: 'bold',
+    lineHeight: 22,
     letterSpacing: 0.3,
   },
   listContainer: {
@@ -1044,12 +1197,57 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFF5F0',
     padding: 15,
-    borderRadius: 8,
-    marginBottom: 8,
+    borderRadius: 12,
+    marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#FFE4D6',
+    shadowColor: '#FF6B35',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  purchasedItemCard: {
+    backgroundColor: '#F8F9FA',
+    opacity: 0.7,
+    borderColor: '#E5E7EB',
+  },
+  purchaseCheckbox: {
+    marginRight: 12,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#10B981',
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkedBox: {
+    backgroundColor: '#10B981',
+    borderColor: '#10B981',
+  },
+  checkmark: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  purchasedText: {
+    textDecorationLine: 'line-through',
+    color: '#9CA3AF',
+  },
+  itemIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#10B981',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
   },
   itemInfo: {
     flex: 1,

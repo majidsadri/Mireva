@@ -1,1 +1,12 @@
-{}
+{
+  "sizarta@gmail.com": {
+    "name": "Sizarta",
+    "email": "sizarta@gmail.com", 
+    "pantryName": "sizarta",
+    "diets": ["None"],
+    "cuisines": ["Chinese"],
+    "savedRecipes": [],
+    "created_at": "2024-01-01T00:00:00.000Z",
+    "updated_at": "2025-01-04T00:00:00.000Z"
+  }
+}

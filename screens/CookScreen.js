@@ -52,9 +52,25 @@ export default function CookScreen() {
 
   const loadSavedRecipes = async () => {
     try {
-      const saved = await AsyncStorage.getItem('savedRecipes');
-      if (saved) {
-        setSavedRecipes(JSON.parse(saved));
+      const userEmail = await AsyncStorage.getItem('userEmail');
+      const userSpecificKey = `savedRecipes_${userEmail}`;
+      let saved = await AsyncStorage.getItem(userSpecificKey);
+      let savedRecipesData = saved ? JSON.parse(saved) : [];
+
+      // Migration: Only migrate for sizarta (the original user) to prevent data leakage
+      if (savedRecipesData.length === 0 && userEmail === 'sizarta@gmail.com') {
+        const oldSaved = await AsyncStorage.getItem('savedRecipes');
+        if (oldSaved) {
+          const oldRecipes = JSON.parse(oldSaved);
+          // Migrate old recipes to user-specific storage
+          await AsyncStorage.setItem(userSpecificKey, oldSaved);
+          savedRecipesData = oldRecipes;
+          console.log(`Migrated ${oldRecipes.length} recipes for user ${userEmail} in CookScreen`);
+        }
+      }
+
+      if (savedRecipesData.length > 0) {
+        setSavedRecipes(savedRecipesData);
       }
       
       // Load cached search results
@@ -164,7 +180,7 @@ export default function CookScreen() {
       
       const recommendResponse = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.RECOMMEND}`, {
         method: 'POST',
-        headers: API_CONFIG.getHeaders(),
+        headers: pantryHeaders,
         body: JSON.stringify({ ingredients }),
       });
       
@@ -173,16 +189,20 @@ export default function CookScreen() {
       }
       
       const recommendData = await recommendResponse.json();
+      console.log('Received data from backend:', recommendData);
       if (recommendData.recipes && recommendData.recipes.length > 0) {
+        console.log('Setting recipes:', recommendData.recipes.length, 'recipes');
         setRecipes(recommendData.recipes);
         // Cache the recommendations
         setCachedRecommendations(recommendData.recipes);
         setLastRecommendationTime(Date.now());
       } else {
+        console.log('No recipes in response data');
         throw new Error('No recipes received from backend');
       }
     } catch (error) {
       console.error('Error loading recommendations:', error);
+      console.error('Error details:', error.message);
       setBackendError(true);
       setRecipes([]); // Clear any existing recipes
     } finally {
@@ -221,7 +241,7 @@ export default function CookScreen() {
       
       const recommendResponse = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.RECOMMEND}`, {
         method: 'POST',
-        headers: API_CONFIG.getHeaders(),
+        headers: pantryHeaders,
         body: JSON.stringify({ ingredients }),
       });
       
@@ -239,6 +259,7 @@ export default function CookScreen() {
       }
     } catch (error) {
       console.error('Error loading more recipes:', error);
+      Alert.alert('Error', 'Failed to load more recipes. Please check your internet connection and try again.');
     } finally {
       setLoadingMore(false);
     }
@@ -306,7 +327,9 @@ export default function CookScreen() {
         try {
           // Get user preferences for intelligent processing
           const userPreferencesData = await AsyncStorage.getItem('userProfile');
-          const savedRecipesData = await AsyncStorage.getItem('savedRecipes');
+          const userEmail = await AsyncStorage.getItem('userEmail');
+          const userSpecificKey = `savedRecipes_${userEmail}`;
+          const savedRecipesData = await AsyncStorage.getItem(userSpecificKey);
           
           if (!savedRecipesData) return 0;
           
@@ -447,7 +470,8 @@ export default function CookScreen() {
       
       const updatedSaved = [...savedRecipes, recipeWithTimestamp];
       setSavedRecipes(updatedSaved);
-      await AsyncStorage.setItem('savedRecipes', JSON.stringify(updatedSaved));
+      const userSpecificKey = `savedRecipes_${userEmail}`;
+      await AsyncStorage.setItem(userSpecificKey, JSON.stringify(updatedSaved));
 
       // Note: Suggestions are added in the UI callback to get count for user feedback
       
@@ -567,7 +591,25 @@ export default function CookScreen() {
         {mode === 'recommend' && (
           <TouchableOpacity
             style={styles.refreshButton}
-            onPress={() => loadPantryAndRecommendations()}
+            onPress={async () => {
+              // Clear ALL cache and force fresh recommendations
+              setCachedRecommendations([]);
+              setLastRecommendationTime(null);
+              
+              // Clear AsyncStorage cache
+              try {
+                await AsyncStorage.removeItem('cachedRecommendations');
+                await AsyncStorage.removeItem('lastRecommendationTime');
+                await AsyncStorage.removeItem('cachedSearchResults');
+                await AsyncStorage.removeItem('lastSearchQuery');
+                console.log('Cleared all recipe cache from storage');
+              } catch (error) {
+                console.log('Error clearing cache:', error);
+              }
+              
+              // Force fresh recommendations
+              loadPantryAndRecommendations();
+            }}
           >
             <Text style={styles.refreshButtonText}>Get Fresh Recipes</Text>
           </TouchableOpacity>

@@ -28,7 +28,6 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
   const [selectedCuisines, setSelectedCuisines] = useState([]);
   const [userInfo, setUserInfo] = useState(null);
   const [showAboutModal, setShowAboutModal] = useState(false);
-  const [showAccountModal, setShowAccountModal] = useState(false);
   const [showChartsModal, setShowChartsModal] = useState(false);
   const [accountActionLoading, setAccountActionLoading] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
@@ -39,13 +38,38 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
   const [showPantryUsersModal, setShowPantryUsersModal] = useState(false);
   const [pantryUsers, setPantryUsers] = useState([]);
   const [loadingPantryUsers, setLoadingPantryUsers] = useState(false);
+  const [pendingRequests, setPendingRequests] = useState([]);
+  const [userRequests, setUserRequests] = useState([]);
+  const [showRequestsModal, setShowRequestsModal] = useState(false);
+  const [loadingRequests, setLoadingRequests] = useState(false);
+  const [pantryOwnership, setPantryOwnership] = useState({});
+  const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
     loadJoinedPantry();
-    loadAvailablePantries();
     loadUserPreferences();
     loadProfileImage();
+    loadPendingRequests();
+    loadUserRequests();
+    loadPantryOwnership();
   }, []);
+
+  // Check ownership whenever joinedPantry changes
+  useEffect(() => {
+    if (joinedPantry && Object.keys(pantryOwnership).length > 0) {
+      const checkOwnership = async () => {
+        const userEmail = await AsyncStorage.getItem('userEmail');
+        if (userEmail && pantryOwnership[joinedPantry]) {
+          setIsOwner(pantryOwnership[joinedPantry].email === userEmail);
+          // Also reload pending requests when we confirm ownership
+          loadPendingRequests();
+        } else {
+          setIsOwner(false);
+        }
+      };
+      checkOwnership();
+    }
+  }, [joinedPantry, pantryOwnership]);
 
   const loadProfileImage = async () => {
     try {
@@ -101,9 +125,11 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
 
       const response = await fetch(`${API_CONFIG.BASE_URL}/upload-profile-image`, {
         method: 'POST',
-        headers: API_CONFIG.getHeaders(),
+        headers: {
+          ...API_CONFIG.getHeaders(),
+          'X-User-Email': userEmail
+        },
         body: JSON.stringify({
-          email: userEmail,
           profileImage: `data:${imageAsset.type};base64,${imageAsset.base64}`,
         }),
       });
@@ -149,6 +175,7 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
             setJoinedPantry(data.pantryName);
             // Also update local storage to sync
             await AsyncStorage.setItem('joinedPantry', data.pantryName);
+            loadPantryOwnership(); // Reload ownership info
             return;
           }
         }
@@ -158,13 +185,19 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
       const pantry = await AsyncStorage.getItem('joinedPantry');
       if (pantry) {
         setJoinedPantry(pantry);
+        loadPantryOwnership(); // Reload ownership info
       }
     } catch (error) {
       console.error('Error loading joined pantry:', error);
     }
   };
 
-  const loadAvailablePantries = async () => {
+  const searchPantries = async (searchTerm) => {
+    if (!searchTerm.trim()) {
+      setAvailablePantries([]);
+      return;
+    }
+    
     setLoadingPantries(true);
     try {
       // Fetch available pantries from backend users.json
@@ -180,22 +213,23 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
         if (data.pantries && Array.isArray(data.pantries)) {
           setAvailablePantries(data.pantries);
         } else {
-          // Fallback to known pantries if response format is unexpected
-          const knownPantries = ['Sadri-FAM Pantry', 'Family Pantry', 'Office Pantry'];
-          setAvailablePantries(knownPantries);
+          setAvailablePantries([]);
         }
       } else {
-        console.warn('Failed to fetch pantries from backend, using defaults');
-        const knownPantries = ['Sadri-FAM Pantry', 'Family Pantry', 'Office Pantry'];
-        setAvailablePantries(knownPantries);
+        console.warn('Failed to fetch pantries from backend');
+        setAvailablePantries([]);
       }
     } catch (error) {
-      console.log('Could not load pantries from backend, using defaults:', error);
-      const knownPantries = ['Sadri-FAM Pantry', 'Family Pantry', 'Office Pantry'];
-      setAvailablePantries(knownPantries);
+      console.log('Could not load pantries from backend:', error);
+      setAvailablePantries([]);
     } finally {
       setLoadingPantries(false);
     }
+  };
+
+  const loadAvailablePantries = async () => {
+    // This function is now only called on component mount for initial setup
+    // Actual pantry search happens in searchPantries
   };
 
   const loadUserPreferences = async () => {
@@ -387,50 +421,95 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
 
     setLoading(true);
     try {
-      // Store locally first
-      await AsyncStorage.setItem('joinedPantry', pantryName.trim());
-      
-      // Update backend user profile with pantry name
       const userEmail = await AsyncStorage.getItem('userEmail');
-      if (userEmail) {
-        try {
-          console.log(`Updating backend user pantry for ${userEmail} with pantry: ${pantryName.trim()}`);
-          
-          const response = await fetch(`${API_CONFIG.BASE_URL}/update-user-pantry`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'ngrok-skip-browser-warning': 'true',
-            },
-            body: JSON.stringify({
-              email: userEmail,
-              pantryName: pantryName.trim()
-            }),
-          });
+      if (!userEmail) {
+        Alert.alert('Error', 'Please sign in again');
+        return;
+      }
 
-          console.log(`Backend response status: ${response.status}`);
+      // Check if this pantry already exists (has members)
+      const isExistingPantry = availablePantries.some(
+        pantry => pantry.toLowerCase() === pantryName.trim().toLowerCase()
+      );
+
+      if (isExistingPantry) {
+        // Submit join request for existing pantry
+        const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REQUEST_PANTRY_JOIN}`, {
+          method: 'POST',
+          headers: API_CONFIG.getHeaders(),
+          body: JSON.stringify({
+            email: userEmail,
+            pantryName: pantryName.trim(),
+            name: user?.name || userEmail.split('@')[0]
+          }),
+        });
+
+        if (response.ok) {
+          const responseData = await response.json();
+          setShowJoinPantry(false);
+          setPantryName('');
           
-          if (response.ok) {
-            const responseData = await response.json();
-            console.log('Successfully updated user pantry in backend:', responseData);
+          if (responseData.isOwner) {
+            // User is the owner, they've been added directly
+            await AsyncStorage.setItem('joinedPantry', pantryName.trim());
+            setJoinedPantry(pantryName.trim());
+            
+            // Update the stored userData to include the pantry
+            const storedUserData = await AsyncStorage.getItem('userData');
+            if (storedUserData) {
+              const userData = JSON.parse(storedUserData);
+              userData.pantryName = pantryName.trim();
+              await AsyncStorage.setItem('userData', JSON.stringify(userData));
+            }
+            
+            Alert.alert('Welcome Back!', responseData.message || `You are now back in your pantry "${pantryName.trim()}"!`);
+            loadPantryOwnership(); // Refresh ownership data
           } else {
-            const errorText = await response.text();
-            console.warn(`Failed to update backend user pantry. Status: ${response.status}, Error: ${errorText}`);
+            // Regular join request submitted
+            Alert.alert(
+              'Request Submitted', 
+              'Your join request has been sent to the pantry members. You will be notified when they respond.',
+              [{ text: 'OK', onPress: () => loadUserRequests() }]
+            );
           }
-        } catch (backendError) {
-          console.warn('Backend update failed, but pantry joined locally:', backendError);
+        } else {
+          const errorData = await response.json();
+          Alert.alert('Error', errorData.error || 'Failed to submit join request');
         }
       } else {
-        console.warn('No user email found for backend update');
+        // Create new pantry (immediate join)
+        const response = await fetch(`${API_CONFIG.BASE_URL}/update-user-pantry`, {
+          method: 'POST',
+          headers: API_CONFIG.getHeaders(),
+          body: JSON.stringify({
+            email: userEmail,
+            pantryName: pantryName.trim()
+          }),
+        });
+
+        if (response.ok) {
+          await AsyncStorage.setItem('joinedPantry', pantryName.trim());
+          setJoinedPantry(pantryName.trim());
+          
+          // Update the stored userData to include the new pantry
+          const storedUserData = await AsyncStorage.getItem('userData');
+          if (storedUserData) {
+            const userData = JSON.parse(storedUserData);
+            userData.pantryName = pantryName.trim();
+            await AsyncStorage.setItem('userData', JSON.stringify(userData));
+          }
+          
+          setShowJoinPantry(false);
+          setPantryName('');
+          Alert.alert('Success', `You have created and joined "${pantryName.trim()}" pantry!`);
+        } else {
+          const errorData = await response.json();
+          Alert.alert('Error', errorData.error || 'Failed to create pantry');
+        }
       }
-      
-      setJoinedPantry(pantryName.trim());
-      setShowJoinPantry(false);
-      setPantryName('');
-      Alert.alert('Success', `You have joined "${pantryName.trim()}" pantry!`);
     } catch (error) {
-      console.error('Error joining pantry:', error);
-      Alert.alert('Error', 'Failed to join pantry. Please try again.');
+      console.error('Error with pantry operation:', error);
+      Alert.alert('Error', 'Failed to process request. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -530,8 +609,11 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
       // Update backend first
       const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.UPDATE_ACCOUNT}`, {
         method: 'POST',
-        headers: API_CONFIG.getHeaders(),
-        body: JSON.stringify({ email: userEmail, name: editName.trim() }),
+        headers: {
+          ...API_CONFIG.getHeaders(),
+          'X-User-Email': userEmail
+        },
+        body: JSON.stringify({ name: editName.trim() }),
       });
       
       if (response.ok) {
@@ -656,23 +738,131 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
     setShowPantryUsersModal(true);
     loadPantryUsers();
   };
+
+  const loadPendingRequests = async () => {
+    try {
+      const userEmail = await AsyncStorage.getItem('userEmail');
+      if (!userEmail) return;
+
+      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.GET_PANTRY_REQUESTS}`, {
+        method: 'GET',
+        headers: {
+          ...API_CONFIG.getHeaders(),
+          'X-User-Email': userEmail,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setPendingRequests(data.requests || []);
+      }
+    } catch (error) {
+      console.error('Error loading pending requests:', error);
+    }
+  };
+
+  const loadUserRequests = async () => {
+    try {
+      const userEmail = await AsyncStorage.getItem('userEmail');
+      if (!userEmail) return;
+
+      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.GET_USER_REQUESTS}`, {
+        method: 'GET',
+        headers: {
+          ...API_CONFIG.getHeaders(),
+          'X-User-Email': userEmail,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUserRequests(data.requests || []);
+      }
+    } catch (error) {
+      console.error('Error loading user requests:', error);
+    }
+  };
+
+  const handleRequestResponse = async (requestId, action) => {
+    try {
+      setLoadingRequests(true);
+      const userEmail = await AsyncStorage.getItem('userEmail');
+
+      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.RESPOND_PANTRY_REQUEST}`, {
+        method: 'POST',
+        headers: API_CONFIG.getHeaders(),
+        body: JSON.stringify({
+          requestId,
+          action,
+          email: userEmail,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        Alert.alert('Success', data.message);
+        loadPendingRequests(); // Refresh the list
+        if (data.status === 'approved') {
+          loadJoinedPantry(); // Refresh pantry info if someone was approved
+        }
+      } else {
+        const errorData = await response.json();
+        Alert.alert('Error', errorData.error || 'Failed to respond to request');
+      }
+    } catch (error) {
+      console.error('Error responding to request:', error);
+      Alert.alert('Error', 'Failed to respond to request');
+    } finally {
+      setLoadingRequests(false);
+    }
+  };
+
+  const showRequestsHandler = () => {
+    setShowRequestsModal(true);
+    loadPendingRequests();
+    loadUserRequests();
+  };
+
+  const loadPantryOwnership = async () => {
+    try {
+      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.GET_PANTRY_OWNERSHIP}`, {
+        method: 'GET',
+        headers: API_CONFIG.getHeaders(),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setPantryOwnership(data.owners || {});
+        
+        // Check if current user is owner of their current pantry
+        const userEmail = await AsyncStorage.getItem('userEmail');
+        if (userEmail && joinedPantry && data.owners && data.owners[joinedPantry]) {
+          setIsOwner(data.owners[joinedPantry].email === userEmail);
+        } else {
+          setIsOwner(false);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading pantry ownership:', error);
+    }
+  };
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.content}>
         {/* Profile Info */}
         <View style={styles.profileSection}>
           <View style={styles.profileWallpaper}>
-            <TouchableOpacity style={styles.avatar} onPress={selectProfileImage} disabled={uploadingImage}>
-              {uploadingImage ? (
-                <ActivityIndicator size="small" color="#fff" />
-              ) : profileImage ? (
+            <View style={styles.avatar}>
+              {profileImage ? (
                 <Image source={{ uri: profileImage }} style={styles.avatarImage} />
               ) : (
-                <Text style={styles.avatarText}>{(user?.name || 'U').charAt(0).toUpperCase()}</Text>
+                <Text style={styles.avatarText}>
+                  {(user?.name || userInfo?.name || user?.email?.charAt(0) || 'U').charAt(0).toUpperCase()}
+                </Text>
               )}
-            </TouchableOpacity>
-            <Text style={styles.userName}>{user?.name || 'User'}</Text>
-            <Text style={styles.userEmail}>{user?.email || 'user@example.com'}</Text>
+            </View>
+            <Text style={styles.userName}>{userInfo?.name || user?.name || 'User'}</Text>
+            <Text style={styles.userEmail}>{userInfo?.email || user?.email || 'user@example.com'}</Text>
           </View>
         </View>
 
@@ -681,16 +871,33 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
           <Text style={styles.sectionTitle}>Current Pantry</Text>
           
           {joinedPantry ? (
-            <View style={styles.joinedPantryCard}>
-              <TouchableOpacity style={styles.pantryInfo} onPress={showPantryUsersHandler}>
-                <Text style={styles.pantryName}>{joinedPantry}</Text>
-                <Text style={styles.pantryTapHint}>Tap to see members</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.leavePantryButton} onPress={handleLeavePantry}>
-                <View style={styles.leavePantryIcon}>
-                  <Text style={styles.leavePantryIconText}>Leave</Text>
-                </View>
-              </TouchableOpacity>
+            <View>
+              <View style={styles.joinedPantryCard}>
+                <TouchableOpacity style={styles.pantryInfo} onPress={showPantryUsersHandler}>
+                  <Text style={styles.pantryName}>
+                    {joinedPantry}
+                    {isOwner && <Text style={styles.ownerBadge}> Owner</Text>}
+                  </Text>
+                  <Text style={styles.pantryTapHint}>Tap to see members</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.leavePantryButton} onPress={handleLeavePantry}>
+                  <View style={styles.leavePantryIcon}>
+                    <Text style={styles.leavePantryIconText}>Leave</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+              
+              {/* Pantry Requests Button - Only show for owners */}
+              {isOwner && (
+                <TouchableOpacity style={styles.requestsButton} onPress={showRequestsHandler}>
+                  <Text style={styles.requestsButtonText}>
+                    Manage Join Requests
+                    {pendingRequests.length > 0 && (
+                      <Text style={styles.requestsBadge}> ({pendingRequests.length})</Text>
+                    )}
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           ) : (
             <View style={styles.noPantryCard}>
@@ -708,37 +915,51 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
                 <View style={styles.joinPantryForm}>
                   <Text style={styles.formTitle}>Join Pantry</Text>
                   <Text style={styles.helpText}>
-                    Choose from available pantries (loaded from backend) or enter a custom name:
+                    Search for an existing pantry or create a new one:
                   </Text>
-                  
-                  {/* Quick pantry options */}
-                  <View style={styles.quickPantryOptions}>
-                    {loadingPantries ? (
-                      <View style={styles.loadingContainer}>
-                        <ActivityIndicator size="small" color="#2D6A4F" />
-                        <Text style={styles.loadingText}>Loading pantries from backend...</Text>
-                      </View>
-                    ) : (
-                      availablePantries.map((pantry, index) => (
-                        <TouchableOpacity
-                          key={index}
-                          style={styles.quickPantryButton}
-                          onPress={() => setPantryName(pantry)}
-                        >
-                          <Text style={styles.quickPantryText}>{pantry}</Text>
-                        </TouchableOpacity>
-                      ))
-                    )}
-                  </View>
                   
                   <TextInput
                     style={styles.pantryInput}
-                    placeholder="Or enter custom pantry name"
+                    placeholder="Search pantry name..."
                     placeholderTextColor="#999"
                     value={pantryName}
-                    onChangeText={setPantryName}
+                    onChangeText={(text) => {
+                      setPantryName(text);
+                      searchPantries(text);
+                    }}
                     autoCapitalize="words"
                   />
+                  
+                  {/* Search results */}
+                  {pantryName.trim().length > 0 && (
+                    <View style={styles.searchResults}>
+                      {loadingPantries ? (
+                        <View style={styles.loadingContainer}>
+                          <ActivityIndicator size="small" color="#2D6A4F" />
+                          <Text style={styles.loadingText}>Searching...</Text>
+                        </View>
+                      ) : (
+                        availablePantries
+                          .filter(pantry => pantry.toLowerCase().includes(pantryName.toLowerCase().trim()))
+                          .map((pantry, index) => (
+                            <TouchableOpacity
+                              key={index}
+                              style={styles.searchResultItem}
+                              onPress={() => setPantryName(pantry)}
+                            >
+                              <Text style={styles.searchResultText}>{pantry}</Text>
+                              <Text style={styles.searchResultSubtext}>Existing pantry</Text>
+                            </TouchableOpacity>
+                          ))
+                      )}
+                      {!loadingPantries && availablePantries.filter(pantry => pantry.toLowerCase().includes(pantryName.toLowerCase().trim())).length === 0 && (
+                        <View style={styles.noResultsContainer}>
+                          <Text style={styles.noResultsText}>No existing pantry found</Text>
+                          <Text style={styles.createNewText}>Tap "Join" to create "{pantryName.trim()}"</Text>
+                        </View>
+                      )}
+                    </View>
+                  )}
                   <View style={styles.formButtons}>
                     <TouchableOpacity 
                       style={styles.cancelButton} 
@@ -831,16 +1052,6 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
 
         {/* Settings Options */}
         <View style={styles.settingsSection}>
-          <TouchableOpacity 
-            style={styles.settingItem}
-            onPress={() => setShowAccountModal(true)}
-          >
-            <View style={styles.settingIconContainer}>
-              <Text style={styles.settingIconText}>Account</Text>
-            </View>
-            <Text style={styles.settingLabel}>Account Settings</Text>
-            <Text style={styles.settingArrow}>›</Text>
-          </TouchableOpacity>
 
           <TouchableOpacity 
             style={styles.settingItem}
@@ -926,73 +1137,6 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
         </View>
       </Modal>
       
-      {/* Account Settings Modal */}
-      <Modal
-        visible={showAccountModal}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setShowAccountModal(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.accountModal}>
-            <TouchableOpacity 
-              style={styles.modalCloseButton}
-              onPress={() => setShowAccountModal(false)}
-            >
-              <Text style={styles.modalCloseText}>✕</Text>
-            </TouchableOpacity>
-            
-            <Text style={styles.accountModalTitle}>Account Settings</Text>
-            <Text style={styles.accountModalSubtitle}>Manage your account</Text>
-            
-            <View style={styles.accountActions}>
-              <TouchableOpacity 
-                style={styles.suspendButton}
-                onPress={handleSuspendAccount}
-                disabled={accountActionLoading}
-              >
-                {accountActionLoading ? (
-                  <ActivityIndicator size="small" color="#FFFFFF" />
-                ) : (
-                  <>
-                    <View style={styles.actionButtonIcon}>
-                      <Text style={styles.actionButtonIconText}>Pause</Text>
-                    </View>
-                    <View style={styles.actionTextContainer}>
-                      <Text style={styles.suspendButtonText}>Suspend Account</Text>
-                      <Text style={styles.suspendButtonDescription}>Temporarily deactivate your account</Text>
-                    </View>
-                  </>
-                )}
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.deleteButton}
-                onPress={handleDeleteAccount}
-                disabled={accountActionLoading}
-              >
-                {accountActionLoading ? (
-                  <ActivityIndicator size="small" color="#FFFFFF" />
-                ) : (
-                  <>
-                    <View style={styles.actionButtonIcon}>
-                      <Text style={styles.actionButtonIconText}>DELETE</Text>
-                    </View>
-                    <View style={styles.actionTextContainer}>
-                      <Text style={styles.deleteButtonText}>Delete Account</Text>
-                      <Text style={styles.deleteButtonDescription}>Permanently remove your account and data</Text>
-                    </View>
-                  </>
-                )}
-              </TouchableOpacity>
-            </View>
-            
-            <Text style={styles.accountModalWarning}>
-              Warning: These actions affect your account permanently. Please be sure before proceeding.
-            </Text>
-          </View>
-        </View>
-      </Modal>
       
       {/* Edit Account Modal */}
       <Modal
@@ -1020,22 +1164,62 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
 
             <View style={styles.editFormSection}>
               <Text style={styles.inputLabel}>Profile Photo</Text>
-              <TouchableOpacity style={styles.photoEditButton} onPress={selectProfileImage} disabled={uploadingImage}>
-                {uploadingImage ? (
-                  <ActivityIndicator size="small" color="#2D6A4F" />
-                ) : (
-                  <>
-                    {profileImage ? (
-                      <Image source={{ uri: profileImage }} style={styles.photoPreview} />
-                    ) : (
-                      <View style={styles.photoPlaceholder}>
-                        <Text style={styles.photoPlaceholderText}>{(editName || 'U').charAt(0).toUpperCase()}</Text>
-                      </View>
-                    )}
-                    <Text style={styles.photoEditText}>📷 Change Photo</Text>
-                  </>
-                )}
+              <TouchableOpacity style={styles.photoEditButton} onPress={selectProfileImage}>
+                <View style={styles.photoPlaceholder}>
+                  <Text style={styles.photoPlaceholderText}>{(editName || 'U').charAt(0).toUpperCase()}</Text>
+                </View>
+                <Text style={styles.photoEditText}>Tap to change photo</Text>
               </TouchableOpacity>
+            </View>
+
+            {/* Account Actions Section */}
+            <View style={styles.editFormSection}>
+              <Text style={styles.inputLabel}>Account Actions</Text>
+              <View style={styles.accountActionsInEdit}>
+                <TouchableOpacity 
+                  style={styles.suspendButtonInEdit}
+                  onPress={handleSuspendAccount}
+                  disabled={accountActionLoading}
+                >
+                  {accountActionLoading ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                  ) : (
+                    <>
+                      <View style={styles.actionButtonIconSmall}>
+                        <Text style={styles.actionButtonIconTextSmall}>Pause</Text>
+                      </View>
+                      <View style={styles.actionTextContainerSmall}>
+                        <Text style={styles.suspendButtonTextSmall}>Suspend Account</Text>
+                        <Text style={styles.suspendButtonDescriptionSmall}>Temporarily deactivate</Text>
+                      </View>
+                    </>
+                  )}
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.deleteButtonInEdit}
+                  onPress={handleDeleteAccount}
+                  disabled={accountActionLoading}
+                >
+                  {accountActionLoading ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                  ) : (
+                    <>
+                      <View style={styles.actionButtonIconSmall}>
+                        <Text style={styles.actionButtonIconTextSmall}>DELETE</Text>
+                      </View>
+                      <View style={styles.actionTextContainerSmall}>
+                        <Text style={styles.deleteButtonTextSmall}>Delete Account</Text>
+                        <Text style={styles.deleteButtonDescriptionSmall}>Permanently remove</Text>
+                      </View>
+                    </>
+                  )}
+                </TouchableOpacity>
+              </View>
+              
+              <Text style={styles.accountWarningInEdit}>
+                ⚠️ These actions are permanent. Please be certain before proceeding.
+              </Text>
             </View>
 
             <View style={styles.modalButtons}>
@@ -1126,6 +1310,93 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
                 {pantryUsers.length} {pantryUsers.length === 1 ? 'member' : 'members'} in this pantry
               </Text>
             </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Pantry Requests Modal */}
+      <Modal
+        visible={showRequestsModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowRequestsModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.requestsModal}>
+            <TouchableOpacity 
+              style={styles.modalCloseButton}
+              onPress={() => setShowRequestsModal(false)}
+            >
+              <Text style={styles.modalCloseText}>✕</Text>
+            </TouchableOpacity>
+            
+            <Text style={styles.requestsModalTitle}>Pantry Requests</Text>
+            
+            <ScrollView style={styles.requestsScrollView}>
+              {/* Pending Requests for Approval */}
+              {pendingRequests.length > 0 && (
+                <View style={styles.requestsSection}>
+                  <Text style={styles.requestsSectionTitle}>Requests to Approve</Text>
+                  {pendingRequests.map((request) => (
+                    <View key={request.id} style={styles.requestItem}>
+                      <View style={styles.requestInfo}>
+                        <Text style={styles.requestName}>{request.requesterName}</Text>
+                        <Text style={styles.requestEmail}>{request.requesterEmail}</Text>
+                        <Text style={styles.requestDate}>
+                          Requested: {new Date(request.requestedAt).toLocaleDateString()}
+                        </Text>
+                      </View>
+                      <View style={styles.requestActions}>
+                        <TouchableOpacity 
+                          style={styles.approveButton}
+                          onPress={() => handleRequestResponse(request.id, 'approve')}
+                          disabled={loadingRequests}
+                        >
+                          <Text style={styles.approveButtonText}>✓ Approve</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity 
+                          style={styles.rejectButton}
+                          onPress={() => handleRequestResponse(request.id, 'reject')}
+                          disabled={loadingRequests}
+                        >
+                          <Text style={styles.rejectButtonText}>✗ Reject</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  ))}
+                </View>
+              )}
+
+              {/* User's Own Requests */}
+              {userRequests.length > 0 && (
+                <View style={styles.requestsSection}>
+                  <Text style={styles.requestsSectionTitle}>Your Requests</Text>
+                  {userRequests.map((request) => (
+                    <View key={request.id} style={styles.userRequestItem}>
+                      <Text style={styles.userRequestPantry}>{request.pantryName}</Text>
+                      <Text style={styles.userRequestStatus}>
+                        Status: {request.status === 'pending' ? '⏳ Pending' : 
+                                request.status === 'approved' ? '✅ Approved' : '❌ Rejected'}
+                      </Text>
+                      <Text style={styles.userRequestDate}>
+                        Requested: {new Date(request.requestedAt).toLocaleDateString()}
+                      </Text>
+                      {request.status === 'pending' && (
+                        <Text style={styles.userRequestProgress}>
+                          Approvals: {request.approvals?.length || 0} / {Math.ceil((request.pantryMembers?.length || 1) / 2)}
+                        </Text>
+                      )}
+                    </View>
+                  ))}
+                </View>
+              )}
+
+              {pendingRequests.length === 0 && userRequests.length === 0 && (
+                <View style={styles.noRequestsContainer}>
+                  <Text style={styles.noRequestsText}>No pending requests</Text>
+                </View>
+              )}
+            </ScrollView>
           </View>
         </View>
       </Modal>
@@ -1322,6 +1593,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#2D6A4F',
   },
+  ownerBadge: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#D69E2E',
+  },
   pantryTapHint: {
     fontSize: 12,
     color: '#81C784',
@@ -1437,10 +1713,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  quickPantryOptions: {
+  searchResults: {
+    marginTop: 10,
     marginBottom: 15,
   },
-  quickPantryButton: {
+  searchResultItem: {
     backgroundColor: '#F0FDF4',
     borderWidth: 1,
     borderColor: '#81C784',
@@ -1448,12 +1725,36 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 15,
     marginBottom: 8,
-    alignItems: 'center',
   },
-  quickPantryText: {
+  searchResultText: {
     color: '#2D6A4F',
     fontSize: 14,
     fontWeight: '600',
+  },
+  searchResultSubtext: {
+    color: '#81C784',
+    fontSize: 12,
+    marginTop: 2,
+  },
+  noResultsContainer: {
+    backgroundColor: '#F7FAFC',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    alignItems: 'center',
+  },
+  noResultsText: {
+    color: '#718096',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  createNewText: {
+    color: '#2D6A4F',
+    fontSize: 12,
+    marginTop: 4,
+    fontStyle: 'italic',
   },
   loadingContainer: {
     flexDirection: 'row',
@@ -1609,111 +1910,68 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontStyle: 'italic',
   },
-  accountModal: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 25,
-    maxWidth: 380,
-    width: '100%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.25,
-    shadowRadius: 20,
-    elevation: 20,
+  accountActionsInEdit: {
+    gap: 12,
+    marginBottom: 16,
   },
-  accountModalTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#2D3748',
-    marginBottom: 5,
-    textAlign: 'center',
-  },
-  accountModalSubtitle: {
-    fontSize: 16,
-    color: '#718096',
-    fontWeight: '500',
-    marginBottom: 30,
-    textAlign: 'center',
-  },
-  accountActions: {
-    marginBottom: 20,
-  },
-  suspendButton: {
+  suspendButtonInEdit: {
     backgroundColor: '#ED8936',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    borderRadius: 8,
+    padding: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#ED8936',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
   },
-  deleteButton: {
+  deleteButtonInEdit: {
     backgroundColor: '#E53E3E',
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 8,
+    padding: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#E53E3E',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
   },
-  suspendButtonIcon: {
-    fontSize: 24,
-    marginRight: 15,
-  },
-  deleteButtonIcon: {
-    fontSize: 24,
-    marginRight: 15,
-  },
-  actionButtonIcon: {
+  actionButtonIconSmall: {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
     borderRadius: 4,
-    marginRight: 15,
-    minWidth: 50,
+    marginRight: 12,
+    minWidth: 40,
     alignItems: 'center',
   },
-  actionButtonIconText: {
-    fontSize: 10,
+  actionButtonIconTextSmall: {
+    fontSize: 8,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
-  actionTextContainer: {
+  actionTextContainerSmall: {
     flex: 1,
   },
-  suspendButtonText: {
-    fontSize: 16,
+  suspendButtonTextSmall: {
+    fontSize: 14,
     fontWeight: '600',
     color: '#FFFFFF',
     marginBottom: 2,
   },
-  deleteButtonText: {
-    fontSize: 16,
+  deleteButtonTextSmall: {
+    fontSize: 14,
     fontWeight: '600',
     color: '#FFFFFF',
     marginBottom: 2,
   },
-  suspendButtonDescription: {
-    fontSize: 12,
+  suspendButtonDescriptionSmall: {
+    fontSize: 10,
     color: 'rgba(255, 255, 255, 0.8)',
   },
-  deleteButtonDescription: {
-    fontSize: 12,
+  deleteButtonDescriptionSmall: {
+    fontSize: 10,
     color: 'rgba(255, 255, 255, 0.8)',
   },
-  accountModalWarning: {
-    fontSize: 12,
+  accountWarningInEdit: {
+    fontSize: 11,
     color: '#E53E3E',
     textAlign: 'center',
     fontWeight: '500',
     fontStyle: 'italic',
+    marginTop: 8,
   },
   // Edit Account Modal Styles
   modalOverlay: {
@@ -1762,6 +2020,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E2E8F0',
     borderStyle: 'dashed',
+  },
+  photoEditText: {
+    fontSize: 12,
+    color: '#718096',
+    marginTop: 8,
   },
   photoPreview: {
     width: 60,
@@ -1935,5 +2198,153 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#4A5568',
     fontWeight: '500',
+  },
+  
+  // Requests Button Styles
+  requestsButton: {
+    backgroundColor: '#F0FDF4',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: '#81C784',
+  },
+  requestsButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#2D6A4F',
+    textAlign: 'center',
+  },
+  requestsBadge: {
+    color: '#E53E3E',
+    fontWeight: 'bold',
+  },
+
+  // Requests Modal Styles
+  requestsModal: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 25,
+    maxWidth: 450,
+    width: '100%',
+    maxHeight: '80%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
+    elevation: 20,
+  },
+  requestsModalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#2D6A4F',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  requestsScrollView: {
+    maxHeight: 400,
+  },
+  requestsSection: {
+    marginBottom: 25,
+  },
+  requestsSectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#2D3748',
+    marginBottom: 12,
+  },
+  requestItem: {
+    backgroundColor: '#F7FAFC',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  requestInfo: {
+    marginBottom: 12,
+  },
+  requestName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#2D3748',
+    marginBottom: 4,
+  },
+  requestEmail: {
+    fontSize: 13,
+    color: '#718096',
+    marginBottom: 4,
+  },
+  requestDate: {
+    fontSize: 12,
+    color: '#A0AEC0',
+  },
+  requestActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  approveButton: {
+    flex: 1,
+    backgroundColor: '#48BB78',
+    borderRadius: 8,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  approveButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  rejectButton: {
+    flex: 1,
+    backgroundColor: '#E53E3E',
+    borderRadius: 8,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  rejectButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  userRequestItem: {
+    backgroundColor: '#F0FDF4',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#C6F6D5',
+  },
+  userRequestPantry: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#2D6A4F',
+    marginBottom: 6,
+  },
+  userRequestStatus: {
+    fontSize: 14,
+    color: '#4A5568',
+    marginBottom: 4,
+  },
+  userRequestDate: {
+    fontSize: 12,
+    color: '#718096',
+    marginBottom: 4,
+  },
+  userRequestProgress: {
+    fontSize: 12,
+    color: '#2D6A4F',
+    fontWeight: '500',
+  },
+  noRequestsContainer: {
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  noRequestsText: {
+    fontSize: 16,
+    color: '#718096',
+    fontStyle: 'italic',
   },
 });
