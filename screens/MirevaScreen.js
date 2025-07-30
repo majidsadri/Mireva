@@ -25,6 +25,7 @@ import { API_CONFIG } from '../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { launchCamera } from 'react-native-image-picker';
 import axios from 'axios';
+import foodCategories from '../food-categories.json';
 // Fallback icon component for cross-platform compatibility
 const Icon = ({ name, size, color, style }) => {
   const iconMap = {
@@ -96,6 +97,23 @@ const ItemCard = ({
       
     </View>
   );
+};
+
+// Function to categorize items using the JSON data
+const categorizeItem = (itemName) => {
+  const normalizedName = itemName.toLowerCase().trim();
+  
+  // Check each category in the JSON file
+  for (const [category, keywords] of Object.entries(foodCategories)) {
+    for (const keyword of keywords) {
+      if (normalizedName.includes(keyword)) {
+        return category;
+      }
+    }
+  }
+  
+  // Default to Grains & Pantry if no match found
+  return 'Grains & Pantry';
 };
 
 export default function MirevaScreen() {
@@ -460,22 +478,8 @@ export default function MirevaScreen() {
         categories[targetCategory].push(item);
       } else {
         // Fallback to frontend categorization for legacy items without backend category
-        const itemName = (item.name || '').toLowerCase().trim();
-        
-        if (itemName.includes('beef') || itemName.includes('chicken') || itemName.includes('fish') || 
-            itemName.includes('meat') || itemName.includes('protein') || itemName.includes('beans') ||
-            itemName.includes('tofu') || itemName.includes('eggs')) {
-          categories['Proteins'].push(item);
-        } else if (itemName.includes('apple') || itemName.includes('banana') || itemName.includes('orange') ||
-                   itemName.includes('vegetable') || itemName.includes('carrot') || itemName.includes('tomato') ||
-                   itemName.includes('lettuce') || itemName.includes('spinach') || itemName.includes('fruit')) {
-          categories['Fruits & Vegetables'].push(item);
-        } else if (itemName.includes('milk') || itemName.includes('cheese') || itemName.includes('yogurt') ||
-                   itemName.includes('butter') || itemName.includes('dairy')) {
-          categories['Dairy'].push(item);
-        } else {
-          categories['Grains & Pantry'].push(item);
-        }
+        const detectedCategory = categorizeItem(item.name || '');
+        categories[detectedCategory].push(item);
       }
     });
     

@@ -1,0 +1,55 @@
+{
+  "Fruits & Vegetables": [
+    "apple", "apples", "banana", "bananas", "orange", "oranges", "pear", "pears",
+    "grape", "grapes", "berry", "berries", "strawberry", "strawberries", 
+    "blueberry", "blueberries", "raspberry", "raspberries", "blackberry", "blackberries",
+    "mango", "mangoes", "pineapple", "pineapples", "kiwi", "kiwis", "peach", "peaches",
+    "plum", "plums", "cherry", "cherries", "watermelon", "cantaloupe", "honeydew",
+    "lemon", "lemons", "lime", "limes", "grapefruit", "avocado", "avocados",
+    "tomato", "tomatoes", "cucumber", "cucumbers", "carrot", "carrots", "celery",
+    "lettuce", "spinach", "kale", "broccoli", "cauliflower", "cabbage", "onion", "onions",
+    "garlic", "potato", "potatoes", "sweet potato", "bell pepper", "peppers",
+    "mushroom", "mushrooms", "zucchini", "eggplant", "corn", "peas", "green beans",
+    "asparagus", "artichoke", "beet", "beets", "radish", "turnip", "parsnip",
+    "vegetable", "vegetables", "fruit", "fruits", "produce"
+  ],
+  "Proteins": [
+    "beef", "chicken", "turkey", "pork", "lamb", "fish", "salmon", "tuna", "cod",
+    "shrimp", "crab", "lobster", "meat", "protein", "egg", "eggs", "tofu", "tempeh",
+    "bean", "beans", "black beans", "kidney beans", "pinto beans", "chickpeas",
+    "lentil", "lentils", "quinoa", "nuts", "almonds", "walnuts", "peanuts",
+    "cashews", "pistachios", "seeds", "chia seeds", "hemp seeds", "protein powder"
+  ],
+  "Dairy": [
+    "milk", "cheese", "cheddar", "mozzarella", "parmesan", "swiss", "goat cheese",
+    "cream cheese", "cottage cheese", "ricotta", "yogurt", "greek yogurt", 
+    "butter", "cream", "heavy cream", "sour cream", "ice cream", "dairy"
+  ],
+  "Grains & Pantry": [
+    "rice", "pasta", "bread", "flour", "wheat", "oats", "oatmeal", "cereal",
+    "crackers", "noodles", "spaghetti", "macaroni", "bagel", "bagels", "tortilla",
+    "quinoa", "barley", "bulgur", "couscous", "millet", "buckwheat",
+    "sugar", "brown sugar", "honey", "maple syrup", "agave", "molasses",
+    "salt", "pepper", "spice", "spices", "herbs", "basil", "oregano", "thyme",
+    "rosemary", "sage", "paprika", "cumin", "turmeric", "ginger", "cinnamon",
+    "vanilla", "baking powder", "baking soda", "yeast", "vinegar", "oil",
+    "olive oil", "coconut oil", "vegetable oil", "canola oil", "sesame oil",
+    "soy sauce", "hot sauce", "ketchup", "mustard", "mayonnaise", "salad dressing",
+    "pasta sauce", "tomato sauce", "broth", "stock", "canned goods", "pantry"
+  ],
+  "Beverages": [
+    "water", "juice", "coffee", "tea", "soda", "beer", "wine", "whiskey", "vodka",
+    "rum", "gin", "cocktail", "smoothie", "shake", "energy drink", "sports drink",
+    "coconut water", "almond milk", "soy milk", "oat milk", "beverage", "drink"
+  ],
+  "Frozen": [
+    "frozen", "ice cream", "frozen vegetables", "frozen fruit", "frozen pizza",
+    "frozen dinner", "frozen meal", "ice", "popsicle", "frozen yogurt"
+  ],
+  "Condiments": [
+    "sauce", "dressing", "condiment", "ketchup", "mustard", "mayonnaise", "mayo",
+    "hot sauce", "bbq sauce", "soy sauce", "teriyaki", "worcestershire", "vinegar",
+    "balsamic", "ranch", "caesar", "italian dressing", "pickle", "pickles", "relish",
+    "jam", "jelly", "peanut butter", "almond butter", "nutella", "syrup"
+  ]
+}
