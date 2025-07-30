@@ -20,7 +20,6 @@ import {
   Vibration,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
 import { API_CONFIG } from '../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -54,6 +53,14 @@ const MEASUREMENTS = [
   'tsp',
   'oz',
   'lb',
+];
+
+const EXPIRY_PERIODS = [
+  { label: '1 Week', days: 7 },
+  { label: '3 Weeks', days: 21 },
+  { label: '1 Month', days: 30 },
+  { label: '3 Months', days: 90 },
+  { label: '1 Year', days: 365 },
 ];
 
 // Simple Item Component
@@ -102,9 +109,10 @@ export default function MirevaScreen() {
     name: '',
     amount: '',
     measurement: 'unit',
-    expiryDate: new Date(),
+    expiryPeriod: '1 Month',
   });
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showCustomExpiry, setShowCustomExpiry] = useState(false);
+  const [customWeeks, setCustomWeeks] = useState('');
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [editedItem, setEditedItem] = useState({
@@ -362,8 +370,10 @@ export default function MirevaScreen() {
         },
         body: JSON.stringify({
           id: Date.now().toString(),
-          ...newItem,
-          expiryDate: newItem.expiryDate.toISOString(),
+          name: newItem.name,
+          amount: newItem.amount,
+          measurement: newItem.measurement,
+          expiryDate: calculateExpiryDate(newItem.expiryPeriod).toISOString(),
         }),
       });
   
@@ -376,7 +386,7 @@ export default function MirevaScreen() {
         name: '',
         amount: '',
         measurement: 'unit',
-        expiryDate: new Date(),
+        expiryPeriod: '1 Month',
       });
       
       setShowAddModal(false);
@@ -393,11 +403,19 @@ export default function MirevaScreen() {
     }
   };
 
-  const onDateChange = (event, selectedDate) => {
-    setShowDatePicker(false);
-    if (selectedDate) {
-      setNewItem({ ...newItem, expiryDate: selectedDate });
+  const calculateExpiryDate = (period) => {
+    let days = 30; // default
+    
+    if (period === 'Custom' && customWeeks) {
+      days = parseInt(customWeeks) * 7;
+    } else {
+      const selectedPeriod = EXPIRY_PERIODS.find(p => p.label === period);
+      days = selectedPeriod ? selectedPeriod.days : 30;
     }
+    
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + days);
+    return expiryDate;
   };
 
   const formatDate = (date) => {
@@ -841,26 +859,61 @@ export default function MirevaScreen() {
             </View>
             
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Expiry Date</Text>
-              <TouchableOpacity
-                style={styles.dateButton}
-                onPress={() => setShowDatePicker(true)}
-              >
-                <Text style={styles.dateButtonText}>
-                  {formatDate(newItem.expiryDate)}
-                </Text>
-              </TouchableOpacity>
+              <Text style={styles.inputLabel}>Expires in</Text>
+              <View style={styles.expiryButtonContainer}>
+                {EXPIRY_PERIODS.map((period) => (
+                  <TouchableOpacity
+                    key={period.label}
+                    style={[
+                      styles.expiryButton,
+                      newItem.expiryPeriod === period.label && styles.expiryButtonSelected
+                    ]}
+                    onPress={() => {
+                      setNewItem({ ...newItem, expiryPeriod: period.label });
+                      setShowCustomExpiry(false);
+                    }}
+                  >
+                    <Text style={[
+                      styles.expiryButtonText,
+                      newItem.expiryPeriod === period.label && styles.expiryButtonTextSelected
+                    ]}>
+                      {period.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+                <TouchableOpacity
+                  style={[
+                    styles.expiryButton,
+                    styles.customExpiryButton,
+                    showCustomExpiry && styles.expiryButtonSelected
+                  ]}
+                  onPress={() => {
+                    setShowCustomExpiry(true);
+                    setNewItem({ ...newItem, expiryPeriod: 'Custom' });
+                  }}
+                >
+                  <Text style={[
+                    styles.expiryButtonText,
+                    showCustomExpiry && styles.expiryButtonTextSelected
+                  ]}>
+                    Custom
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              
+              {showCustomExpiry && (
+                <View style={styles.customExpiryContainer}>
+                  <TextInput
+                    style={styles.customExpiryInput}
+                    placeholder="Enter weeks (e.g., 2)"
+                    value={customWeeks}
+                    onChangeText={setCustomWeeks}
+                    keyboardType="numeric"
+                  />
+                  <Text style={styles.customExpiryLabel}>weeks</Text>
+                </View>
+              )}
             </View>
-            
-            {showDatePicker && (
-              <DateTimePicker
-                value={newItem.expiryDate}
-                mode="date"
-                display="default"
-                onChange={onDateChange}
-                minimumDate={new Date()}
-              />
-            )}
           </ScrollView>
         </KeyboardAvoidingView>
       </Modal>
@@ -1765,5 +1818,84 @@ const styles = StyleSheet.create({
   
   itemTouchable: {
     flex: 1,
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  picker: {
+    height: 50,
+    color: '#000000',
+  },
+  pickerItem: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#000000',
+    textAlign: 'center',
+  },
+  expiryButtonContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 8,
+  },
+  expiryButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: '#E2E8F0',
+    backgroundColor: '#F7FAFC',
+    minWidth: 80,
+    alignItems: 'center',
+  },
+  expiryButtonSelected: {
+    backgroundColor: '#48BB78',
+    borderColor: '#48BB78',
+  },
+  expiryButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#4A5568',
+  },
+  expiryButtonTextSelected: {
+    color: '#FFFFFF',
+  },
+  customExpiryButton: {
+    backgroundColor: '#EDF2F7',
+    borderColor: '#CBD5E0',
+  },
+  customExpiryContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 12,
+    gap: 8,
+  },
+  customExpiryInput: {
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    fontSize: 16,
+    backgroundColor: '#FFFFFF',
+    width: 80,
+    textAlign: 'center',
+  },
+  customExpiryLabel: {
+    fontSize: 16,
+    color: '#4A5568',
+    fontWeight: '500',
   },
 });

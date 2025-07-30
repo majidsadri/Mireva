@@ -117,6 +117,12 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   picker: { height: 48 },
+  pickerLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.text,
+    marginBottom: 4,
+  },
   dateButton: {
     flex: 1,
     height: 48,

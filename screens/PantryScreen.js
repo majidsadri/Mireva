@@ -23,7 +23,6 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
 import axios from 'axios';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
@@ -41,6 +40,18 @@ const MEASUREMENTS = [
   'tsp',
   'oz',
   'lb',
+];
+
+const EXPIRY_PERIODS = [
+  { label: '1 Week', days: 7 },
+  { label: '2 Weeks', days: 14 },
+  { label: '3 Weeks', days: 21 },
+  { label: '1 Month', days: 30 },
+  { label: '2 Months', days: 60 },
+  { label: '3 Months', days: 90 },
+  { label: '6 Months', days: 180 },
+  { label: '1 Year', days: 365 },
+  { label: '2 Years', days: 730 },
 ];
 
 
@@ -73,10 +84,9 @@ const PantryScreen = () => {
     name: '',
     amount: '',
     measurement: 'unit',
-    expiryDate: new Date(),
+    expiryPeriod: '1 Month', // Default to 1 month
   });
   const [error, setError] = useState(null);
-  const [showDatePicker, setShowDatePicker] = useState(false);
   const [imageUri, setImageUri] = useState(null);
 
   const getFilteredItems = () => {
@@ -238,8 +248,10 @@ const PantryScreen = () => {
         },
         body: JSON.stringify({
           id: Date.now().toString(),
-          ...newItem,
-          expiryDate: newItem.expiryDate.toISOString(),
+          name: newItem.name,
+          amount: newItem.amount,
+          measurement: newItem.measurement,
+          expiryDate: calculateExpiryDate(newItem.expiryPeriod).toISOString(),
         }),
       });
   
@@ -249,7 +261,7 @@ const PantryScreen = () => {
         name: '',
         amount: '',
         measurement: 'unit',
-        expiryDate: new Date(),
+        expiryPeriod: '1 Month',
       });
       fetchPantryItems();
       setError(null);
@@ -283,11 +295,12 @@ const PantryScreen = () => {
   };
   
 
-  const onDateChange = (event, selectedDate) => {
-    setShowDatePicker(false);
-    if (selectedDate) {
-      setNewItem({ ...newItem, expiryDate: selectedDate });
-    }
+  const calculateExpiryDate = (period) => {
+    const selectedPeriod = EXPIRY_PERIODS.find(p => p.label === period);
+    const days = selectedPeriod ? selectedPeriod.days : 30; // Default to 30 days
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + days);
+    return expiryDate;
   };
 
   const pickImage = () => {
@@ -436,14 +449,23 @@ const PantryScreen = () => {
           </View>
 
           <View style={styles.inputRow}>
-            <TouchableOpacity
-              style={styles.dateButton}
-              onPress={() => setShowDatePicker(true)}
-            >
-              <Text style={styles.dateButtonText}>
-                Expiry: {formatDate(newItem.expiryDate)}
-              </Text>
-            </TouchableOpacity>
+            <View style={[styles.measurementPicker, { flex: 1 }]}>
+              <Text style={styles.pickerLabel}>Expires in:</Text>
+              <Picker
+                selectedValue={newItem.expiryPeriod}
+                onValueChange={(value) => setNewItem({ ...newItem, expiryPeriod: value })}
+                style={styles.picker}
+              >
+                {EXPIRY_PERIODS.map((period) => (
+                  <Picker.Item 
+                    key={period.label} 
+                    label={period.label} 
+                    value={period.label}
+                    color={COLORS.text}
+                  />
+                ))}
+              </Picker>
+            </View>
 
             <TouchableOpacity style={styles.addButton} onPress={addItem}>
               <Text style={styles.addButtonText}>➕ Add to Pantry</Text>
@@ -457,15 +479,6 @@ const PantryScreen = () => {
         </View>
         
 
-        {showDatePicker && (
-          <DateTimePicker
-            value={newItem.expiryDate}
-            mode="date"
-            display="default"
-            onChange={onDateChange}
-            minimumDate={new Date()}
-          />
-        )}
 
         <View style={styles.pantryListContainer}>
           <Text style={styles.sectionTitle}>Your Pantry Items (Updated)</Text>

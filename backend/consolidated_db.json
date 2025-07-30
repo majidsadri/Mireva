@@ -1,0 +1,435 @@
+{
+  "pantry": {
+    "Sadri-FAM Pantry": [
+      {
+        "id": "1745610225589",
+        "name": "Beef",
+        "amount": "2",
+        "measurement": "unit",
+        "expiryDate": "2025-04-25T19:43:22.610Z"
+      },
+      {
+        "id": "94f1318b-0e17-45cc-a1c6-d6ffcfb34a5b",
+        "name": "Tomato paste",
+        "amount": "2",
+        "measurement": "unit",
+        "expiryDate": "2025-08-24T02:11:13.000Z"
+      },
+      {
+        "id": "87dd87fd-a3e5-41e4-b5e5-75e5aeb2ba09",
+        "name": "eggs",
+        "amount": "6",
+        "measurement": "unit",
+        "expiryDate": "2025-06-27T22:35:37.726769"
+      },
+      {
+        "id": "1751314883593",
+        "name": "noodles",
+        "amount": "3",
+        "measurement": "unit",
+        "expiryDate": "2025-09-28T20:21:23.742564",
+        "category": "Grains & Pantry"
+      },
+      {
+        "id": "f59c518a-4a37-4a29-abbc-b6878de1dd8e",
+        "name": "Yogurt",
+        "amount": "1",
+        "measurement": "container",
+        "category": "Dairy",
+        "purchaseDate": "2025-07-01T01:40:43.366527",
+        "expiryDate": "2025-07-11T01:40:43.366527",
+        "expired": "no"
+      },
+      {
+        "id": "8d9f8b2f-d1c1-45f7-a384-74a43017f3eb",
+        "name": "Sauerkraut",
+        "amount": "1",
+        "measurement": "jar",
+        "category": "Grains & Pantry",
+        "purchaseDate": "2025-07-01T01:40:43.366527",
+        "expiryDate": "2025-09-29T01:40:43.366527",
+        "expired": "no"
+      },
+      {
+        "id": "3bb01489-d8d0-4ab2-ad90-773e5d0f8c5a",
+        "name": "Jam",
+        "amount": "1",
+        "measurement": "container",
+        "category": "Grains & Pantry",
+        "purchaseDate": "2025-07-01T01:40:43.366527",
+        "expiryDate": "2025-08-30T01:40:43.366527",
+        "expired": "no"
+      },
+      {
+        "name": "Test Item",
+        "amount": "1",
+        "measurement": "unit",
+        "category": "Grains & Pantry",
+        "expiryDate": "2025-09-29T23:40:04.165895"
+      },
+      {
+        "id": "1751537734217",
+        "name": "lemon",
+        "amount": "10",
+        "measurement": "unit",
+        "expiryDate": "2025-07-13T10:15:34.370369",
+        "category": "Fruits & Vegetables"
+      },
+      {
+        "id": "fe2c7d3d-f0e0-4520-b644-cac0f2ef97e2",
+        "name": "Turnip",
+        "amount": "1",
+        "measurement": "unit",
+        "category": "Fruits & Vegetables",
+        "purchaseDate": "2025-07-05T00:04:13.010326",
+        "expiryDate": "2025-07-26T00:04:13.010326",
+        "expired": "no"
+      },
+      {
+        "id": "61d14794-ca68-4762-b0a8-71bb4f100d88",
+        "name": "Grapes",
+        "amount": "1",
+        "measurement": "container",
+        "category": "Fruits & Vegetables",
+        "purchaseDate": "2025-07-05T00:05:05.524152",
+        "expiryDate": "2025-08-18T22:24:56.000Z",
+        "expired": "no"
+      },
+      {
+        "name": "Test Item from Backend Check",
+        "amount": "1",
+        "measurement": "unit",
+        "expiryDate": "2025-08-01T00:00:00.000Z"
+      },
+      {
+        "name": "TEST PANTRY ACTIVITY LOG",
+        "amount": "1",
+        "measurement": "unit",
+        "expiryDate": "2025-08-01T00:00:00.000Z"
+      },
+      {
+        "id": "1752436697752",
+        "name": "Almond",
+        "amount": "",
+        "measurement": "unit",
+        "expiryDate": "2025-10-16T19:58:00.000Z"
+      },
+      {
+        "id": "6945301d-8a8d-41e7-a3ab-93583450563e",
+        "name": "Honey roasted peanuts",
+        "amount": "1",
+        "measurement": "container",
+        "purchaseDate": "2025-07-13T20:39:40.558701",
+        "expiryDate": "2025-08-12T20:39:40.558701",
+        "expired": "no"
+      },
+      {
+        "id": "31ff1c7d-1c00-473b-8d2f-75ac13ea1be8",
+        "name": "Guacamole",
+        "amount": "1",
+        "measurement": "container",
+        "purchaseDate": "2025-07-13T20:39:40.558701",
+        "expiryDate": "2025-08-12T20:39:40.558701",
+        "expired": "no"
+      },
+      {
+        "id": "e6421c16-ff2c-4adb-9dd6-14227db994e9",
+        "name": "Jar of grains or legumes",
+        "amount": "10",
+        "measurement": "unit",
+        "purchaseDate": "2025-07-13T22:12:18.226017",
+        "expiryDate": "2025-08-12T22:12:18.226017",
+        "expired": "no"
+      },
+      {
+        "id": "10184467-bc5a-42c0-b2f0-7874af55c5f0",
+        "name": "Peanuts",
+        "amount": "5",
+        "measurement": "unit",
+        "purchaseDate": "2025-07-14T20:40:58.136631",
+        "expiryDate": "2025-08-13T20:40:58.136631",
+        "expired": "no"
+      },
+      {
+        "id": "7a2c1e50-89f0-4d94-9011-15590a647071",
+        "name": "Edamame",
+        "amount": "1",
+        "measurement": "bowl",
+        "purchaseDate": "2025-07-15T02:47:02.831030",
+        "expiryDate": "2025-08-14T02:47:02.831030",
+        "expired": "no"
+      },
+      {
+        "id": "09b1a015-dce4-4ebc-8e04-cca26a028f44",
+        "name": "Banana",
+        "amount": "3",
+        "measurement": "unit",
+        "purchaseDate": "2025-07-18T21:01:33.558279",
+        "expiryDate": "2025-08-17T21:01:33.558279",
+        "expired": "no",
+        "category": "Produce"
+      },
+      {
+        "id": "4c557afd-5623-494e-bc7c-e2e687047184",
+        "name": "Apple",
+        "amount": "14",
+        "measurement": "unit",
+        "category": "Produce",
+        "purchaseDate": "2025-07-03T20:02:08.051415",
+        "expiryDate": "2025-08-18T22:23:40.000Z",
+        "expired": "no"
+      },
+      {
+        "id": "1752876631628",
+        "name": "Orange ",
+        "amount": "6",
+        "measurement": "unit",
+        "expiryDate": "2025-08-04T22:10:00.000Z",
+        "category": "Produce"
+      },
+      {
+        "id": "4ca3b24c-827f-4bcd-b590-2aa985e1f745",
+        "name": "Grapes",
+        "amount": "1",
+        "measurement": "unit",
+        "category": "Fruits & Vegetables",
+        "purchaseDate": "2025-07-28T20:49:59.901960",
+        "expiryDate": "",
+        "expired": "no"
+      }
+    ],
+    "default": [
+      {
+        "id": "377e5f5a-8a3d-4bdc-83a5-8e8f5836e668",
+        "name": "Bottled water",
+        "amount": "1",
+        "measurement": "unit",
+        "purchaseDate": "2025-06-28T01:23:12.264231",
+        "expiryDate": "2025-07-28T01:23:12.264231",
+        "expired": "no"
+      },
+      {
+        "id": "1751073927789",
+        "name": "Rice",
+        "amount": "1",
+        "measurement": "unit",
+        "expiryDate": "2025-06-28T01:07:23.768Z"
+      },
+      {
+        "id": "test-debug-1751073963",
+        "name": "Debug Test Item",
+        "amount": "1",
+        "measurement": "unit",
+        "expiryDate": "2025-07-05T00:00:00.000Z"
+      },
+      {
+        "id": "3f8e15fb-ac81-4fdc-9f18-5535f49b5ad9",
+        "name": "Pistachio",
+        "amount": "74",
+        "measurement": "unit",
+        "category": "Other",
+        "purchaseDate": "2025-07-29T20:21:29.911967",
+        "expiryDate": "2025-08-28T20:21:29.911967",
+        "expired": "no"
+      },
+      {
+        "id": "1753820719478",
+        "name": "Rice",
+        "amount": "10",
+        "measurement": "kg",
+        "expiryDate": "2026-05-13T20:02:00.000Z",
+        "category": "Pantry"
+      }
+    ],
+    "TEST": [],
+    "Saeid": [
+      {
+        "id": "1751097760729",
+        "name": "Dill",
+        "amount": "2",
+        "measurement": "unit",
+        "expiryDate": "2025-06-28T08:01:53.147Z"
+      },
+      {
+        "id": "1751097773061",
+        "name": "chicken",
+        "amount": "4",
+        "measurement": "unit",
+        "expiryDate": "2025-08-20T08:02:00.000Z"
+      }
+    ],
+    "Nadia": [],
+    "Saeed_Panter": [
+      {
+        "id": "1752279489275",
+        "name": "Beef",
+        "amount": "",
+        "measurement": "unit",
+        "expiryDate": "2025-07-16T00:18:09.323706",
+        "category": "Proteins"
+      },
+      {
+        "id": "1752279504312",
+        "name": "rice",
+        "amount": "",
+        "measurement": "unit",
+        "expiryDate": "2026-07-12T00:18:24.361499",
+        "category": "Grains & Pantry"
+      }
+    ],
+    "Owl": [
+      {
+        "id": "1752351792046",
+        "name": "Rice",
+        "amount": "2",
+        "measurement": "unit",
+        "expiryDate": "2026-07-12T20:23:12.098127",
+        "category": "Grains & Pantry"
+      },
+      {
+        "id": "1752351803612",
+        "name": "Salmon",
+        "amount": "",
+        "measurement": "unit",
+        "expiryDate": "2025-07-14T20:23:23.659966",
+        "category": "Proteins"
+      },
+      {
+        "id": "1752351820045",
+        "name": "Salt",
+        "amount": "",
+        "measurement": "unit",
+        "expiryDate": "2026-07-12T20:23:40.094911",
+        "category": "Grains & Pantry"
+      },
+      {
+        "id": "1752351990439",
+        "name": "Egg",
+        "amount": "6",
+        "measurement": "unit",
+        "expiryDate": "2025-07-22T20:26:30.462155",
+        "category": "Proteins"
+      }
+    ],
+    "Juju": [
+      {
+        "id": "1753119217419",
+        "name": "Chicken",
+        "amount": "",
+        "measurement": "unit",
+        "expiryDate": "2026-03-17T17:33:00.000Z",
+        "category": "Other"
+      },
+      {
+        "id": "3ac5418c-e276-4fd2-bb17-6a8834c84640",
+        "name": "garlic",
+        "amount": "1",
+        "measurement": "unit",
+        "category": "Produce",
+        "purchaseDate": "2025-07-21T18:52:34.488942",
+        "expiryDate": "2028-07-23T20:10:28.000Z",
+        "expired": "no"
+      },
+      {
+        "id": "e23d2bc9-2373-4c09-b9c4-72792b8aae04",
+        "name": "eggs",
+        "amount": "1",
+        "measurement": "unit",
+        "category": "Proteins",
+        "purchaseDate": "2025-07-21T19:20:21.325503",
+        "expiryDate": "",
+        "expired": "no"
+      },
+      {
+        "id": "0d6ebf3e-3a1f-4be8-8627-662197d312ca",
+        "name": "Tomatoes",
+        "amount": "1",
+        "measurement": "unit",
+        "category": "Fruits & Vegetables",
+        "purchaseDate": "2025-07-21T19:35:47.141868",
+        "expiryDate": "",
+        "expired": "no"
+      },
+      {
+        "id": "1753135457915",
+        "name": "rice",
+        "amount": "",
+        "measurement": "unit",
+        "expiryDate": "2025-10-16T22:04:00.000Z",
+        "category": "Pantry"
+      },
+      {
+        "id": "dc3d04ff-23d5-4b9e-b11e-0c1e398267c0",
+        "name": "black pepper",
+        "amount": "1",
+        "measurement": "unit",
+        "category": "Condiments",
+        "purchaseDate": "2025-07-22T02:09:54.679487",
+        "expiryDate": "",
+        "expired": "no"
+      },
+      {
+        "id": "1753301449733",
+        "name": "apple",
+        "amount": "",
+        "measurement": "unit",
+        "expiryDate": "2025-07-23T20:02:53.920Z",
+        "category": "Produce"
+      },
+      {
+        "id": "0825ec6a-02e5-4630-9131-aa431f8072a8",
+        "name": "onions",
+        "amount": "1",
+        "measurement": "unit",
+        "category": "Produce",
+        "purchaseDate": "2025-07-23T21:45:41.495553",
+        "expiryDate": "",
+        "expired": "no"
+      },
+      {
+        "id": "1753821577156",
+        "name": "Sugar",
+        "amount": "1",
+        "measurement": "kg",
+        "expiryDate": "2025-11-26T20:30:00.000Z",
+        "category": "Other"
+      },
+      {
+        "id": "2e83deab-080a-4e5a-8c87-5d76ba8fa874",
+        "name": "Chicken breast",
+        "amount": "4",
+        "measurement": "unit",
+        "category": "Other",
+        "purchaseDate": "2025-07-29T21:00:30.925711",
+        "expiryDate": "2025-09-01T00:00:00.000Z",
+        "expired": "no"
+      },
+      {
+        "id": "3b7eef33-a09c-47c9-a5d4-716484591481",
+        "name": "Pumpkin seed",
+        "amount": "50",
+        "measurement": "unit",
+        "category": "Other",
+        "purchaseDate": "2025-07-29T21:01:35.252845",
+        "expiryDate": "2025-08-28T21:01:35.252845",
+        "expired": "no"
+      },
+      {
+        "id": "1753823432454",
+        "name": "celery",
+        "amount": "",
+        "measurement": "unit",
+        "expiryDate": "2025-08-21T21:10:00.000Z",
+        "category": "Produce"
+      },
+      {
+        "id": "1753823445442",
+        "name": "Orange",
+        "amount": "",
+        "measurement": "unit",
+        "expiryDate": "2025-08-21T21:10:00.000Z",
+        "category": "Produce"
+      }
+    ]
+  }
+}
