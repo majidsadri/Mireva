@@ -2916,41 +2916,80 @@ def manage_pantry_suggestions():
             return jsonify({"error": "User email required in X-User-Email header"}), 400
 
         if request.method == 'GET':
-            # Return basic pantry suggestions in the format the frontend expects
+            # Get saved recipes for this user
             suggestions = []
+            recipe_ingredients = set()
             
+            # Load current database
+            try:
+                with open(DB_FILE_PATH, 'r') as f:
+                    db_data = json.load(f)
+            except Exception as e:
+                logging.error(f"Error loading database: {e}")
+                db_data = {}
+            
+            # Try to get saved recipes
+            try:
+                saved_recipes_key = f"saved_recipes_{user_email}"
+                if saved_recipes_key in db_data:
+                    saved_recipes = db_data[saved_recipes_key]
+                    # Extract ingredients from saved recipes
+                    for recipe in saved_recipes:
+                        if 'ingredients' in recipe:
+                            for ingredient in recipe['ingredients']:
+                                # Extract ingredient name (remove quantities)
+                                ingredient_name = ingredient.split(',')[0].strip()
+                                ingredient_name = ingredient_name.split('(')[0].strip()
+                                recipe_ingredients.add(ingredient_name)
+            except Exception as e:
+                logging.warning(f"Could not load saved recipes for suggestions: {e}")
+            
+            # Add ingredients from saved recipes first
+            for i, ingredient in enumerate(list(recipe_ingredients)[:10]):
+                suggestions.append({
+                    "id": f"recipe_{i+1}",
+                    "name": ingredient,
+                    "priority": "high",
+                    "reason": "From your saved recipes",
+                    "category": "From Recipes"
+                })
+            
+            # Add default suggestions
             # Proteins
             protein_items = ["Chicken breast", "Salmon", "Eggs", "Greek yogurt"]
             for i, item in enumerate(protein_items):
-                suggestions.append({
-                    "id": f"protein_{i+1}",
-                    "name": item,
-                    "priority": "high" if i < 2 else "medium",
-                    "reason": "Essential protein source",
-                    "category": "Proteins"
-                })
+                if item not in recipe_ingredients:
+                    suggestions.append({
+                        "id": f"protein_{i+1}",
+                        "name": item,
+                        "priority": "high" if i < 2 else "medium",
+                        "reason": "Essential protein source",
+                        "category": "Proteins"
+                    })
             
             # Vegetables  
             vegetable_items = ["Broccoli", "Spinach", "Bell peppers", "Onions"]
             for i, item in enumerate(vegetable_items):
-                suggestions.append({
-                    "id": f"vegetable_{i+1}",
-                    "name": item,
-                    "priority": "medium",
-                    "reason": "Fresh vegetables",
-                    "category": "Vegetables"
-                })
+                if item not in recipe_ingredients:
+                    suggestions.append({
+                        "id": f"vegetable_{i+1}",
+                        "name": item,
+                        "priority": "medium",
+                        "reason": "Fresh vegetables",
+                        "category": "Vegetables"
+                    })
             
             # Pantry Staples
             staple_items = ["Rice", "Pasta", "Olive oil", "Garlic"]
             for i, item in enumerate(staple_items):
-                suggestions.append({
-                    "id": f"staple_{i+1}",
-                    "name": item,
-                    "priority": "high" if item in ["Olive oil", "Garlic"] else "medium",
-                    "reason": "Pantry essential",
-                    "category": "Pantry Staples"
-                })
+                if item not in recipe_ingredients:
+                    suggestions.append({
+                        "id": f"staple_{i+1}",
+                        "name": item,
+                        "priority": "high" if item in ["Olive oil", "Garlic"] else "medium",
+                        "reason": "Pantry essential",
+                        "category": "Pantry Staples"
+                    })
             
             return jsonify({"suggestions": suggestions}), 200
 

@@ -14,6 +14,7 @@ import {
   Linking,
   Modal,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_CONFIG } from '../config';
 
@@ -30,8 +31,19 @@ export default function ShopScreen() {
 
   useEffect(() => {
     loadShoppingList();
-    loadSuggestions();
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadSuggestions();
+    }, [])
+  );
+
+  const forceRefreshSuggestions = async () => {
+    // Clear cache and force regenerate
+    await AsyncStorage.removeItem('shopping_suggestions');
+    await refreshSuggestions();
+  };
 
   const getUserHeaders = async () => {
     const userEmail = await AsyncStorage.getItem('userEmail');
@@ -73,6 +85,7 @@ export default function ShopScreen() {
   const loadSuggestions = async () => {
     try {
       setSuggestionsLoading(true);
+      console.log('🔄 Loading suggestions...');
       
       // Try to load suggestions from backend first (pantry-based)
       const headers = await getUserHeaders();
@@ -84,17 +97,21 @@ export default function ShopScreen() {
       if (response.ok) {
         const data = await response.json();
         const pantrySuggestions = data.suggestions || [];
+        console.log('✅ Loaded suggestions from backend:', pantrySuggestions.length);
         setSuggestions(pantrySuggestions);
         
         // Cache in AsyncStorage for faster loading
         await AsyncStorage.setItem('shopping_suggestions', JSON.stringify(pantrySuggestions));
       } else {
+        console.log('⚠️ Backend suggestions failed, using fallback');
         // Fallback to local suggestions if backend fails
         const localSuggestions = await AsyncStorage.getItem('shopping_suggestions');
         if (localSuggestions) {
           const parsedSuggestions = JSON.parse(localSuggestions);
+          console.log('📱 Using cached suggestions:', parsedSuggestions.length);
           setSuggestions(parsedSuggestions);
         } else {
+          console.log('🔄 No cache, generating new suggestions');
           // Generate new suggestions if none exist
           await refreshSuggestions();
         }
@@ -784,7 +801,7 @@ export default function ShopScreen() {
           </View>
         </TouchableOpacity>
         
-        <TouchableOpacity style={styles.circularButtonWrapper} onPress={refreshSuggestions}>
+        <TouchableOpacity style={styles.circularButtonWrapper} onPress={forceRefreshSuggestions}>
           <View style={[styles.circularButton, styles.refreshButton]}>
             <Text style={styles.circularButtonText}>Refresh</Text>
           </View>

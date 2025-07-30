@@ -20,6 +20,7 @@ import {
   Vibration,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
 import { API_CONFIG } from '../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -809,13 +810,7 @@ export default function MirevaScreen() {
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
           <View style={styles.modalHeader}>
-            <TouchableOpacity onPress={() => setShowAddModal(false)}>
-              <Text style={styles.cancelButton}>Cancel</Text>
-            </TouchableOpacity>
             <Text style={styles.modalTitle}>Add Item</Text>
-            <TouchableOpacity onPress={addManualItem}>
-              <Text style={styles.saveButton}>Save</Text>
-            </TouchableOpacity>
           </View>
           
           <ScrollView style={styles.modalContent} keyboardShouldPersistTaps="handled">
@@ -840,25 +835,6 @@ export default function MirevaScreen() {
                   onChangeText={(text) => setNewItem({ ...newItem, amount: text })}
                   keyboardType="numeric"
                 />
-              </View>
-              
-              <View style={styles.measurementContainer}>
-                <Text style={styles.inputLabel}>Unit</Text>
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    selectedValue={newItem.measurement}
-                    onValueChange={(value) => setNewItem({ ...newItem, measurement: value })}
-                    style={styles.picker}
-                  >
-                    {MEASUREMENTS.map((measure) => (
-                      <Picker.Item 
-                        key={measure} 
-                        label={measure} 
-                        value={measure}
-                      />
-                    ))}
-                  </Picker>
-                </View>
               </View>
             </View>
             
@@ -917,6 +893,27 @@ export default function MirevaScreen() {
                   <Text style={styles.customExpiryLabel}>weeks</Text>
                 </View>
               )}
+            </View>
+            
+            {/* Action Buttons */}
+            <View style={styles.addModalButtonContainer}>
+              <TouchableOpacity 
+                style={styles.addModalCircularButton}
+                onPress={() => setShowAddModal(false)}
+              >
+                <View style={[styles.circularButton, styles.cancelCircularButton]}>
+                  <Text style={styles.circularButtonText}>Cancel</Text>
+                </View>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.addModalCircularButton}
+                onPress={addManualItem}
+              >
+                <View style={[styles.circularButton, styles.saveCircularButton]}>
+                  <Text style={styles.circularButtonText}>Save</Text>
+                </View>
+              </TouchableOpacity>
             </View>
           </ScrollView>
         </KeyboardAvoidingView>
@@ -1486,43 +1483,48 @@ const styles = StyleSheet.create({
   // Modal styles
   modalContainer: {
     flex: 1,
-    backgroundColor: '#F7F9FC',
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 12,
+    marginVertical: 60,
+    borderRadius: 24,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 15,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 25,
+    elevation: 15,
   },
   modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: '#FFFFFF',
+    paddingVertical: 24,
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: '#F0F4F8',
+    backgroundColor: '#F8FAFC',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
   },
   modalTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 22,
+    fontWeight: '700',
     color: '#1A202C',
-  },
-  cancelButton: {
-    fontSize: 16,
-    color: '#718096',
-  },
-  saveButton: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#2D6A4F',
+    letterSpacing: 0.5,
   },
   modalContent: {
     flex: 1,
-    padding: 20,
+    padding: 24,
+    backgroundColor: '#FFFFFF',
   },
   inputContainer: {
-    marginBottom: 20,
+    marginBottom: 24,
   },
   inputRow: {
     flexDirection: 'row',
     gap: 16,
-    marginBottom: 20,
+    marginBottom: 24,
   },
   amountContainer: {
     flex: 1,
@@ -1531,27 +1533,45 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   inputLabel: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 17,
+    fontWeight: '700',
     color: '#2D3748',
-    marginBottom: 8,
+    marginBottom: 12,
+    letterSpacing: 0.3,
   },
   textInput: {
     backgroundColor: '#FFFFFF',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderRadius: 12,
-    borderWidth: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderRadius: 16,
+    borderWidth: 2,
     borderColor: '#E2E8F0',
     fontSize: 16,
     color: '#2D3748',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+    fontWeight: '500',
   },
   pickerContainer: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    borderWidth: 1,
+    borderRadius: 16,
+    borderWidth: 2,
     borderColor: '#E2E8F0',
     overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 3,
   },
   picker: {
     height: 50,
@@ -1851,55 +1871,133 @@ const styles = StyleSheet.create({
   expiryButtonContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
-    marginTop: 8,
+    gap: 12,
+    marginTop: 16,
+    justifyContent: 'center',
   },
   expiryButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    borderRadius: 25,
     borderWidth: 2,
     borderColor: '#E2E8F0',
-    backgroundColor: '#F7FAFC',
-    minWidth: 80,
+    backgroundColor: '#FFFFFF',
+    minWidth: 90,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 3,
+    transform: [{ scale: 1 }],
   },
   expiryButtonSelected: {
-    backgroundColor: '#48BB78',
-    borderColor: '#48BB78',
+    backgroundColor: '#4299E1',
+    borderColor: '#4299E1',
+    shadowColor: '#4299E1',
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 6,
+    transform: [{ scale: 1.05 }],
   },
   expiryButtonText: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '600',
-    color: '#4A5568',
+    color: '#2D3748',
+    textAlign: 'center',
   },
   expiryButtonTextSelected: {
     color: '#FFFFFF',
+    fontWeight: '700',
   },
   customExpiryButton: {
-    backgroundColor: '#EDF2F7',
+    backgroundColor: '#F7FAFC',
     borderColor: '#CBD5E0',
+    borderStyle: 'dashed',
   },
   customExpiryContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 12,
-    gap: 8,
-  },
-  customExpiryInput: {
+    justifyContent: 'center',
+    marginTop: 16,
+    gap: 12,
+    backgroundColor: '#F8FAFC',
+    padding: 16,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: '#E2E8F0',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+  },
+  customExpiryInput: {
+    borderWidth: 2,
+    borderColor: '#4299E1',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     fontSize: 16,
     backgroundColor: '#FFFFFF',
-    width: 80,
+    width: 100,
     textAlign: 'center',
+    fontWeight: '600',
+    color: '#2D3748',
+    shadowColor: '#4299E1',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   customExpiryLabel: {
     fontSize: 16,
     color: '#4A5568',
-    fontWeight: '500',
+    fontWeight: '600',
+  },
+  addModalButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingVertical: 30,
+    paddingHorizontal: 20,
+  },
+  addModalCircularButton: {
+    alignItems: 'center',
+  },
+  circularButton: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  circularButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  cancelCircularButton: {
+    backgroundColor: '#FF6B35',
+    shadowColor: '#FF6B35',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  saveCircularButton: {
+    backgroundColor: '#2D6A4F',
+    shadowColor: '#2D6A4F',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
 });
