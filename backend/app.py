@@ -1803,6 +1803,101 @@ def get_shopping_suggestions():
 
         suggestions = []
         
+        # Get user's pantry items to exclude from suggestions
+        pantry_items = set()
+        try:
+            # Get pantry name from header or user data
+            pantry_name = request.headers.get('X-Pantry-Name') or user_pantry_name
+            
+            if pantry_name:
+                with open(DB_FILE_PATH, 'r') as f:
+                    db_data = json.load(f)
+                
+                # Get items from the pantry (check case-insensitive)
+                if 'pantry' in db_data:
+                    # Find pantry with case-insensitive matching
+                    actual_pantry_name = None
+                    for existing_pantry in db_data['pantry'].keys():
+                        if existing_pantry.lower() == pantry_name.lower():
+                            actual_pantry_name = existing_pantry
+                            break
+                    
+                    if actual_pantry_name:
+                        for item in db_data['pantry'][actual_pantry_name]:
+                            if 'name' in item:
+                                # Normalize item name for comparison
+                                pantry_items.add(item['name'].lower().strip())
+            
+            logging.info(f"Found {len(pantry_items)} items in pantry {pantry_name} for exclusion")
+        except Exception as e:
+            logging.warning(f"Could not load pantry items for exclusion: {e}")
+        
+        # Get ingredients from saved recipes for suggestions
+        recipe_ingredients = set()
+        try:
+            # Saved recipes are in users.json, not db.json
+            saved_recipes = user_data.get('savedRecipes', [])
+            
+            # Extract ingredients from saved recipes
+            for recipe in saved_recipes:
+                if 'ingredients' in recipe:
+                    for ingredient in recipe['ingredients']:
+                        # Extract ingredient name (remove quantities)
+                        ingredient_name = ingredient.split(',')[0].strip()
+                        ingredient_name = ingredient_name.split('(')[0].strip()
+                        recipe_ingredients.add(ingredient_name)
+            
+            logging.info(f"Found {len(recipe_ingredients)} unique ingredients from saved recipes")
+        except Exception as e:
+            logging.warning(f"Could not load saved recipes for suggestions: {e}")
+        
+        # Add ingredients from saved recipes first (excluding pantry items)
+        # Prioritize proteins and main ingredients
+        recipe_ingredients_list = list(recipe_ingredients)
+        proteins = ['salmon', 'chicken', 'beef', 'fish', 'pork', 'turkey', 'lamb', 'tofu', 'tempeh']
+        
+        # Sort recipe ingredients to prioritize proteins
+        sorted_ingredients = []
+        for ingredient in recipe_ingredients_list:
+            if any(protein in ingredient.lower() for protein in proteins):
+                sorted_ingredients.append(ingredient)
+        
+        # Add non-protein ingredients
+        for ingredient in recipe_ingredients_list:
+            if not any(protein in ingredient.lower() for protein in proteins):
+                sorted_ingredients.append(ingredient)
+        
+        added_suggestions = 0
+        for ingredient in sorted_ingredients:
+            if added_suggestions >= 10:
+                break
+                
+            ingredient_lower = ingredient.lower().strip()
+            # Remove quantity prefixes (numbers, measurements)
+            import re
+            ingredient_clean = re.sub(r'^[\d\s]*(?:cup|cups|tablespoon|tbsp|teaspoon|tsp|pound|lb|ounce|oz|gram|g|kilogram|kg)?\s*', '', ingredient_lower).strip()
+            if not ingredient_clean:
+                ingredient_clean = ingredient_lower
+            
+            # Check if ingredient matches any pantry item (exact match or simple plural/singular variants)
+            excluded = False
+            for pantry_item in pantry_items:
+                if (ingredient_clean == pantry_item or 
+                    (ingredient_clean + 's' == pantry_item and len(ingredient_clean) > 3) or 
+                    (ingredient_clean == pantry_item + 's' and len(pantry_item) > 3)):
+                    excluded = True
+                    break
+            
+            if not excluded:
+                suggestions.append({
+                    "id": f"recipe_{added_suggestions+1}",
+                    "name": ingredient,
+                    "category": getCategoryForItem(ingredient),
+                    "reason": "From your saved recipes",
+                    "priority": "high"
+                })
+                added_suggestions += 1
+        
         # 1. EXPIRED ITEMS - Get replacements for expired pantry items
         if user_pantry_name:
             try:
@@ -1881,7 +1976,21 @@ def get_shopping_suggestions():
         if len(suggestions) < 8:
             staples = ["Onions", "Garlic", "Lemons", "Olive Oil", "Salt", "Black Pepper", "Eggs", "Milk"]
             for item in staples:
-                if not any(s['name'].lower() == item.lower() for s in suggestions):
+                # Check if item is already in suggestions
+                if any(s['name'].lower() == item.lower() for s in suggestions):
+                    continue
+                
+                # Check if item matches any pantry item (exact match or simple plural/singular variants)
+                item_lower = item.lower().strip()
+                excluded = False
+                for pantry_item in pantry_items:
+                    if (item_lower == pantry_item or 
+                        (item_lower + 's' == pantry_item and len(item_lower) > 3) or 
+                        (item_lower == pantry_item + 's' and len(pantry_item) > 3)):
+                        excluded = True
+                        break
+                
+                if not excluded:
                     suggestions.append({
                         "id": f"staple_{len(suggestions)+1}",
                         "name": item,
@@ -2928,6 +3037,44 @@ def manage_pantry_suggestions():
                 logging.error(f"Error loading database: {e}")
                 db_data = {}
             
+            # Get user's pantry items to exclude from suggestions
+            pantry_items = set()
+            try:
+                # Get pantry name from header or determine from user's pantries
+                pantry_name = request.headers.get('X-Pantry-Name')
+                
+                if not pantry_name:
+                    # Find user's pantries
+                    for pname, items in db_data.get('pantry', {}).items():
+                        # Check if user has access to this pantry
+                        pantry_owner_key = f"{pname}_owner"
+                        pantry_members_key = f"{pname}_members"
+                        
+                        if (pantry_owner_key in db_data and db_data[pantry_owner_key] == user_email) or \
+                           (pantry_members_key in db_data and user_email in db_data.get(pantry_members_key, [])):
+                            pantry_name = pname
+                            break
+                
+                # Get items from the pantry (check case-insensitive)
+                if pantry_name and 'pantry' in db_data:
+                    # Find pantry with case-insensitive matching
+                    actual_pantry_name = None
+                    for existing_pantry in db_data['pantry'].keys():
+                        if existing_pantry.lower() == pantry_name.lower():
+                            actual_pantry_name = existing_pantry
+                            break
+                    
+                    if actual_pantry_name:
+                        for item in db_data['pantry'][actual_pantry_name]:
+                            if 'name' in item:
+                                # Normalize item name for comparison
+                                pantry_items.add(item['name'].lower().strip())
+                
+                logging.info(f"Found {len(pantry_items)} items in pantry for {user_email}")
+                logging.info(f"Pantry items (lowercase): {list(pantry_items)[:10]}")
+            except Exception as e:
+                logging.warning(f"Could not load pantry items: {e}")
+            
             # Try to get saved recipes
             try:
                 saved_recipes_key = f"saved_recipes_{user_email}"
@@ -2944,21 +3091,22 @@ def manage_pantry_suggestions():
             except Exception as e:
                 logging.warning(f"Could not load saved recipes for suggestions: {e}")
             
-            # Add ingredients from saved recipes first
+            # Add ingredients from saved recipes first (excluding pantry items)
             for i, ingredient in enumerate(list(recipe_ingredients)[:10]):
-                suggestions.append({
-                    "id": f"recipe_{i+1}",
-                    "name": ingredient,
-                    "priority": "high",
-                    "reason": "From your saved recipes",
-                    "category": "From Recipes"
-                })
+                if ingredient.lower().strip() not in pantry_items:
+                    suggestions.append({
+                        "id": f"recipe_{i+1}",
+                        "name": ingredient,
+                        "priority": "high",
+                        "reason": "From your saved recipes",
+                        "category": "From Recipes"
+                    })
             
-            # Add default suggestions
+            # Add default suggestions (excluding pantry items)
             # Proteins
             protein_items = ["Chicken breast", "Salmon", "Eggs", "Greek yogurt"]
             for i, item in enumerate(protein_items):
-                if item not in recipe_ingredients:
+                if item.lower().strip() not in pantry_items and item not in recipe_ingredients:
                     suggestions.append({
                         "id": f"protein_{i+1}",
                         "name": item,
@@ -2970,7 +3118,7 @@ def manage_pantry_suggestions():
             # Vegetables  
             vegetable_items = ["Broccoli", "Spinach", "Bell peppers", "Onions"]
             for i, item in enumerate(vegetable_items):
-                if item not in recipe_ingredients:
+                if item.lower().strip() not in pantry_items and item not in recipe_ingredients:
                     suggestions.append({
                         "id": f"vegetable_{i+1}",
                         "name": item,
@@ -2982,7 +3130,7 @@ def manage_pantry_suggestions():
             # Pantry Staples
             staple_items = ["Rice", "Pasta", "Olive oil", "Garlic"]
             for i, item in enumerate(staple_items):
-                if item not in recipe_ingredients:
+                if item.lower().strip() not in pantry_items and item not in recipe_ingredients:
                     suggestions.append({
                         "id": f"staple_{i+1}",
                         "name": item,
@@ -2991,7 +3139,12 @@ def manage_pantry_suggestions():
                         "category": "Pantry Staples"
                     })
             
-            return jsonify({"suggestions": suggestions}), 200
+            # Add cache-busting header to force refresh
+            response = jsonify({"suggestions": suggestions, "version": "v2-fixed", "timestamp": datetime.now().isoformat()})
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+            return response, 200
 
         elif request.method == 'POST':
             # Handle different POST request types

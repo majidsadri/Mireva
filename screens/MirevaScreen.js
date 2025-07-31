@@ -1895,9 +1895,9 @@ const styles = StyleSheet.create({
     transform: [{ scale: 1 }],
   },
   expiryButtonSelected: {
-    backgroundColor: '#4299E1',
-    borderColor: '#4299E1',
-    shadowColor: '#4299E1',
+    backgroundColor: '#90EE90',
+    borderColor: '#90EE90',
+    shadowColor: '#90EE90',
     shadowOpacity: 0.25,
     shadowRadius: 8,
     elevation: 6,
@@ -1910,7 +1910,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   expiryButtonTextSelected: {
-    color: '#FFFFFF',
+    color: '#2D3748',
     fontWeight: '700',
   },
   customExpiryButton: {
@@ -1932,7 +1932,7 @@ const styles = StyleSheet.create({
   },
   customExpiryInput: {
     borderWidth: 2,
-    borderColor: '#4299E1',
+    borderColor: '#90EE90',
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -1942,7 +1942,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: '600',
     color: '#2D3748',
-    shadowColor: '#4299E1',
+    shadowColor: '#90EE90',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -1966,9 +1966,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   circularButton: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     justifyContent: 'center',
     alignItems: 'center',
   },

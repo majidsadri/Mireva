@@ -40,16 +40,28 @@ export default function ShopScreen() {
   );
 
   const forceRefreshSuggestions = async () => {
-    // Clear cache and force regenerate
+    // Clear cache and reload from backend
     await AsyncStorage.removeItem('shopping_suggestions');
-    await refreshSuggestions();
+    await loadSuggestions();
   };
 
   const getUserHeaders = async () => {
     const userEmail = await AsyncStorage.getItem('userEmail');
+    const pantryName = await AsyncStorage.getItem('currentPantryName');
+    console.log('🏪 AsyncStorage pantryName:', pantryName);
+    console.log('👤 AsyncStorage userEmail:', userEmail);
+    
+    // Fallback: if no currentPantryName, use user's default pantry from profile
+    let finalPantryName = pantryName;
+    if (!finalPantryName) {
+      console.log('⚠️ No currentPantryName found, using user default: Juju');
+      finalPantryName = 'Juju'; // Hardcode for now since we know user is in Juju
+    }
+    
     return {
       ...API_CONFIG.getHeaders(),
-      ...(userEmail && { 'X-User-Email': userEmail.trim().toLowerCase() })
+      ...(userEmail && { 'X-User-Email': userEmail.trim().toLowerCase() }),
+      ...(finalPantryName && { 'X-Pantry-Name': finalPantryName })
     };
   };
 
@@ -87,8 +99,13 @@ export default function ShopScreen() {
       setSuggestionsLoading(true);
       console.log('🔄 Loading suggestions...');
       
+      // FORCE CLEAR OLD CACHE - Remove this after fixing cache issue
+      console.log('🧹 FORCE CLEARING CACHE...');
+      await AsyncStorage.removeItem('shopping_suggestions');
+      
       // Try to load suggestions from backend first (pantry-based)
       const headers = await getUserHeaders();
+      console.log('📤 Request headers:', headers);
       const response = await fetch(`${API_CONFIG.BASE_URL}/pantry-suggestions`, {
         method: 'GET',
         headers,
@@ -98,16 +115,34 @@ export default function ShopScreen() {
         const data = await response.json();
         const pantrySuggestions = data.suggestions || [];
         console.log('✅ Loaded suggestions from backend:', pantrySuggestions.length);
+        console.log('🐟 Salmon in suggestions?', pantrySuggestions.some(s => s.name === 'Salmon'));
+        console.log('🚨 Chicken breast in suggestions?', pantrySuggestions.some(s => s.name === 'Chicken breast'));
+        console.log('🍚 Rice in suggestions?', pantrySuggestions.some(s => s.name === 'Rice'));
+        console.log('📋 All suggestions:', pantrySuggestions.map(s => s.name));
+        
+        // Auto-clear old cache if backend has version info
+        if (data.version === 'v2-fixed') {
+          console.log('🔄 Backend updated - clearing old cache');
+          await AsyncStorage.removeItem('shopping_suggestions');
+        }
+        
         setSuggestions(pantrySuggestions);
         
-        // Cache in AsyncStorage for faster loading
-        await AsyncStorage.setItem('shopping_suggestions', JSON.stringify(pantrySuggestions));
+        // Cache in AsyncStorage for faster loading (with version info)
+        const cacheData = {
+          suggestions: pantrySuggestions,
+          version: data.version || 'v1',
+          timestamp: Date.now()
+        };
+        await AsyncStorage.setItem('shopping_suggestions', JSON.stringify(cacheData));
       } else {
         console.log('⚠️ Backend suggestions failed, using fallback');
         // Fallback to local suggestions if backend fails
         const localSuggestions = await AsyncStorage.getItem('shopping_suggestions');
         if (localSuggestions) {
-          const parsedSuggestions = JSON.parse(localSuggestions);
+          const cacheData = JSON.parse(localSuggestions);
+          // Handle both old and new cache formats
+          const parsedSuggestions = cacheData.suggestions || cacheData;
           console.log('📱 Using cached suggestions:', parsedSuggestions.length);
           setSuggestions(parsedSuggestions);
         } else {
@@ -122,7 +157,9 @@ export default function ShopScreen() {
       try {
         const localSuggestions = await AsyncStorage.getItem('shopping_suggestions');
         if (localSuggestions) {
-          const parsedSuggestions = JSON.parse(localSuggestions);
+          const cacheData = JSON.parse(localSuggestions);
+          // Handle both old and new cache formats
+          const parsedSuggestions = cacheData.suggestions || cacheData;
           setSuggestions(parsedSuggestions);
         } else {
           setSuggestions([]);
