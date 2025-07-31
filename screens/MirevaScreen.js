@@ -65,6 +65,13 @@ const EXPIRY_PERIODS = [
   { label: '1 Year', days: 365 },
 ];
 
+const ESSENTIAL_PANTRY_ITEMS = [
+  'Rice', 'Pasta', 'Bread', 'Eggs', 'Milk', 'Butter',
+  'Olive Oil', 'Salt', 'Pepper', 'Garlic', 'Onions', 'Tomatoes',
+  'Chicken', 'Ground Beef', 'Fish', 'Cheese', 'Yogurt', 'Flour',
+  'Sugar', 'Honey', 'Potatoes', 'Carrots', 'Bell Peppers', 'Spinach'
+];
+
 // Simple Item Component
 const ItemCard = ({ 
   item, 
@@ -132,6 +139,10 @@ export default function MirevaScreen() {
   });
   const [showCustomExpiry, setShowCustomExpiry] = useState(false);
   const [customWeeks, setCustomWeeks] = useState('');
+  const [showCreatePantryModal, setShowCreatePantryModal] = useState(false);
+  const [newPantryName, setNewPantryName] = useState('');
+  const [creatingPantry, setCreatingPantry] = useState(false);
+  const [selectedEssentialItems, setSelectedEssentialItems] = useState([]);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [editedItem, setEditedItem] = useState({
@@ -357,7 +368,12 @@ export default function MirevaScreen() {
       if (err.code === 'ECONNABORTED') {
         errorMessage = 'Request timed out. Please try again.';
       } else if (err.response) {
-        errorMessage = `Server error: ${err.response.status}`;
+        // Check for image quality errors
+        if (err.response.status === 400 && err.response.data?.error) {
+          errorMessage = err.response.data.message;
+        } else {
+          errorMessage = `Server error: ${err.response.status}`;
+        }
       } else if (err.request) {
         errorMessage = 'Network error. Check your connection.';
       }
@@ -419,6 +435,106 @@ export default function MirevaScreen() {
     } catch (err) {
       console.error('Error adding manual item:', err);
       Alert.alert('Error', 'Failed to add item. Please try again.');
+    }
+  };
+
+  const toggleEssentialItem = (item) => {
+    setSelectedEssentialItems(prev => 
+      prev.includes(item) 
+        ? prev.filter(i => i !== item)
+        : [...prev, item]
+    );
+  };
+
+  const createNewPantry = async () => {
+    if (!newPantryName.trim()) {
+      Alert.alert('Error', 'Please enter a pantry name');
+      return;
+    }
+
+    setCreatingPantry(true);
+    
+    try {
+      const email = await AsyncStorage.getItem('userEmail');
+      if (!email) {
+        Alert.alert('Error', 'Please sign in to create a pantry');
+        return;
+      }
+
+      const response = await fetch(`${API_CONFIG.BASE_URL}/update-user-pantry`, {
+        method: 'POST',
+        headers: {
+          ...API_CONFIG.getHeaders(),
+        },
+        body: JSON.stringify({
+          email: email.trim().toLowerCase(),
+          pantryName: newPantryName.trim(),
+          essentialItems: selectedEssentialItems,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create pantry');
+      }
+
+      const result = await response.json();
+      
+      // Update local storage with new pantry name
+      await AsyncStorage.setItem('currentPantryName', newPantryName.trim());
+      
+      // Save user's essential items preferences for future smart suggestions
+      if (selectedEssentialItems.length > 0) {
+        await AsyncStorage.setItem('userEssentialItems', JSON.stringify(selectedEssentialItems));
+      }
+      
+      // Add selected essential items to the new pantry
+      if (selectedEssentialItems.length > 0) {
+        for (const itemName of selectedEssentialItems) {
+          try {
+            await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PANTRY}`, {
+              method: 'POST',
+              headers: {
+                ...API_CONFIG.getHeaders(),
+                'X-User-Email': email.trim().toLowerCase(),
+              },
+              body: JSON.stringify({
+                id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+                name: itemName,
+                amount: '1',
+                measurement: 'unit',
+                expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+              }),
+            });
+          } catch (err) {
+            console.error(`Error adding ${itemName}:`, err);
+          }
+        }
+      }
+      
+      // Reset form and close modal
+      setNewPantryName('');
+      setSelectedEssentialItems([]);
+      setShowCreatePantryModal(false);
+      
+      // Refresh pantry data
+      loadUserPantryName();
+      loadPantryItems();
+      
+      const itemsText = selectedEssentialItems.length > 0 
+        ? ` with ${selectedEssentialItems.length} essential items` 
+        : '';
+      
+      Alert.alert(
+        'Pantry Created!', 
+        `Welcome to your new pantry "${newPantryName.trim()}"${itemsText}!`,
+        [{ text: 'OK' }]
+      );
+      
+    } catch (err) {
+      console.error('Error creating pantry:', err);
+      Alert.alert('Error', 'Failed to create pantry. Please try again.');
+    } finally {
+      setCreatingPantry(false);
     }
   };
 
@@ -776,16 +892,49 @@ export default function MirevaScreen() {
       {/* Content Area */}
       <ScrollView style={styles.contentContainer} showsVerticalScrollIndicator={false}>
         {pantryItems.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Icon name="inventory" size={80} color="#9FD5CD" />
-            <Text style={styles.emptyStateTitle}>Your pantry is empty</Text>
-            <Text style={styles.emptyStateText}>
-              Start by scanning items with the camera button above or make sure you've joined a pantry from your Profile.
-            </Text>
-            <TouchableOpacity style={styles.emptyStateButton} onPress={takePictureAndScan}>
-              <Icon name="photo-camera" size={20} color="#FFFFFF" style={styles.buttonIcon} />
-              <Text style={styles.emptyStateButtonText}>Scan Your First Item</Text>
-            </TouchableOpacity>
+          <View style={styles.welcomeContainer}>
+            <View style={styles.welcomeContent}>
+              <View style={styles.welcomeIconContainer}>
+                <View style={styles.welcomeIconShape} />
+              </View>
+              
+              <Text style={styles.welcomeTitle}>Welcome to Mireva!</Text>
+              <Text style={styles.welcomeSubtitle}>
+                Smart pantry management made simple
+              </Text>
+              
+              <TouchableOpacity 
+                style={styles.primaryButton} 
+                onPress={() => setShowCreatePantryModal(true)}
+              >
+                <Text style={styles.primaryButtonText}>CREATE YOUR PANTRY</Text>
+              </TouchableOpacity>
+              
+              <View style={styles.welcomeFeatures}>
+                <View style={styles.featureItem}>
+                  <View style={[styles.featureIconContainer, { backgroundColor: '#EFF6FF' }]}>
+                    <View style={styles.featureDot} />
+                  </View>
+                  <Text style={styles.featureText}>Track expiry dates</Text>
+                </View>
+                <View style={styles.featureItem}>
+                  <View style={[styles.featureIconContainer, { backgroundColor: '#F0FDF4' }]}>
+                    <View style={styles.featureDot} />
+                  </View>
+                  <Text style={styles.featureText}>Smart shopping lists</Text>
+                </View>
+                <View style={styles.featureItem}>
+                  <View style={[styles.featureIconContainer, { backgroundColor: '#FEF3F2' }]}>
+                    <View style={styles.featureDot} />
+                  </View>
+                  <Text style={styles.featureText}>Share with family</Text>
+                </View>
+              </View>
+              
+              <Text style={styles.helpText}>
+                Already have a pantry? Join one from your Profile page.
+              </Text>
+            </View>
           </View>
         ) : (
           <View style={styles.categoriesContainer}>
@@ -1111,6 +1260,90 @@ export default function MirevaScreen() {
           </TouchableOpacity>
         </TouchableOpacity>
       </Modal>
+
+      {/* Create New Pantry Modal */}
+      <Modal
+        visible={showCreatePantryModal}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowCreatePantryModal(false)}
+      >
+        <KeyboardAvoidingView 
+          style={styles.compactModalContainer}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+          <ScrollView style={styles.modalContent} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.modalContentContainer}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Create New Pantry</Text>
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Pantry Name</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="Enter pantry name (e.g., Family Kitchen)"
+                value={newPantryName}
+                onChangeText={setNewPantryName}
+                autoFocus
+              />
+            </View>
+
+            <View style={styles.essentialsContainer}>
+              <Text style={styles.essentialsTitle}>Add Essential Items (Optional)</Text>
+              
+              <View style={styles.essentialsGrid}>
+                {ESSENTIAL_PANTRY_ITEMS.map((item) => (
+                  <TouchableOpacity
+                    key={item}
+                    style={[
+                      styles.essentialButton,
+                      selectedEssentialItems.includes(item) && styles.essentialButtonSelected
+                    ]}
+                    onPress={() => toggleEssentialItem(item)}
+                  >
+                    <Text style={[
+                      styles.essentialButtonText,
+                      selectedEssentialItems.includes(item) && styles.essentialButtonTextSelected
+                    ]}>
+                      {item}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              
+              {selectedEssentialItems.length > 0 && (
+                <Text style={styles.selectedItemsCount}>
+                  {selectedEssentialItems.length} items selected
+                </Text>
+              )}
+            </View>
+          </ScrollView>
+          
+          {/* Action Buttons - Outside ScrollView to stay visible */}
+          <View style={styles.addModalButtonContainer}>
+            <TouchableOpacity 
+              style={styles.addModalCircularButton}
+              onPress={() => setShowCreatePantryModal(false)}
+            >
+              <View style={[styles.circularButton, styles.cancelCircularButton]}>
+                <Text style={styles.circularButtonText}>Cancel</Text>
+              </View>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.addModalCircularButton}
+              onPress={createNewPantry}
+              disabled={creatingPantry}
+            >
+              <View style={[styles.circularButton, styles.saveCircularButton, creatingPantry && { opacity: 0.6 }]}>
+                <Text style={styles.circularButtonText}>
+                  {creatingPantry ? 'Creating...' : 'Create'}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -1398,55 +1631,166 @@ const styles = StyleSheet.create({
     height: 12,
     borderRadius: 6,
   },
-  emptyState: {
+  welcomeContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 60,
-    paddingHorizontal: 32,
-    marginTop: 20,
-    backgroundColor: '#FFFFFF',
-    marginHorizontal: 16,
-    borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 6,
+    paddingHorizontal: 24,
+    paddingVertical: 40,
+    minHeight: 500,
   },
-  emptyStateTitle: {
-    fontSize: 26,
-    fontWeight: '700',
-    color: '#1A202C',
-    marginTop: 20,
+  welcomeContent: {
+    alignItems: 'center',
+    maxWidth: 340,
+    width: '100%',
+  },
+  welcomeIconContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#F0FDF4',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+    shadowColor: '#22C55E',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  welcomeIconShape: {
+    width: 40,
+    height: 40,
+    backgroundColor: '#22C55E',
+    borderRadius: 12,
+  },
+  welcomeTitle: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: '#1F2937',
     marginBottom: 8,
     textAlign: 'center',
   },
-  emptyStateText: {
-    fontSize: 16,
-    color: '#718096',
+  welcomeSubtitle: {
+    fontSize: 18,
+    color: '#6B7280',
     textAlign: 'center',
+    marginBottom: 32,
     lineHeight: 24,
-    marginBottom: 28,
   },
-  emptyStateButton: {
-    backgroundColor: '#0A4B4C',
+  welcomeFeatures: {
+    width: '100%',
+    marginBottom: 40,
+  },
+  featureItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 28,
-    paddingVertical: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
-    shadowColor: '#0A4B4C',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 6,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
-  buttonIcon: {
-    marginRight: 8,
+  featureIconContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
   },
-  emptyStateButtonText: {
+  featureDot: {
+    width: 8,
+    height: 8,
+    backgroundColor: '#22C55E',
+    borderRadius: 4,
+  },
+  featureText: {
     fontSize: 16,
     fontWeight: '600',
+    color: '#374151',
+    flex: 1,
+  },
+  primaryButton: {
+    backgroundColor: '#22C55E',
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 16,
+    shadowColor: '#22C55E',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
+    marginBottom: 20,
+    minWidth: 200,
+  },
+  primaryButtonText: {
+    fontSize: 18,
+    fontWeight: '700',
     color: '#FFFFFF',
+    textAlign: 'center',
+  },
+  helpText: {
+    fontSize: 14,
+    color: '#9CA3AF',
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  essentialsContainer: {
+    marginTop: 24,
+  },
+  essentialsTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1F2937',
+    marginBottom: 4,
+  },
+  essentialsSubtitle: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginBottom: 16,
+    lineHeight: 20,
+  },
+  essentialsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginHorizontal: -4,
+  },
+  essentialButton: {
+    backgroundColor: '#F9FAFB',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    margin: 4,
+    minWidth: 80,
+    alignItems: 'center',
+  },
+  essentialButtonSelected: {
+    backgroundColor: '#0A4B4C',
+    borderColor: '#0A4B4C',
+  },
+  essentialButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#374151',
+  },
+  essentialButtonTextSelected: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  selectedItemsCount: {
+    fontSize: 14,
+    color: '#22C55E',
+    fontWeight: '600',
+    textAlign: 'center',
+    marginTop: 16,
   },
   loadingContainer: {
     flex: 1,

@@ -2243,10 +2243,12 @@ def scan_and_add_items():
                         {
                             "type": "text",
                             "text": (
-                                "You are a food recognition assistant. Based on the image, identify all recognizable food items "
-                                "such as fruits, vegetables, or packaged pantry items. For each item, count how many are visible in the image.\n\n"
-                                "Return the response as a JSON array where each element is an object with `name`, `amount`, and `measurement` (use 'unit' if unknown).\n\n"
-                                "Example: [\n"
+                                "You are a food recognition assistant. First, assess the image quality:\n"
+                                "- If the image is too dark, blurry, or has poor lighting, return: {\"error\": \"poor_lighting\", \"message\": \"Image is too dark or has poor lighting. Please take a photo in better lighting conditions.\"}\n"
+                                "- If there are too many items (more than 5), return: {\"error\": \"too_many_items\", \"message\": \"Too many items detected. Please take a photo with fewer items (1-5 items) for better accuracy.\"}\n"
+                                "- If no food items are clearly visible, return: {\"error\": \"no_food_detected\", \"message\": \"No food items detected. Please ensure food items are clearly visible in the photo.\"}\n\n"
+                                "If the image quality is good and has 1-5 recognizable food items, identify them and return a JSON array where each element is an object with `name`, `amount`, and `measurement` (use 'unit' if unknown).\n\n"
+                                "Example good response: [\n"
                                 "  {\"name\": \"banana\", \"amount\": 2, \"measurement\": \"unit\"},\n"
                                 "  {\"name\": \"apple\", \"amount\": 3, \"measurement\": \"unit\"}\n"
                                 "]"
@@ -2275,6 +2277,10 @@ def scan_and_add_items():
         except Exception:
             # Fallback to JSON decode
             food_items = json.loads(raw_output)
+
+        # Check if response is an error message about image quality
+        if isinstance(food_items, dict) and 'error' in food_items:
+            return jsonify(food_items), 400
 
         if not isinstance(food_items, list):
             raise ValueError("Expected a JSON array of food items")
@@ -2401,6 +2407,7 @@ def update_user_pantry():
         data = request.json
         email = data.get('email')
         pantry_name = data.get('pantryName')
+        essential_items = data.get('essentialItems', [])
 
         if not email:
             return jsonify({"error": "Email is required"}), 400
@@ -2441,6 +2448,11 @@ def update_user_pantry():
 
         # Update user's pantry name
         users[email]['pantryName'] = pantry_name
+        
+        # Save essential items if provided (when creating new pantry)
+        if essential_items and is_new_pantry:
+            users[email]['essentialItems'] = essential_items
+            logging.info(f"Saved {len(essential_items)} essential items for user {email}")
         
         # Save updated users data
         with open(USERS_FILE, 'w') as f:
@@ -3101,6 +3113,28 @@ def manage_pantry_suggestions():
                         "reason": "From your saved recipes",
                         "category": "From Recipes"
                     })
+            
+            # Try to get user's essential items preferences from users.json
+            try:
+                with open(USERS_FILE, 'r') as f:
+                    users = json.load(f)
+                user_data = users.get(user_email, {})
+                essential_items = user_data.get('essentialItems', [])
+                
+                # Add user's essential items (excluding those already in pantry and recipes)
+                for i, item in enumerate(essential_items):
+                    if (item.lower().strip() not in pantry_items and 
+                        item not in recipe_ingredients and
+                        len([s for s in suggestions if s['name'].lower() == item.lower()]) == 0):
+                        suggestions.append({
+                            "id": f"essential_{i+1}",
+                            "name": item,
+                            "priority": "high",
+                            "reason": "Your usual pantry item",
+                            "category": "Your Essentials"
+                        })
+            except Exception as e:
+                logging.warning(f"Could not load user essential items: {e}")
             
             # Add default suggestions (excluding pantry items)
             # Proteins
