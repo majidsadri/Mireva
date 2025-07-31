@@ -806,14 +806,11 @@ export default function MirevaScreen() {
         onRequestClose={() => setShowAddModal(false)}
       >
         <KeyboardAvoidingView 
-          style={styles.modalContainer}
+          style={styles.compactModalContainer}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Add Item</Text>
-          </View>
           
-          <ScrollView style={styles.modalContent} keyboardShouldPersistTaps="handled">
+          <ScrollView style={styles.modalContent} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.modalContentContainer}>
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Item Name</Text>
               <TextInput
@@ -895,27 +892,28 @@ export default function MirevaScreen() {
               )}
             </View>
             
-            {/* Action Buttons */}
-            <View style={styles.addModalButtonContainer}>
-              <TouchableOpacity 
-                style={styles.addModalCircularButton}
-                onPress={() => setShowAddModal(false)}
-              >
-                <View style={[styles.circularButton, styles.cancelCircularButton]}>
-                  <Text style={styles.circularButtonText}>Cancel</Text>
-                </View>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.addModalCircularButton}
-                onPress={addManualItem}
-              >
-                <View style={[styles.circularButton, styles.saveCircularButton]}>
-                  <Text style={styles.circularButtonText}>Save</Text>
-                </View>
-              </TouchableOpacity>
-            </View>
           </ScrollView>
+          
+          {/* Action Buttons - Outside ScrollView to stay visible */}
+          <View style={styles.addModalButtonContainer}>
+            <TouchableOpacity 
+              style={styles.addModalCircularButton}
+              onPress={() => setShowAddModal(false)}
+            >
+              <View style={[styles.circularButton, styles.cancelCircularButton]}>
+                <Text style={styles.circularButtonText}>Cancel</Text>
+              </View>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.addModalCircularButton}
+              onPress={addManualItem}
+            >
+              <View style={[styles.circularButton, styles.saveCircularButton]}>
+                <Text style={styles.circularButtonText}>Save</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
         </KeyboardAvoidingView>
       </Modal>
 
@@ -1496,6 +1494,26 @@ const styles = StyleSheet.create({
     shadowRadius: 25,
     elevation: 15,
   },
+  compactModalContainer: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 20,
+    marginVertical: 120,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 15,
+    elevation: 10,
+  },
+  modalContentContainer: {
+    paddingTop: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
   modalHeader: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -1876,42 +1894,29 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   expiryButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    borderRadius: 25,
-    borderWidth: 2,
+    backgroundColor: '#F7FAFC',
+    borderWidth: 1,
     borderColor: '#E2E8F0',
-    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    marginBottom: 8,
     minWidth: 90,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 3,
-    transform: [{ scale: 1 }],
   },
   expiryButtonSelected: {
-    backgroundColor: '#90EE90',
-    borderColor: '#90EE90',
-    shadowColor: '#90EE90',
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 6,
-    transform: [{ scale: 1.05 }],
+    backgroundColor: '#0A4B4C',
+    borderColor: '#0A4B4C',
   },
   expiryButtonText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#2D3748',
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#4A5568',
     textAlign: 'center',
   },
   expiryButtonTextSelected: {
-    color: '#2D3748',
-    fontWeight: '700',
+    color: '#FFFFFF',
+    fontWeight: '600',
   },
   customExpiryButton: {
     backgroundColor: '#F7FAFC',
