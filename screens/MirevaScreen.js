@@ -354,11 +354,8 @@ export default function MirevaScreen() {
       console.log('✅ Backend response:', response.data);
       const food = response.data.item || 'Unknown food';
       
-      Alert.alert(
-        'Item Added! 🎉', 
-        `${food} was successfully added to your pantry.`,
-        [{ text: 'OK', onPress: () => loadPantryItems() }]
-      );
+      // Refresh pantry items immediately after adding
+      loadPantryItems();
       
     } catch (err) {
       console.error('❌ Error in scan process:', err);
@@ -426,11 +423,8 @@ export default function MirevaScreen() {
       
       setShowAddModal(false);
       
-      Alert.alert(
-        'Item Added! 🎉', 
-        `${newItem.name} was successfully added to your pantry.`,
-        [{ text: 'OK', onPress: () => loadPantryItems() }]
-      );
+      // Refresh pantry items immediately after adding
+      loadPantryItems();
       
     } catch (err) {
       console.error('Error adding manual item:', err);
@@ -567,6 +561,9 @@ export default function MirevaScreen() {
       'Proteins': [],
       'Grains & Pantry': [],
       'Dairy': [],
+      'Beverages': [],
+      'Frozen': [],
+      'Condiments': [],
       'Expired': []
     };
 
@@ -596,7 +593,13 @@ export default function MirevaScreen() {
       } else {
         // Fallback to frontend categorization for legacy items without backend category
         const detectedCategory = categorizeItem(item.name || '');
-        categories[detectedCategory].push(item);
+        // Safety check: ensure the detected category exists in our categories object
+        if (categories.hasOwnProperty(detectedCategory)) {
+          categories[detectedCategory].push(item);
+        } else {
+          // If detected category doesn't exist, default to 'Grains & Pantry'
+          categories['Grains & Pantry'].push(item);
+        }
       }
     });
     
@@ -812,6 +815,9 @@ export default function MirevaScreen() {
     'Proteins': '#FFF5E6', // Light orange from Mireva palette
     'Grains & Pantry': '#F0FFF4', // Light green from Mireva palette
     'Dairy': '#E8F5E8', // Light sage green from Mireva palette
+    'Beverages': '#E6F3FF', // Light blue
+    'Frozen': '#F0E6FF', // Light purple
+    'Condiments': '#FFE6E6', // Light pink
     'Expired': '#FFEBEE' // Light red for expired items
   };
 

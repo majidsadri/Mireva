@@ -3053,8 +3053,15 @@ def manage_pantry_suggestions():
             # Get user's pantry items to exclude from suggestions
             pantry_items = set()
             try:
-                # Get pantry name from header or determine from user's pantries
-                pantry_name = request.headers.get('X-Pantry-Name')
+                # Load user data to get pantry name
+                with open(USERS_FILE, 'r') as f:
+                    users = json.load(f)
+                
+                user_data = users.get(user_email, {})
+                user_pantry_name = user_data.get('pantryName', '')
+                
+                # Get pantry name from header or fall back to user's stored pantry name
+                pantry_name = request.headers.get('X-Pantry-Name') or user_pantry_name
                 
                 if not pantry_name:
                     # Find user's pantries

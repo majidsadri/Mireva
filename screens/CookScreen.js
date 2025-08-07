@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -10,11 +10,16 @@ import {
   ActivityIndicator,
   Alert,
   TextInput,
+  Dimensions,
+  useColorScheme,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_CONFIG } from '../config';
 
+const { width: screenWidth } = Dimensions.get('window');
+
 export default function CookScreen() {
+  const colorScheme = useColorScheme();
   const [recipes, setRecipes] = useState([]);
   const [currentRecipeIndex, setCurrentRecipeIndex] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -25,6 +30,7 @@ export default function CookScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searching, setSearching] = useState(false);
   const [cachedRecommendations, setCachedRecommendations] = useState([]);
+  const scrollViewRef = useRef(null);
   const [lastRecommendationTime, setLastRecommendationTime] = useState(null);
   const [cachedSearchResults, setCachedSearchResults] = useState([]);
   const [lastSearchQuery, setLastSearchQuery] = useState('');
@@ -588,32 +594,6 @@ export default function CookScreen() {
           </TouchableOpacity>
         </View>
         
-        {mode === 'recommend' && (
-          <TouchableOpacity
-            style={styles.refreshButton}
-            onPress={async () => {
-              // Clear ALL cache and force fresh recommendations
-              setCachedRecommendations([]);
-              setLastRecommendationTime(null);
-              
-              // Clear AsyncStorage cache
-              try {
-                await AsyncStorage.removeItem('cachedRecommendations');
-                await AsyncStorage.removeItem('lastRecommendationTime');
-                await AsyncStorage.removeItem('cachedSearchResults');
-                await AsyncStorage.removeItem('lastSearchQuery');
-                console.log('Cleared all recipe cache from storage');
-              } catch (error) {
-                console.log('Error clearing cache:', error);
-              }
-              
-              // Force fresh recommendations
-              loadPantryAndRecommendations();
-            }}
-          >
-            <Text style={styles.refreshButtonText}>Get Fresh Recipes</Text>
-          </TouchableOpacity>
-        )}
 
         {mode === 'search' && (
           <View style={styles.searchContainer}>
@@ -692,91 +672,165 @@ export default function CookScreen() {
               Please try again or check your connection.
             </Text>
           </View>
-        ) : currentRecipe.name ? (
-          /* Recipe Card */
-          <View style={styles.recipeCard}>
-          <View style={styles.recipeHeader}>
-            <Text style={styles.recipeTitle}>
-              {currentRecipe.name}
-            </Text>
-            <View style={styles.chefsBadge}>
-              <Text style={styles.chefsBadgeText}>⭐ Chef's Choice</Text>
-            </View>
-          </View>
+        ) : recipes.length > 0 ? (
+          /* Recipe Cards with Horizontal Scrolling */
+          <View style={styles.recipeContainer}>
+            <ScrollView
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              onMomentumScrollEnd={(event) => {
+                const newIndex = Math.round(event.nativeEvent.contentOffset.x / screenWidth);
+                setCurrentRecipeIndex(newIndex);
+              }}
+              ref={scrollViewRef}
+              contentContainerStyle={styles.scrollContent}
+              decelerationRate="fast"
+              snapToInterval={screenWidth}
+              snapToAlignment="start"
+            >
+              {recipes.map((recipe, index) => (
+                <View key={index} style={styles.recipeCard}>
+                  <View style={styles.recipeHeader}>
+                    <Text style={styles.recipeTitle}>
+                      {recipe.name}
+                    </Text>
+                    <View style={styles.chefsBadge}>
+                      <Text style={styles.chefsBadgeText}>⭐</Text>
+                    </View>
+                  </View>
 
-          <Text style={styles.recipeDescription}>
-            {currentRecipe.description}
-          </Text>
+                  <Text style={styles.recipeDescription}>
+                    {recipe.description}
+                  </Text>
 
-          {/* Recipe Stats */}
-          <View style={styles.recipeStats}>
-            <View style={styles.statItem}>
-              <Text style={styles.statIcon}>🕐</Text>
-              <Text style={styles.statText}>{currentRecipe.cookingTime || '30 minutes'}</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statIcon}>⚪</Text>
-              <Text style={styles.statText}>{currentRecipe.calories || '250 calories'}</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statIcon}>🍴</Text>
-              <Text style={styles.statText}>Easy</Text>
-            </View>
-          </View>
+                  {/* Enhanced Recipe Stats */}
+                  <View style={styles.recipeStats}>
+                    <View style={[styles.statItem, styles.timeStatItem]}>
+                      <Text style={styles.statLabel}>Time</Text>
+                      <Text style={styles.statText}>{recipe.cookingTime || '30 min'}</Text>
+                    </View>
+                    <View style={[styles.statItem, styles.caloriesStatItem]}>
+                      <Text style={styles.statLabel}>Calories</Text>
+                      <Text style={styles.statText}>{(recipe.calories || '250').replace(/calories?( per serving)?/gi, '').trim()} cal</Text>
+                    </View>
+                    <View style={[styles.statItem, styles.servesStatItem]}>
+                      <Text style={styles.statLabel}>Serves</Text>
+                      <Text style={styles.statText}>4</Text>
+                    </View>
+                  </View>
 
-          {/* Ingredients Section */}
-          <View style={styles.ingredientsSection}>
-            <Text style={styles.sectionTitle}>🥘 Ingredients</Text>
-            <View style={styles.ingredientsList}>
-              {currentRecipe.ingredients && currentRecipe.ingredients.map((ingredient, index) => (
-                <View key={index} style={styles.ingredient}>
-                  <Text style={styles.bulletPoint}>•</Text>
-                  <Text style={styles.ingredientText}>{ingredient}</Text>
+                  {/* Enhanced Ingredients Section */}
+                  <View style={styles.ingredientsSection}>
+                    <View style={styles.sectionHeader}>
+                      <Text style={styles.sectionTitle}>Ingredients</Text>
+                      <View style={styles.ingredientCount}>
+                        <Text style={styles.ingredientCountText}>
+                          {recipe.ingredients?.length || 0}
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={styles.ingredientsList}>
+                      {recipe.ingredients && recipe.ingredients.slice(0, 8).map((ingredient, idx) => (
+                        <View key={idx} style={[
+                          styles.ingredientPill,
+                          colorScheme === 'dark' ? styles.ingredientPillDark : styles.ingredientPillLight
+                        ]}>
+                          <Text style={[
+                            styles.ingredientText,
+                            colorScheme === 'dark' ? styles.ingredientTextDark : styles.ingredientTextLight
+                          ]}>{ingredient}</Text>
+                        </View>
+                      ))}
+                      {recipe.ingredients && recipe.ingredients.length > 8 && (
+                        <View style={[
+                          styles.moreIngredientsPill,
+                          colorScheme === 'dark' ? styles.moreIngredientsPillDark : styles.moreIngredientsPillLight
+                        ]}>
+                          <Text style={[
+                            styles.moreIngredientsText,
+                            colorScheme === 'dark' ? styles.moreIngredientsTextDark : styles.moreIngredientsTextLight
+                          ]}>
+                            +{recipe.ingredients.length - 8} more
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                  </View>
                 </View>
               ))}
-            </View>
-          </View>
+            </ScrollView>
 
-          {/* Navigation and Instructions */}
-          <View style={styles.navigationSection}>
-            <View style={styles.navigationButtons}>
-              <TouchableOpacity 
-                style={[styles.navButton, currentRecipeIndex === 0 && styles.navButtonDisabled]}
-                onPress={() => setCurrentRecipeIndex(Math.max(0, currentRecipeIndex - 1))}
-                disabled={currentRecipeIndex === 0}
-              >
-                <Text style={styles.navButtonText}>← Previous</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                style={[styles.navButton, currentRecipeIndex === recipes.length - 1 && styles.navButtonDisabled]}
-                onPress={() => setCurrentRecipeIndex(Math.min(recipes.length - 1, currentRecipeIndex + 1))}
-                disabled={currentRecipeIndex === recipes.length - 1}
-              >
-                <Text style={styles.navButtonText}>Next →</Text>
-              </TouchableOpacity>
+            {/* Page Indicator */}
+            <View style={styles.pageIndicator}>
+              {recipes.map((_, index) => (
+                <View
+                  key={index}
+                  style={[
+                    styles.dot,
+                    index === currentRecipeIndex && styles.activeDot
+                  ]}
+                />
+              ))}
             </View>
             
-            {/* Load More Recipes Button - Only in recommend mode */}
-            {mode === 'recommend' && (
-              <TouchableOpacity 
-                style={styles.loadMoreButton}
-                onPress={loadMoreRecipes}
-                disabled={loadingMore}
-              >
-                {loadingMore ? (
-                  <ActivityIndicator size="small" color="#FFFFFF" />
-                ) : (
-                  <Text style={styles.loadMoreButtonText}>Load More Recipes</Text>
-                )}
-              </TouchableOpacity>
+            {/* Swipe Hint */}
+            {recipes.length > 1 && currentRecipeIndex === 0 && (
+              <Text style={styles.swipeHint}>← Swipe for more recipes →</Text>
             )}
+
+            {/* Navigation and Instructions */}
+            <View style={styles.navigationSection}>
             
-            {/* Save Recipe Button */}
-            <TouchableOpacity 
-              style={[
-                styles.saveRecipeButton,
-                isRecipeSaved(currentRecipe) && styles.savedRecipeButton
-              ]}
+            {/* Circular Action Buttons */}
+            <View style={styles.circularButtonsContainer}>
+              {mode === 'recommend' && (
+                <>
+                  <TouchableOpacity 
+                    style={styles.circularButton}
+                    onPress={async () => {
+                      // Clear ALL cache and force fresh recommendations
+                      setCachedRecommendations([]);
+                      setLastRecommendationTime(null);
+                      
+                      // Clear AsyncStorage cache
+                      try {
+                        await AsyncStorage.removeItem('cachedRecommendations');
+                        await AsyncStorage.removeItem('lastRecommendationTime');
+                        await AsyncStorage.removeItem('cachedSearchResults');
+                        await AsyncStorage.removeItem('lastSearchQuery');
+                        console.log('Cleared all recipe cache from storage');
+                      } catch (error) {
+                        console.log('Error clearing cache:', error);
+                      }
+                      
+                      // Force fresh recommendations
+                      loadPantryAndRecommendations();
+                    }}
+                  >
+                    <Text style={styles.circularButtonText}>Fresh</Text>
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity 
+                    style={[styles.circularButton, styles.loadMoreButton]}
+                    onPress={loadMoreRecipes}
+                    disabled={loadingMore}
+                  >
+                    {loadingMore ? (
+                      <ActivityIndicator size="small" color="#FFFFFF" />
+                    ) : (
+                      <Text style={[styles.circularButtonText, styles.loadMoreButtonText]}>More</Text>
+                    )}
+                  </TouchableOpacity>
+                </>
+              )}
+              
+              <TouchableOpacity 
+                style={[
+                  styles.circularButton,
+                  styles.saveButton,
+                  isRecipeSaved(currentRecipe) && styles.saveButtonSaved
+                ]}
               onPress={async () => {
                 if (isRecipeSaved(currentRecipe)) {
                   // Show instructions for saved recipe in a nicer format
@@ -804,11 +858,11 @@ export default function CookScreen() {
                       : 0;
                     
                     const alertMessage = suggestionsCount > 0
-                      ? `${currentRecipe.name} has been saved! 🛒 ${suggestionsCount} ingredients have been added as smart suggestions on your Shop page.`
-                      : `${currentRecipe.name} has been saved to your recipe collection. You can now view the full instructions anytime!`;
+                      ? `Recipe saved! ${suggestionsCount} ingredients have been added as smart suggestions on your Shop page.`
+                      : `Recipe saved! You can now view the full instructions anytime.`;
                     
                     Alert.alert(
-                      'Recipe Saved! 🎉',
+                      'Recipe saved!',
                       alertMessage,
                       [
                         {
@@ -840,14 +894,15 @@ export default function CookScreen() {
               }}
             >
               <Text style={[
-                styles.saveRecipeButtonText,
-                isRecipeSaved(currentRecipe) && styles.savedRecipeButtonText
+                styles.circularButtonText,
+                (isRecipeSaved(currentRecipe) || !isRecipeSaved(currentRecipe)) && styles.saveButtonTextColor
               ]}>
-                {isRecipeSaved(currentRecipe) ? '📋 View Instructions' : '⭐ Save Recipe'}
+                {isRecipeSaved(currentRecipe) ? 'View' : 'Save'}
               </Text>
             </TouchableOpacity>
+            </View>
+            </View>
           </View>
-        </View>
         ) : (
           /* No recipes in recommend mode */
           <View style={styles.searchPlaceholder}>
@@ -921,70 +976,123 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: 0,
+  },
+  recipeContainer: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
   },
   recipeCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 20,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 24,
+    marginHorizontal: 10,
+    width: screenWidth - 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 8,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#F1F5F9',
   },
   recipeHeader: {
+    flexDirection: 'column',
+    marginBottom: 16,
+  },
+  recipeTitleContainer: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   recipeTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#2D6A4F',
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#1A365D',
     flex: 1,
-    marginRight: 10,
+    lineHeight: 28,
+  },
+  difficultyTag: {
+    backgroundColor: '#E6FFFA',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#38B2AC',
+  },
+  difficultyText: {
+    fontSize: 12,
+    color: '#2C7A7B',
+    fontWeight: '600',
   },
   chefsBadge: {
-    backgroundColor: '#FFF3CD',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    backgroundColor: '#FFF8E1',
+    width: 24,
+    height: 24,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#FFC107',
+    borderColor: '#FFB300',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   chefsBadgeText: {
     fontSize: 12,
-    color: '#856404',
-    fontWeight: '600',
+    color: '#E65100',
+  },
+  descriptionContainer: {
+    backgroundColor: '#F8FAFC',
+    padding: 16,
+    borderRadius: 12,
+    borderLeftWidth: 3,
+    borderLeftColor: '#4299E1',
+    marginBottom: 20,
   },
   recipeDescription: {
     fontSize: 16,
-    color: '#718096',
-    fontStyle: 'italic',
-    marginBottom: 20,
-    lineHeight: 22,
+    color: '#4A5568',
+    lineHeight: 24,
+    fontWeight: '400',
   },
   recipeStats: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    backgroundColor: '#F0FDF4',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: '#81C784',
+    marginTop: 16,
+    marginBottom: 24,
+    gap: 8,
   },
   statItem: {
     alignItems: 'center',
     flex: 1,
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  statIcon: {
-    fontSize: 24,
-    marginBottom: 5,
+  timeStatItem: {
+    backgroundColor: '#F0FDF4',
+  },
+  caloriesStatItem: {
+    backgroundColor: '#ECFDF5',
+  },
+  servesStatItem: {
+    backgroundColor: '#E6FFFA',
+  },
+  statLabel: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#718096',
+    marginBottom: 4,
+    textAlign: 'center',
   },
   statText: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 16,
+    fontWeight: '700',
     color: '#2D6A4F',
     textAlign: 'center',
   },
@@ -994,31 +1102,91 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   ingredientsSection: {
-    marginBottom: 20,
+    marginBottom: 24,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '600',
     color: '#2D6A4F',
-    marginBottom: 15,
+    letterSpacing: 0.3,
+  },
+  ingredientCount: {
+    backgroundColor: '#2D6A4F',
+    borderRadius: 12,
+    minWidth: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+  },
+  ingredientCountText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
   ingredientsList: {
-    paddingLeft: 10,
-  },
-  ingredient: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 4,
   },
-  bulletPoint: {
-    fontSize: 16,
-    color: '#81C784',
-    marginRight: 10,
-    fontWeight: 'bold',
+  ingredientPill: {
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    marginBottom: 4,
+  },
+  ingredientPillLight: {
+    backgroundColor: '#F0FDF4',
+    borderColor: '#D1FAE5',
+  },
+  ingredientPillDark: {
+    backgroundColor: '#1F2937',
+    borderColor: '#374151',
   },
   ingredientText: {
-    fontSize: 16,
-    color: '#4A5568',
+    fontSize: 13,
+    fontWeight: '500',
+    textAlign: 'center',
+  },
+  ingredientTextLight: {
+    color: '#2D6A4F',
+  },
+  ingredientTextDark: {
+    color: '#FFFFFF',
+  },
+  moreIngredientsPill: {
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    marginBottom: 4,
+  },
+  moreIngredientsPillLight: {
+    backgroundColor: '#F3F4F6',
+    borderColor: '#E5E7EB',
+  },
+  moreIngredientsPillDark: {
+    backgroundColor: '#374151',
+    borderColor: '#4B5563',
+  },
+  moreIngredientsText: {
+    fontSize: 13,
+    fontWeight: '500',
+    textAlign: 'center',
+  },
+  moreIngredientsTextLight: {
+    color: '#6B7280',
+  },
+  moreIngredientsTextDark: {
+    color: '#D1D5DB',
   },
   ratingSection: {
     borderTopWidth: 1,
@@ -1063,6 +1231,32 @@ const styles = StyleSheet.create({
     borderTopColor: '#E2E8F0',
     paddingTop: 20,
   },
+  pageIndicator: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#E2E8F0',
+    marginHorizontal: 4,
+  },
+  activeDot: {
+    backgroundColor: '#2D6A4F',
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  swipeHint: {
+    textAlign: 'center',
+    color: '#718096',
+    fontSize: 14,
+    fontStyle: 'italic',
+    marginBottom: 10,
+  },
   navigationButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -1099,83 +1293,105 @@ const styles = StyleSheet.create({
     color: '#4A5568',
     lineHeight: 20,
   },
-  loadMoreButton: {
-    backgroundColor: '#2D6A4F',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
+  circularButtonsContainer: {
+    flexDirection: 'row',
     justifyContent: 'center',
-    marginVertical: 15,
-    shadowColor: '#2D6A4F',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
+    alignItems: 'center',
+    gap: 20,
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  circularButton: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#E6FFFA',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+    borderWidth: 2,
+    borderColor: '#38B2AC',
+  },
+  loadMoreButton: {
+    backgroundColor: '#F56500',
+    borderColor: '#E53E3E',
+  },
+  saveButton: {
+    backgroundColor: '#2D6A4F',
+    borderColor: '#1F4E3D',
+  },
+  saveButtonSaved: {
+    backgroundColor: '#48BB78',
+    borderColor: '#38A169',
+  },
+  circularButtonText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#2D6A4F',
+    textAlign: 'center',
+  },
+  savedButtonText: {
+    color: '#FFFFFF',
+  },
+  saveButtonTextColor: {
+    color: '#FFFFFF',
   },
   loadMoreButtonText: {
     color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  saveRecipeButton: {
-    backgroundColor: '#2D6A4F',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 10,
-    shadowColor: '#2D6A4F',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  savedRecipeButton: {
-    backgroundColor: '#81C784',
-  },
-  saveRecipeButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  savedRecipeButtonText: {
-    color: '#FFFFFF',
   },
   
-  // New styles for search functionality
+  // Enhanced styles for controls
   controlsContainer: {
     backgroundColor: '#FFFFFF',
-    paddingVertical: 16,
+    paddingVertical: 20,
     paddingHorizontal: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#E2E8F0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   modeToggle: {
     flexDirection: 'row',
-    backgroundColor: '#F7FAFC',
-    borderRadius: 12,
-    padding: 4,
-    marginBottom: 12,
+    backgroundColor: '#F1F5F9',
+    borderRadius: 16,
+    padding: 6,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
   modeButton: {
     flex: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 12,
     alignItems: 'center',
   },
   modeButtonActive: {
     backgroundColor: '#48BB78',
+    shadowColor: '#48BB78',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   modeButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#718096',
+    color: '#64748B',
   },
   modeButtonTextActive: {
     color: '#FFFFFF',
+    fontWeight: '700',
   },
   searchContainer: {
     flexDirection: 'row',
@@ -1184,21 +1400,28 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    backgroundColor: '#F7FAFC',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    backgroundColor: '#F8FAFC',
+    borderRadius: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
     fontSize: 16,
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: '#E2E8F0',
+    color: '#2D3748',
+    fontWeight: '500',
   },
   searchButton: {
-    backgroundColor: '#48BB78',
+    backgroundColor: '#4299E1',
     paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 12,
-    minWidth: 80,
+    paddingVertical: 16,
+    borderRadius: 16,
+    minWidth: 90,
     alignItems: 'center',
+    shadowColor: '#4299E1',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   searchIcon: {
     position: 'relative',
@@ -1338,20 +1561,26 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   
-  // Refresh button styles
+  // Enhanced refresh button styles
   refreshButton: {
     backgroundColor: '#E6FFFA',
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     marginTop: 8,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#81E6D9',
+    borderWidth: 2,
+    borderColor: '#38B2AC',
+    shadowColor: '#38B2AC',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
   },
   refreshButtonText: {
     color: '#2D6A4F',
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: '700',
+    letterSpacing: 0.2,
   },
 });

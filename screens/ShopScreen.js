@@ -51,12 +51,27 @@ export default function ShopScreen() {
     console.log('🏪 AsyncStorage pantryName:', pantryName);
     console.log('👤 AsyncStorage userEmail:', userEmail);
     
-    // Fallback: if no currentPantryName, use user's default pantry from profile
+    // Fallback: if no currentPantryName, try to get from user profile
     let finalPantryName = pantryName;
     if (!finalPantryName) {
-      console.log('⚠️ No currentPantryName found, using user default: Juju');
-      finalPantryName = 'Juju'; // Hardcode for now since we know user is in Juju
+      // Get user's current pantry from their profile
+      try {
+        const userProfileData = await AsyncStorage.getItem('userProfile');
+        if (userProfileData) {
+          const profile = JSON.parse(userProfileData);
+          finalPantryName = profile.currentPantryName;
+          console.log('📱 Got pantry from profile:', finalPantryName);
+        }
+      } catch (error) {
+        console.log('Error getting pantry from profile:', error);
+      }
+      
+      if (!finalPantryName) {
+        console.log('⚠️ No pantry found anywhere, this might cause issues');
+      }
     }
+    
+    console.log('🏪 Final pantry name being sent:', finalPantryName);
     
     return {
       ...API_CONFIG.getHeaders(),
@@ -106,10 +121,15 @@ export default function ShopScreen() {
       // Try to load suggestions from backend first (pantry-based)
       const headers = await getUserHeaders();
       console.log('📤 Request headers:', headers);
+      console.log('🔍 Making request to:', `${API_CONFIG.BASE_URL}/pantry-suggestions`);
+      
       const response = await fetch(`${API_CONFIG.BASE_URL}/pantry-suggestions`, {
         method: 'GET',
         headers,
       });
+      
+      console.log('📡 Response status:', response.status);
+      console.log('📡 Response headers:', response.headers);
       
       if (response.ok) {
         const data = await response.json();
@@ -118,7 +138,9 @@ export default function ShopScreen() {
         console.log('🐟 Salmon in suggestions?', pantrySuggestions.some(s => s.name === 'Salmon'));
         console.log('🚨 Chicken breast in suggestions?', pantrySuggestions.some(s => s.name === 'Chicken breast'));
         console.log('🍚 Rice in suggestions?', pantrySuggestions.some(s => s.name === 'Rice'));
+        console.log('🍞 Bread in suggestions?', pantrySuggestions.some(s => s.name === 'Bread'));
         console.log('📋 All suggestions:', pantrySuggestions.map(s => s.name));
+        console.log('🗄️ Raw response data:', JSON.stringify(data, null, 2));
         
         // Auto-clear old cache if backend has version info
         if (data.version === 'v2-fixed') {
@@ -137,6 +159,9 @@ export default function ShopScreen() {
         await AsyncStorage.setItem('shopping_suggestions', JSON.stringify(cacheData));
       } else {
         console.log('⚠️ Backend suggestions failed, using fallback');
+        console.log('⚠️ Response status:', response.status);
+        console.log('⚠️ Response error:', await response.text().catch(() => 'Could not read response'));
+        
         // Fallback to local suggestions if backend fails
         const localSuggestions = await AsyncStorage.getItem('shopping_suggestions');
         if (localSuggestions) {
@@ -144,6 +169,9 @@ export default function ShopScreen() {
           // Handle both old and new cache formats
           const parsedSuggestions = cacheData.suggestions || cacheData;
           console.log('📱 Using cached suggestions:', parsedSuggestions.length);
+          console.log('📱 Cached suggestions names:', parsedSuggestions.map(s => s.name));
+          console.log('📱 🍚 Rice in cached suggestions?', parsedSuggestions.some(s => s.name === 'Rice'));
+          console.log('📱 🍞 Bread in cached suggestions?', parsedSuggestions.some(s => s.name === 'Bread'));
           setSuggestions(parsedSuggestions);
         } else {
           console.log('🔄 No cache, generating new suggestions');
@@ -632,7 +660,6 @@ export default function ShopScreen() {
           setShowAddModal(false);
         }
         await loadShoppingList();
-        Alert.alert('Success', 'Item added to shopping list!');
       } else {
         Alert.alert('Error', 'Failed to add item');
       }
