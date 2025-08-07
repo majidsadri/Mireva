@@ -9,10 +9,15 @@ import {
   Image,
   Alert,
   ActivityIndicator,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  Dimensions,
 } from 'react-native';
 import { API_CONFIG } from '../config';
 import BiometricAuth from '../utils/BiometricAuth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 export default function SigninScreen({ onSignin, onGoToSignup }) {
   const [email, setEmail] = useState('');
@@ -20,10 +25,23 @@ export default function SigninScreen({ onSignin, onGoToSignup }) {
   const [loading, setLoading] = useState(false);
   const [biometricSupported, setBiometricSupported] = useState(false);
   const [biometricType, setBiometricType] = useState('');
+  const [showPasswordField, setShowPasswordField] = useState(false);
 
   useEffect(() => {
     checkBiometricSupport();
+    configureGoogleSignIn();
   }, []);
+
+  const configureGoogleSignIn = () => {
+    GoogleSignin.configure({
+      webClientId: '677358849010-v7rm0ps4cq0me3el7r1c5upgj2ceido1.apps.googleusercontent.com',
+      iosClientId: '677358849010-1d5fb5u1unmish4oahjqir6i6ja5f95i.apps.googleusercontent.com',
+      offlineAccess: false,
+      forceCodeForRefreshToken: true,
+      scopes: ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile'],
+      prompt: 'select_account',
+    });
+  };
 
   const checkBiometricSupport = async () => {
     const { isSupported, biometryType } = await BiometricAuth.checkSupport();
@@ -118,75 +136,244 @@ export default function SigninScreen({ onSignin, onGoToSignup }) {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    try {
+      setLoading(true);
+      console.log('Starting Google Sign-In process...');
+      
+      // Sign out any existing session first to force account selection
+      try {
+        await GoogleSignin.signOut();
+        console.log('Signed out existing Google session to force account selection');
+      } catch (signOutError) {
+        console.log('No existing session to sign out');
+      }
+      
+      // Check if Google Play Services are available
+      await GoogleSignin.hasPlayServices();
+      
+      // Sign in with Google
+      const userInfo = await GoogleSignin.signIn();
+      
+      // Get the ID token
+      let idToken = userInfo.data?.idToken || userInfo.idToken;
+      if (!idToken) {
+        const tokens = await GoogleSignin.getTokens();
+        idToken = tokens.idToken;
+      }
+      
+      // Decode JWT token to get user data
+      function decodeJWT(token) {
+        try {
+          const parts = token.split('.');
+          if (parts.length !== 3) return null;
+          const payload = parts[1];
+          const paddedPayload = payload + '='.repeat((4 - payload.length % 4) % 4);
+          const decoded = atob(paddedPayload);
+          return JSON.parse(decoded);
+        } catch (error) {
+          console.error('JWT decode error:', error);
+          return null;
+        }
+      }
+      
+      if (idToken) {
+        const jwtPayload = decodeJWT(idToken);
+        if (jwtPayload) {
+          const userData = jwtPayload;
+          const userId = userData.sub || userData.user_id || userData.uid;
+          const userName = userData.name || userData.given_name + ' ' + userData.family_name;
+          const userEmail = userData.email;
+          const userPhoto = userData.picture || userData.photo;
+          
+          if (!userEmail) {
+            Alert.alert('Error', 'Google authentication failed - no email received');
+            return;
+          }
+          
+          // Send to backend
+          const requestData = {
+            googleToken: idToken,
+            user: {
+              id: userId,
+              name: userName,
+              email: userEmail,
+              photo: userPhoto,
+            }
+          };
+          
+          const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.GOOGLE_AUTH}`, {
+            method: 'POST',
+            headers: API_CONFIG.getHeaders(),
+            body: JSON.stringify(requestData),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            
+            // Store user data
+            await AsyncStorage.setItem('userEmail', userEmail);
+            await AsyncStorage.setItem('userData', JSON.stringify({
+              name: userName,
+              email: userEmail,
+              photo: userPhoto,
+              google_user: true,
+            }));
+
+            Alert.alert('Success!', 'Welcome back to Mireva!', [
+              { text: 'Continue', onPress: () => onSignin(data) }
+            ]);
+          } else {
+            const errorData = await response.json();
+            Alert.alert('Error', errorData.error || 'Failed to sign in with Google');
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Google Sign-In Error:', error);
+      if (error.code === 'SIGN_IN_CANCELLED') {
+        return;
+      } else if (error.code === 'PLAY_SERVICES_NOT_AVAILABLE') {
+        Alert.alert('Error', 'Google Play Services not available');
+      } else {
+        Alert.alert('Google Sign-In Error', `Failed to sign in with Google.\n\nError: ${error.message || error.code || 'Unknown error'}\n\nPlease try again.`);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const { width, height } = Dimensions.get('window');
+
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header with logo */}
-      <View style={styles.header}>
-        <Image
-          source={require('../assets/mireva-logo.png')}
-          style={styles.logo}
-        />
-        <Text style={styles.title}>Welcome to Mireva</Text>
-        <Text style={styles.subtitle}>Sign in to your account</Text>
-      </View>
+      <View style={styles.gradientBackground}>
+        <KeyboardAvoidingView 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardAvoid}
+        >
+          <ScrollView 
+            contentContainerStyle={styles.scrollContainer}
+            showsVerticalScrollIndicator={false}
+            bounces={false}
+          >
+          {/* Header with logo */}
+          <View style={styles.header}>
+            <Image
+              source={require('../assets/IMG_4544.png')}
+              style={styles.logo}
+            />
+            <Text style={styles.title}>Sign In</Text>
+            <Text style={styles.subtitle}>Access your account to continue</Text>
+          </View>
 
-      {/* Sign in form */}
-      <View style={styles.formContainer}>
+          {/* Sign in form */}
+          <View style={styles.formContainer}>
+        {/* Authentication Options */}
+        <View style={styles.authOptionsContainer}>
+          {/* Google Sign In Circle */}
+          <View style={styles.authOption}>
+            <TouchableOpacity 
+              style={[styles.googleCircle, loading && styles.googleCircleDisabled]} 
+              onPress={handleGoogleSignIn}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="#4285F4" size="large" />
+              ) : (
+                <View style={styles.googleIconContainer}>
+                  <Image 
+                    source={require('../assets/google-logo.jpg')}
+                    style={styles.googleLogoImage}
+                    resizeMode="contain"
+                  />
+                </View>
+              )}
+            </TouchableOpacity>
+            <Text style={styles.googleLabel}>Sign in with Google</Text>
+          </View>
+
+          {/* Biometric Authentication Circle */}
+          {biometricSupported && (
+            <View style={styles.authOption}>
+              <TouchableOpacity 
+                style={[styles.biometricCircle, loading && styles.biometricCircleDisabled]} 
+                onPress={handleBiometricSignin}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#2D6A4F" size="large" />
+                ) : (
+                  <View style={styles.biometricIconContainer}>
+                    <Image 
+                      source={require('../assets/face-id-logo.png.png')}
+                      style={styles.faceIdImage}
+                      resizeMode="contain"
+                    />
+                  </View>
+                )}
+              </TouchableOpacity>
+              <Text style={styles.biometricLabel}>Use {biometricType}</Text>
+            </View>
+          )}
+        </View>
+
+        <View style={styles.dividerContainer}>
+          <View style={styles.dividerLine} />
+          <View style={styles.dividerCircle}>
+            <Text style={styles.dividerText}>OR</Text>
+          </View>
+          <View style={styles.dividerLine} />
+        </View>
+
         <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Email</Text>
+          <Text style={styles.inputLabel}>Username</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter your email"
+            placeholder="Enter your username or email"
             placeholderTextColor="#999"
             value={email}
-            onChangeText={setEmail}
+            onChangeText={(text) => {
+              setEmail(text);
+              setShowPasswordField(text.trim().length > 0);
+            }}
             keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
           />
         </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Password</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your password"
-            placeholderTextColor="#999"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
-        </View>
+        {showPasswordField && (
+          <View style={[styles.inputContainer, styles.fadeIn]}>
+            <Text style={styles.inputLabel}>Password</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your password"
+              placeholderTextColor="#999"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
+          </View>
+        )}
 
-        <TouchableOpacity 
-          style={[styles.signinButton, loading && styles.signinButtonDisabled]} 
-          onPress={handleSignin}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.signinButtonText}>Sign In</Text>
-          )}
-        </TouchableOpacity>
-
-        {/* Biometric Authentication Button */}
-        {biometricSupported && (
+        {showPasswordField && (
           <TouchableOpacity 
-            style={[styles.biometricButton, loading && styles.signinButtonDisabled]} 
-            onPress={handleBiometricSignin}
+            style={[styles.signinButton, loading && styles.signinButtonDisabled]} 
+            onPress={handleSignin}
             disabled={loading}
           >
-            {loading ? (
-              <ActivityIndicator color="#2D6A4F" />
-            ) : (
-              <View style={styles.biometricButtonContent}>
-                <Text style={styles.biometricIcon}>👤</Text>
-                <Text style={styles.biometricButtonText}>Sign in with {biometricType}</Text>
-              </View>
-            )}
+            <View style={styles.gradientButton}>
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.signinButtonText}>Sign In</Text>
+              )}
+            </View>
           </TouchableOpacity>
         )}
+
+
 
         {/* Sign up link */}
         <View style={styles.signupLinkContainer}>
@@ -196,12 +383,15 @@ export default function SigninScreen({ onSignin, onGoToSignup }) {
           </TouchableOpacity>
         </View>
 
-      </View>
+          </View>
 
-      {/* Footer */}
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>Version 31.0</Text>
-        <Text style={styles.footerSubtext}>Powered by Mireva AI</Text>
+          {/* Footer */}
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>Version 1.3</Text>
+            <Text style={styles.footerSubtext}>Powered by Mireva Life Group</Text>
+          </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </View>
     </SafeAreaView>
   );
@@ -210,112 +400,197 @@ export default function SigninScreen({ onSignin, onGoToSignup }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#0d1f0d',
+  },
+  gradientBackground: {
+    flex: 1,
+    backgroundColor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  },
+  keyboardAvoid: {
+    flex: 1,
+  },
+  scrollContainer: {
+    flexGrow: 1,
   },
   header: {
     alignItems: 'center',
-    paddingVertical: 40,
-    paddingHorizontal: 20,
+    paddingTop: Platform.OS === 'ios' ? 80 : 60,
+    paddingBottom: 50,
+    paddingHorizontal: 24,
+    backgroundColor: 'transparent',
   },
   logo: {
     width: 100,
     height: 100,
     resizeMode: 'contain',
-    marginBottom: 20,
+    marginBottom: 40,
+    borderRadius: 50,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 15,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 25,
+    elevation: 15,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderWidth: 3,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   title: {
     fontSize: 32,
-    fontWeight: 'bold',
-    color: '#2D6A4F',
-    marginBottom: 10,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 16,
+    textAlign: 'center',
+    letterSpacing: -0.3,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
   subtitle: {
     fontSize: 16,
-    color: '#81C784',
+    color: 'rgba(255, 255, 255, 0.9)',
+    textAlign: 'center',
+    fontWeight: '400',
+    lineHeight: 22,
+    paddingHorizontal: 20,
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   formContainer: {
     flex: 1,
-    paddingHorizontal: 30,
-    paddingTop: 40,
+    paddingHorizontal: 24,
+    paddingTop: 30,
+    marginBottom: 24,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    marginHorizontal: 16,
+    borderRadius: 25,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
+    elevation: 15,
+    backdropFilter: 'blur(10px)',
   },
   inputContainer: {
-    marginBottom: 25,
+    marginBottom: 24,
   },
   inputLabel: {
     fontSize: 16,
     fontWeight: '600',
     color: '#2D3748',
-    marginBottom: 8,
+    marginBottom: 10,
+    marginLeft: 6,
+    letterSpacing: 0.2,
   },
   input: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 20,
+    paddingVertical: 18,
+    borderRadius: 15,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: 'rgba(102, 126, 234, 0.2)',
     fontSize: 16,
     color: '#2D3748',
+    shadowColor: 'rgba(102, 126, 234, 0.3)',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+    minHeight: 56,
   },
   signinButton: {
     backgroundColor: '#2D6A4F',
-    paddingVertical: 16,
-    borderRadius: 12,
+    paddingVertical: 18,
+    borderRadius: 15,
     alignItems: 'center',
-    marginTop: 20,
+    justifyContent: 'center',
+    marginTop: 30,
     shadowColor: '#2D6A4F',
     shadowOffset: {
       width: 0,
-      height: 4,
+      height: 6,
     },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 8,
+    transform: [{ scale: 1 }],
+    minHeight: 56,
+    overflow: 'hidden',
   },
   signinButtonDisabled: {
     opacity: 0.6,
+    transform: [{ scale: 0.98 }],
   },
   signinButtonText: {
-    color: '#fff',
-    fontSize: 18,
+    color: '#FFFFFF',
+    fontSize: 17,
     fontWeight: '600',
+    letterSpacing: 0.3,
   },
   signupLinkContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 30,
+    paddingVertical: 20,
+    marginHorizontal: -24,
   },
   signupLinkText: {
     fontSize: 16,
-    color: '#718096',
+    color: 'rgba(45, 106, 79, 0.8)',
+    fontWeight: '500',
   },
   signupLinkButton: {
     fontSize: 16,
     color: '#2D6A4F',
-    fontWeight: '600',
+    fontWeight: '700',
+    textDecorationLine: 'underline',
   },
-  biometricButton: {
-    backgroundColor: '#F0FDF4',
-    paddingVertical: 16,
-    borderRadius: 12,
+  biometricCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 3,
+    borderColor: '#2D6A4F',
     alignItems: 'center',
-    marginTop: 15,
-    borderWidth: 2,
-    borderColor: '#81C784',
+    justifyContent: 'center',
+    shadowColor: '#2D6A4F',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
+    elevation: 12,
+    marginBottom: 12,
   },
-  biometricButtonContent: {
-    flexDirection: 'row',
+  biometricCircleDisabled: {
+    opacity: 0.6,
+    transform: [{ scale: 0.95 }],
+  },
+  biometricIconContainer: {
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  biometricIcon: {
-    fontSize: 20,
-    marginRight: 10,
+  faceIdImage: {
+    width: 40,
+    height: 40,
   },
-  biometricButtonText: {
+  biometricLabel: {
+    fontSize: 14,
     color: '#2D6A4F',
-    fontSize: 16,
     fontWeight: '600',
+    textAlign: 'center',
   },
   statusText: {
     fontSize: 12,
@@ -342,14 +617,114 @@ const styles = StyleSheet.create({
   footer: {
     alignItems: 'center',
     paddingVertical: 30,
+    paddingBottom: Platform.OS === 'ios' ? 40 : 30,
+    marginTop: 'auto',
   },
   footerText: {
     fontSize: 14,
-    color: '#A0AEC0',
-    marginBottom: 5,
+    color: 'rgba(255, 255, 255, 0.7)',
+    marginBottom: 8,
+    fontWeight: '500',
   },
   footerSubtext: {
     fontSize: 12,
-    color: '#CBD5E0',
+    color: 'rgba(255, 255, 255, 0.6)',
+  },
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 28,
+    paddingHorizontal: 8,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: 'rgba(156, 163, 175, 0.3)',
+  },
+  dividerCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F8F9FA',
+    borderWidth: 1,
+    borderColor: 'rgba(156, 163, 175, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  dividerText: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontWeight: '600',
+    letterSpacing: 0.5,
+  },
+  fadeIn: {
+    opacity: 1,
+  },
+  authOptionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    marginBottom: 20,
+    paddingHorizontal: 20,
+  },
+  authOption: {
+    alignItems: 'center',
+    marginHorizontal: 15,
+  },
+  googleCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 3,
+    borderColor: '#2D6A4F',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#2D6A4F',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
+    elevation: 12,
+    marginBottom: 12,
+  },
+  googleCircleDisabled: {
+    opacity: 0.6,
+    transform: [{ scale: 0.95 }],
+  },
+  googleIconContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    overflow: 'hidden',
+  },
+  googleLogoImage: {
+    width: 70,
+    height: 70,
+  },
+  googleIcon: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#4285F4',
+    fontFamily: Platform.OS === 'ios' ? 'Helvetica' : 'Roboto',
+  },
+  googleLabel: {
+    fontSize: 14,
+    color: '#2D6A4F',
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });

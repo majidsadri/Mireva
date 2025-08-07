@@ -4,6 +4,7 @@ export const API_CONFIG = {
   ENDPOINTS: {
     SIGNIN: '/signin',
     SIGNUP: '/signup',
+    GOOGLE_AUTH: '/google-auth',
     BIOMETRIC_SIGNIN: '/biometric-signin',
     PANTRY: '/pantry',
     RECOMMEND: '/recommend',
@@ -16,6 +17,7 @@ export const API_CONFIG = {
     GET_RECIPE_LOGS: '/get-recipe-logs',
     SEARCH_RECIPES: '/search-recipes',
     UPDATE_ACCOUNT: '/update-account',
+    UPDATE_PASSWORD: '/update-password',
     REQUEST_PANTRY_JOIN: '/request-pantry-join',
     GET_PANTRY_REQUESTS: '/get-pantry-requests',
     RESPOND_PANTRY_REQUEST: '/respond-pantry-request',

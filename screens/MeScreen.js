@@ -35,6 +35,10 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
   const [showEditAccountModal, setShowEditAccountModal] = useState(false);
   const [editName, setEditName] = useState('');
   const [updatingAccount, setUpdatingAccount] = useState(false);
+  const [showPasswordSection, setShowPasswordSection] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPantryUsersModal, setShowPantryUsersModal] = useState(false);
   const [pantryUsers, setPantryUsers] = useState([]);
   const [loadingPantryUsers, setLoadingPantryUsers] = useState(false);
@@ -236,6 +240,10 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
     try {
       const userEmail = await AsyncStorage.getItem('userEmail');
       if (userEmail) {
+        // Load local user data to get google_user flag
+        const localUserData = await AsyncStorage.getItem('userData');
+        const localUser = localUserData ? JSON.parse(localUserData) : {};
+        
         const response = await fetch(`${API_CONFIG.BASE_URL}/get-user-pantry`, {
           method: 'POST',
           headers: {
@@ -247,7 +255,8 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
         
         if (response.ok) {
           const data = await response.json();
-          setUserInfo(data);
+          // Merge local data (like google_user flag) with backend data
+          setUserInfo({ ...data, google_user: localUser.google_user || false });
           setSelectedDiets(data.diets || []);
           setSelectedCuisines(data.cuisines || []);
         }
@@ -477,35 +486,12 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
           Alert.alert('Error', errorData.error || 'Failed to submit join request');
         }
       } else {
-        // Create new pantry (immediate join)
-        const response = await fetch(`${API_CONFIG.BASE_URL}/update-user-pantry`, {
-          method: 'POST',
-          headers: API_CONFIG.getHeaders(),
-          body: JSON.stringify({
-            email: userEmail,
-            pantryName: pantryName.trim()
-          }),
-        });
-
-        if (response.ok) {
-          await AsyncStorage.setItem('joinedPantry', pantryName.trim());
-          setJoinedPantry(pantryName.trim());
-          
-          // Update the stored userData to include the new pantry
-          const storedUserData = await AsyncStorage.getItem('userData');
-          if (storedUserData) {
-            const userData = JSON.parse(storedUserData);
-            userData.pantryName = pantryName.trim();
-            await AsyncStorage.setItem('userData', JSON.stringify(userData));
-          }
-          
-          setShowJoinPantry(false);
-          setPantryName('');
-          Alert.alert('Success', `You have created and joined "${pantryName.trim()}" pantry!`);
-        } else {
-          const errorData = await response.json();
-          Alert.alert('Error', errorData.error || 'Failed to create pantry');
-        }
+        // Pantry doesn't exist - show error
+        Alert.alert(
+          'Pantry Not Found', 
+          `The pantry "${pantryName.trim()}" doesn't exist. Please check the name or create a new pantry from the Pantry page.`,
+          [{ text: 'OK' }]
+        );
       }
     } catch (error) {
       console.error('Error with pantry operation:', error);
@@ -643,6 +629,69 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
     } catch (error) {
       console.error('Error updating account:', error);
       Alert.alert('Error', 'Failed to update account. Please try again.');
+    } finally {
+      setUpdatingAccount(false);
+    }
+  };
+
+  const updatePassword = async () => {
+    if (!newPassword.trim() || !confirmPassword.trim()) {
+      Alert.alert('Error', 'Please fill in all password fields');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      Alert.alert('Error', 'New passwords do not match');
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      Alert.alert('Error', 'Password must be at least 6 characters long');
+      return;
+    }
+
+    // For Google users, current password is not required
+    const isGoogleUser = userInfo?.google_user || false;
+
+    if (!isGoogleUser && !currentPassword.trim()) {
+      Alert.alert('Error', 'Current password is required');
+      return;
+    }
+
+    try {
+      setUpdatingAccount(true);
+      const userEmail = await AsyncStorage.getItem('userEmail');
+      
+      const requestBody = {
+        newPassword: newPassword.trim(),
+        ...(isGoogleUser ? {} : { currentPassword: currentPassword.trim() })
+      };
+
+      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.UPDATE_PASSWORD}`, {
+        method: 'POST',
+        headers: {
+          ...API_CONFIG.getHeaders(),
+          'X-User-Email': userEmail
+        },
+        body: JSON.stringify(requestBody),
+      });
+      
+      if (response.ok) {
+        // Clear password fields
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+        setShowPasswordSection(false);
+        
+        Alert.alert('Success', 'Password updated successfully!');
+      } else {
+        const errorData = await response.json();
+        Alert.alert('Error', errorData.error || 'Failed to update password. Please try again.');
+      }
+      
+    } catch (error) {
+      console.error('Error updating password:', error);
+      Alert.alert('Error', 'Failed to update password. Please try again.');
     } finally {
       setUpdatingAccount(false);
     }
@@ -1170,6 +1219,85 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
                 </View>
                 <Text style={styles.photoEditText}>Tap to change photo</Text>
               </TouchableOpacity>
+            </View>
+
+            {/* Password Section */}
+            <View style={styles.editFormSection}>
+              <TouchableOpacity 
+                style={styles.passwordSectionHeader}
+                onPress={() => setShowPasswordSection(!showPasswordSection)}
+              >
+                <Text style={styles.inputLabel}>Password</Text>
+                <Text style={styles.passwordToggleIcon}>
+                  {showPasswordSection ? '▼' : '▶'}
+                </Text>
+              </TouchableOpacity>
+              
+              {showPasswordSection && (
+                <View style={styles.passwordSection}>
+                  {!userInfo?.google_user && (
+                    <View style={styles.passwordInputContainer}>
+                      <Text style={styles.passwordInputLabel}>Current Password</Text>
+                      <TextInput
+                        style={styles.passwordInput}
+                        placeholder="Enter current password"
+                        placeholderTextColor="#A0AEC0"
+                        value={currentPassword}
+                        onChangeText={setCurrentPassword}
+                        secureTextEntry
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                      />
+                    </View>
+                  )}
+                  
+                  <View style={styles.passwordInputContainer}>
+                    <Text style={styles.passwordInputLabel}>New Password</Text>
+                    <TextInput
+                      style={styles.passwordInput}
+                      placeholder="Enter new password (min 6 characters)"
+                      placeholderTextColor="#A0AEC0"
+                      value={newPassword}
+                      onChangeText={setNewPassword}
+                      secureTextEntry
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                    />
+                  </View>
+                  
+                  <View style={styles.passwordInputContainer}>
+                    <Text style={styles.passwordInputLabel}>Confirm New Password</Text>
+                    <TextInput
+                      style={styles.passwordInput}
+                      placeholder="Confirm new password"
+                      placeholderTextColor="#A0AEC0"
+                      value={confirmPassword}
+                      onChangeText={setConfirmPassword}
+                      secureTextEntry
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                    />
+                  </View>
+
+                  <TouchableOpacity 
+                    style={[styles.updatePasswordButton, updatingAccount && styles.updatePasswordButtonDisabled]} 
+                    onPress={updatePassword}
+                    disabled={updatingAccount}
+                  >
+                    {updatingAccount ? (
+                      <ActivityIndicator color="#fff" size="small" />
+                    ) : (
+                      <Text style={styles.updatePasswordButtonText}>Update Password</Text>
+                    )}
+                  </TouchableOpacity>
+
+                  {userInfo?.google_user && (
+                    <Text style={styles.googleUserNote}>
+                      💡 As a Google user, you can set a password to also sign in with email/password
+                    </Text>
+                  )}
+                </View>
+              )}
             </View>
 
             {/* Account Actions Section */}
@@ -2346,5 +2474,68 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#718096',
     fontStyle: 'italic',
+  },
+
+  // Password Section Styles
+  passwordSectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  passwordToggleIcon: {
+    fontSize: 16,
+    color: '#2D6A4F',
+    fontWeight: '600',
+  },
+  passwordSection: {
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#E2E8F0',
+  },
+  passwordInputContainer: {
+    marginBottom: 16,
+  },
+  passwordInputLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#2D3748',
+    marginBottom: 6,
+  },
+  passwordInput: {
+    backgroundColor: '#F7FAFC',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    color: '#2D3748',
+  },
+  updatePasswordButton: {
+    backgroundColor: '#2D6A4F',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    marginTop: 8,
+    marginBottom: 16,
+  },
+  updatePasswordButtonDisabled: {
+    opacity: 0.6,
+  },
+  updatePasswordButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  googleUserNote: {
+    fontSize: 12,
+    color: '#718096',
+    textAlign: 'center',
+    lineHeight: 16,
+    fontStyle: 'italic',
+    marginTop: 8,
   },
 });

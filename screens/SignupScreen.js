@@ -16,6 +16,7 @@ import {
 import { API_CONFIG } from '../config';
 import BiometricAuth from '../utils/BiometricAuth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 export default function SignupScreen({ onSignup, onBackToSignin }) {
   const [step, setStep] = useState('email'); // email, verify, password
@@ -27,6 +28,22 @@ export default function SignupScreen({ onSignup, onBackToSignin }) {
   const [loading, setLoading] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
 
+  // Configure Google Sign-In
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId: '677358849010-v7rm0ps4cq0me3el7r1c5upgj2ceido1.apps.googleusercontent.com',
+      iosClientId: '677358849010-1d5fb5u1unmish4oahjqir6i6ja5f95i.apps.googleusercontent.com',
+      offlineAccess: false,
+      forceCodeForRefreshToken: true,
+      scopes: ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile'],
+      accountName: '',
+      loginHint: '',
+      hostedDomain: '',
+      // Force account selection
+      prompt: 'select_account',
+    });
+  }, []);
+
   // Timer for resend code
   useEffect(() => {
     if (resendTimer > 0) {
@@ -37,6 +54,193 @@ export default function SignupScreen({ onSignup, onBackToSignin }) {
 
   const validateEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const handleGoogleSignUp = async () => {
+    try {
+      setLoading(true);
+      console.log('Starting Google Sign-In process...');
+      
+      // Sign out any existing session first to force account selection
+      try {
+        await GoogleSignin.signOut();
+        console.log('Signed out existing Google session to force account selection');
+      } catch (signOutError) {
+        console.log('No existing session to sign out');
+      }
+      
+      // Check if Google Play Services are available
+      console.log('Checking Google Play Services...');
+      await GoogleSignin.hasPlayServices();
+      console.log('Google Play Services available');
+      
+      // Sign in with Google and get tokens
+      console.log('Attempting Google Sign-In...');
+      
+      // Add timeout to prevent hanging on passkey screen
+      const signInPromise = GoogleSignin.signIn();
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Google Sign-In timeout - please try again')), 30000)
+      );
+      
+      const userInfo = await Promise.race([signInPromise, timeoutPromise]);
+      console.log('Google Sign-In successful, got userInfo');
+      
+      // Get the ID token separately if not included
+      let idToken = userInfo.idToken;
+      if (!idToken) {
+        const tokens = await GoogleSignin.getTokens();
+        idToken = tokens.idToken;
+      }
+      
+      // Debug: Log what we got from Google
+      console.log('🔍 FULL Google Response:', JSON.stringify(userInfo, null, 2));
+      console.log('🔍 Top-level properties:', Object.keys(userInfo));
+      console.log('🔍 ID Token present:', !!idToken);
+      
+      // Log the response structure
+      console.log('🔍 Response structure - user object exists:', !!userInfo.user);
+      
+      // Check for email anywhere in the response
+      function findEmailInObject(obj, path = '') {
+        for (const [key, value] of Object.entries(obj)) {
+          const currentPath = path ? `${path}.${key}` : key;
+          if (key.toLowerCase().includes('email') || (typeof value === 'string' && value.includes('@'))) {
+            console.log(`🔍 Found potential email at ${currentPath}:`, value);
+          }
+          if (typeof value === 'object' && value !== null) {
+            findEmailInObject(value, currentPath);
+          }
+        }
+      }
+      
+      console.log('🔍 Searching for email in entire response:');
+      findEmailInObject(userInfo);
+      
+      // Extract user data from JWT token since Google isn't returning user object
+      let userData, userId, userName, userEmail, userPhoto;
+      
+      // Function to decode JWT token (simple base64 decode for payload)
+      function decodeJWT(token) {
+        try {
+          const parts = token.split('.');
+          if (parts.length !== 3) return null;
+          
+          const payload = parts[1];
+          // Add padding if necessary
+          const paddedPayload = payload + '='.repeat((4 - payload.length % 4) % 4);
+          const decoded = atob(paddedPayload);
+          return JSON.parse(decoded);
+        } catch (error) {
+          console.error('JWT decode error:', error);
+          return null;
+        }
+      }
+      
+      // Try to get user data from JWT token
+      if (idToken) {
+        console.log('🔍 Decoding JWT token for user data...');
+        const jwtPayload = decodeJWT(idToken);
+        console.log('🔍 JWT Payload:', JSON.stringify(jwtPayload, null, 2));
+        
+        if (jwtPayload) {
+          userData = jwtPayload;
+          userId = userData.sub || userData.user_id || userData.uid;
+          userName = userData.name || userData.given_name + ' ' + userData.family_name;
+          userEmail = userData.email;
+          userPhoto = userData.picture || userData.photo;
+        }
+      }
+      
+      // Fallback: Try different data structures that Google might return
+      if (!userData && userInfo.user) {
+        userData = userInfo.user;
+        userId = userData.id || userData.uid || userData.sub;
+        userName = userData.name || userData.displayName || (userData.given_name && userData.family_name ? userData.given_name + ' ' + userData.family_name : userData.given_name);
+        userEmail = userData.email;
+        userPhoto = userData.photo || userData.photoURL || userData.picture;
+      } else if (!userData && userInfo.data) {
+        userData = userInfo.data;
+        userId = userData.id || userData.uid || userData.sub;
+        userName = userData.name || userData.displayName || (userData.given_name && userData.family_name ? userData.given_name + ' ' + userData.family_name : userData.given_name);
+        userEmail = userData.email;
+        userPhoto = userData.photo || userData.photoURL || userData.picture;
+      }
+      
+      console.log('Extracted data:', { userId, userName, userEmail, userPhoto });
+      console.log('Google token:', idToken);
+      console.log('Full userData object:', JSON.stringify(userData, null, 2));
+      
+      if (!idToken) {
+        Alert.alert('Error', 'Google authentication failed - no token received');
+        return;
+      }
+      
+      if (!userEmail) {
+        console.error('No email found in Google response');
+        console.error('Available properties:', Object.keys(userData || {}));
+        Alert.alert('Error', `Google authentication failed - no email received.\n\nPlease ensure your Google account has a public email address.\n\nDebug info: ${JSON.stringify(Object.keys(userData || {}))}`);
+        return;
+      }
+      
+      const requestData = {
+        googleToken: idToken,
+        user: {
+          id: userId,
+          name: userName,
+          email: userEmail,
+          photo: userPhoto,
+        }
+      };
+      
+      console.log('Sending to backend:', JSON.stringify(requestData, null, 2));
+      
+      // Send Google user info to your backend
+      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.GOOGLE_AUTH}`, {
+        method: 'POST',
+        headers: API_CONFIG.getHeaders(),
+        body: JSON.stringify(requestData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Store user data
+        await AsyncStorage.setItem('userEmail', userEmail);
+        await AsyncStorage.setItem('userData', JSON.stringify({
+          name: userName,
+          email: userEmail,
+          photo: userPhoto,
+          google_user: true,
+        }));
+
+        Alert.alert('Success!', 'Welcome to Mireva!', [
+          { text: 'Continue', onPress: () => onSignup({ id: userId, name: userName, email: userEmail, photo: userPhoto }) }
+        ]);
+      } else {
+        const errorData = await response.json();
+        Alert.alert('Error', errorData.error || 'Failed to sign up with Google');
+      }
+    } catch (error) {
+      console.error('Google Sign-In Error:', error);
+      console.error('Error Code:', error.code);
+      console.error('Error Message:', error.message);
+      
+      if (error.code === 'SIGN_IN_CANCELLED') {
+        // User cancelled the sign-in
+        return;
+      } else if (error.code === 'PLAY_SERVICES_NOT_AVAILABLE') {
+        Alert.alert('Error', 'Google Play Services not available');
+      } else if (error.code === 'SIGN_IN_REQUIRED') {
+        Alert.alert('Error', 'Google Sign-In is required but not configured properly');
+      } else if (error.code === 'IN_PROGRESS') {
+        Alert.alert('Error', 'Google Sign-In already in progress');
+      } else {
+        Alert.alert('Google Sign-In Error', `Failed to sign in with Google.\n\nError: ${error.message || error.code || 'Unknown error'}\n\nPlease check your Google configuration and try again.`);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSendVerificationCode = async () => {
@@ -229,6 +433,32 @@ export default function SignupScreen({ onSignup, onBackToSignin }) {
 
   const renderEmailStep = () => (
     <View style={styles.formContainer}>
+      {/* Google Sign Up - moved to top */}
+      <TouchableOpacity 
+        style={[styles.googleButton, loading && styles.googleButtonDisabled]} 
+        onPress={handleGoogleSignUp}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator color="#666" />
+        ) : (
+          <>
+            <Image 
+              source={require('../assets/google-logo.jpg')}
+              style={styles.googleLogoImage}
+              resizeMode="contain"
+            />
+            <Text style={styles.googleButtonText}>Sign up with Google</Text>
+          </>
+        )}
+      </TouchableOpacity>
+
+      <View style={styles.dividerContainer}>
+        <View style={styles.dividerLine} />
+        <Text style={styles.dividerText}>or</Text>
+        <View style={styles.dividerLine} />
+      </View>
+
       <View style={styles.inputContainer}>
         <Text style={styles.inputLabel}>Full Name</Text>
         <TextInput
@@ -447,8 +677,8 @@ export default function SignupScreen({ onSignup, onBackToSignin }) {
 
           {/* Footer */}
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Version 31.0</Text>
-            <Text style={styles.footerSubtext}>Powered by Mireva AI</Text>
+            <Text style={styles.footerText}>Version 1.3</Text>
+            <Text style={styles.footerSubtext}>Powered by Mireva Life Group</Text>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -586,6 +816,60 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
   },
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#E2E8F0',
+  },
+  dividerText: {
+    marginHorizontal: 16,
+    fontSize: 14,
+    color: '#718096',
+    fontWeight: '500',
+  },
+  googleButton: {
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E8EAED',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  googleButtonDisabled: {
+    opacity: 0.6,
+  },
+  googleLogoImage: {
+    width: 24,
+    height: 24,
+    marginRight: 12,
+  },
+  googleIcon: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#4285F4',
+    marginRight: 12,
+    fontFamily: 'Arial',
+  },
+  googleButtonText: {
+    color: '#374151',
+    fontSize: 16,
+    fontWeight: '600',
+  },
   resendButton: {
     marginTop: 20,
     alignItems: 'center',
@@ -629,7 +913,8 @@ const styles = StyleSheet.create({
   },
   footer: {
     alignItems: 'center',
-    paddingVertical: 20,
+    paddingVertical: 40,
+    marginTop: 20,
   },
   footerText: {
     fontSize: 14,

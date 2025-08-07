@@ -31,15 +31,16 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 logging.basicConfig(level=logging.INFO)
 
 # File paths - use EC2 absolute paths for production
-DB_FILE_PATH = '/mnt/data/MirevaApp/db.json'
-PROFILE_FILE_PATH = '/mnt/data/MirevaApp/profile.json'
-USERS_FILE = '/mnt/data/MirevaApp/users.json'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_FILE_PATH = os.path.join(BASE_DIR, 'db.json')
+PROFILE_FILE_PATH = os.path.join(BASE_DIR, 'profile.json')
+USERS_FILE = os.path.join(BASE_DIR, 'users.json')
 
 # Store data file
-STORES_FILE = '/mnt/data/MirevaApp/stores.json'
-SHOPPING_LIST_FILE = '/mnt/data/MirevaApp/shopping_lists.json'
-PANTRY_REQUESTS_FILE = '/mnt/data/MirevaApp/pantry_requests.json'
-PANTRY_OWNERS_FILE = '/mnt/data/MirevaApp/pantry_owners.json'
+STORES_FILE = os.path.join(BASE_DIR, 'stores.json')
+SHOPPING_LIST_FILE = os.path.join(BASE_DIR, 'shopping_list.json')
+PANTRY_REQUESTS_FILE = os.path.join(BASE_DIR, 'pantry_requests.json')
+PANTRY_OWNERS_FILE = os.path.join(BASE_DIR, 'pantry_owners.json')
 
 def add_item_to_pantry(pantry_items, new_item):
     """
@@ -114,7 +115,7 @@ def log_user_activity(user_email, activity_type, activity_data=None, pantry_name
     """Log user activity with deduplication to prevent duplicate entries"""
     try:
         # Ensure the logs directory exists
-        logs_dir = "/mnt/data/MirevaApp/activity_logs"
+        logs_dir = os.path.join(BASE_DIR, 'activity_logs')
         os.makedirs(logs_dir, exist_ok=True)
         
         # Determine log file based on activity type
@@ -1106,7 +1107,7 @@ def search_recipes():
         
         # First, try local database
         local_recipes = []
-        recipe_db_path = '/mnt/data/MirevaApp/recipes_database.json'
+        recipe_db_path = os.path.join(BASE_DIR, 'recipes_database.json')
         
         try:
             if os.path.exists(recipe_db_path):
@@ -1462,7 +1463,7 @@ import boto3
 from botocore.exceptions import ClientError
 
 # Constants for email verification
-VERIFICATION_CODES_FILE = '/mnt/data/MirevaApp/verification_codes.json'
+VERIFICATION_CODES_FILE = os.path.join(BASE_DIR, 'verification_codes.json')
 MAX_ATTEMPTS = 3
 CODE_EXPIRY_MINUTES = 10
 
@@ -3317,7 +3318,7 @@ def get_pantry_activity_logs():
             user_pantry_name = "default"
         
         # Read from actual log file
-        log_file = f"/mnt/data/MirevaApp/activity_logs/{user_pantry_name}_pantry_activity.json"
+        log_file = os.path.join(BASE_DIR, 'activity_logs', f"{user_pantry_name}_pantry_activity.json")
         try:
             with open(log_file, "r") as f:
                 log_data = json.load(f)
@@ -3354,7 +3355,7 @@ def get_shopping_activity_logs():
             user_pantry_name = "default"
         
         # Read from actual log file
-        log_file = f"/mnt/data/MirevaApp/activity_logs/{user_pantry_name}_shopping_activity.json"
+        log_file = os.path.join(BASE_DIR, 'activity_logs', f"{user_pantry_name}_shopping_activity.json")
         try:
             with open(log_file, "r") as f:
                 log_data = json.load(f)
