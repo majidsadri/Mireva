@@ -12,6 +12,7 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Dimensions,
 } from 'react-native';
 import { API_CONFIG } from '../config';
 import BiometricAuth from '../utils/BiometricAuth';
@@ -433,29 +434,36 @@ export default function SignupScreen({ onSignup, onBackToSignin }) {
 
   const renderEmailStep = () => (
     <View style={styles.formContainer}>
-      {/* Google Sign Up - moved to top */}
-      <TouchableOpacity 
-        style={[styles.googleButton, loading && styles.googleButtonDisabled]} 
-        onPress={handleGoogleSignUp}
-        disabled={loading}
-      >
-        {loading ? (
-          <ActivityIndicator color="#666" />
-        ) : (
-          <>
-            <Image 
-              source={require('../assets/google-logo.jpg')}
-              style={styles.googleLogoImage}
-              resizeMode="contain"
-            />
-            <Text style={styles.googleButtonText}>Sign up with Google</Text>
-          </>
-        )}
-      </TouchableOpacity>
+      {/* Authentication Options */}
+      <View style={styles.authOptionsContainer}>
+        {/* Google Sign Up Circle */}
+        <View style={styles.authOption}>
+          <TouchableOpacity 
+            style={[styles.googleCircle, loading && styles.googleCircleDisabled]} 
+            onPress={handleGoogleSignUp}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#4285F4" size="large" />
+            ) : (
+              <View style={styles.googleIconContainer}>
+                <Image 
+                  source={require('../assets/google-logo.jpg')}
+                  style={styles.googleLogoImage}
+                  resizeMode="contain"
+                />
+              </View>
+            )}
+          </TouchableOpacity>
+          <Text style={styles.googleLabel}>Sign up with Google</Text>
+        </View>
+      </View>
 
       <View style={styles.dividerContainer}>
         <View style={styles.dividerLine} />
-        <Text style={styles.dividerText}>or</Text>
+        <View style={styles.dividerCircle}>
+          <Text style={styles.dividerText}>OR</Text>
+        </View>
         <View style={styles.dividerLine} />
       </View>
 
@@ -491,11 +499,13 @@ export default function SignupScreen({ onSignup, onBackToSignin }) {
         onPress={handleSendVerificationCode}
         disabled={loading}
       >
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.signupButtonText}>Send Verification Code</Text>
-        )}
+        <View style={styles.gradientButton}>
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.signupButtonText}>Send Verification Code</Text>
+          )}
+        </View>
       </TouchableOpacity>
     </View>
   );
@@ -533,11 +543,13 @@ export default function SignupScreen({ onSignup, onBackToSignin }) {
         onPress={handleVerifyCode}
         disabled={loading}
       >
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.signupButtonText}>Verify Code</Text>
-        )}
+        <View style={styles.gradientButton}>
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.signupButtonText}>Verify Code</Text>
+          )}
+        </View>
       </TouchableOpacity>
 
       <TouchableOpacity 
@@ -593,11 +605,13 @@ export default function SignupScreen({ onSignup, onBackToSignin }) {
         onPress={handleCompleteSignup}
         disabled={loading}
       >
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.signupButtonText}>Create Account</Text>
-        )}
+        <View style={styles.gradientButton}>
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.signupButtonText}>Create Account</Text>
+          )}
+        </View>
       </TouchableOpacity>
     </View>
   );
@@ -628,24 +642,29 @@ export default function SignupScreen({ onSignup, onBackToSignin }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}
-      >
-        <ScrollView showsVerticalScrollIndicator={false}>
-          {/* Header with logo */}
-          <View style={styles.header}>
-            <Image
-              source={require('../assets/mireva-logo.png')}
-              style={styles.logo}
-            />
-            <Text style={styles.title}>Join Mireva</Text>
-            <Text style={styles.subtitle}>
-              {step === 'email' && 'Create your account to get started'}
-              {step === 'verify' && 'Verify your email address'}
-              {step === 'password' && 'Set up your password'}
-            </Text>
-          </View>
+      <View style={styles.gradientBackground}>
+        <KeyboardAvoidingView 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardAvoid}
+        >
+          <ScrollView 
+            contentContainerStyle={styles.scrollContainer}
+            showsVerticalScrollIndicator={false}
+            bounces={false}
+          >
+            {/* Header with logo */}
+            <View style={styles.header}>
+              <Image
+                source={require('../assets/IMG_4544.png')}
+                style={styles.logo}
+              />
+              <Text style={styles.title}>Join Mireva</Text>
+              <Text style={styles.subtitle}>
+                {step === 'email' && 'Create your account to get started'}
+                {step === 'verify' && 'Verify your email address'}
+                {step === 'password' && 'Set up your password'}
+              </Text>
+            </View>
 
           {/* Step Indicator */}
           {getStepIndicator()}
@@ -675,13 +694,14 @@ export default function SignupScreen({ onSignup, onBackToSignin }) {
             </View>
           )}
 
-          {/* Footer */}
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>Version 1.3</Text>
-            <Text style={styles.footerSubtext}>Powered by Mireva Life Group</Text>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+            {/* Footer */}
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>Version 1.3</Text>
+              <Text style={styles.footerSubtext}>Powered by Mireva Life Group</Text>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </View>
     </SafeAreaView>
   );
 }
@@ -689,29 +709,64 @@ export default function SignupScreen({ onSignup, onBackToSignin }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#0d1f0d',
+  },
+  gradientBackground: {
+    flex: 1,
+    backgroundColor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  },
+  keyboardAvoid: {
+    flex: 1,
+  },
+  scrollContainer: {
+    flexGrow: 1,
   },
   header: {
     alignItems: 'center',
-    paddingVertical: 40,
-    paddingHorizontal: 20,
+    paddingTop: Platform.OS === 'ios' ? 80 : 60,
+    paddingBottom: 20,
+    paddingHorizontal: 24,
+    backgroundColor: 'transparent',
   },
   logo: {
-    width: 80,
-    height: 80,
+    width: 100,
+    height: 100,
     resizeMode: 'contain',
-    marginBottom: 20,
+    marginBottom: 40,
+    borderRadius: 50,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 15,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 25,
+    elevation: 15,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderWidth: 3,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   title: {
     fontSize: 32,
-    fontWeight: 'bold',
-    color: '#2D6A4F',
-    marginBottom: 10,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 16,
+    textAlign: 'center',
+    letterSpacing: -0.3,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
   subtitle: {
     fontSize: 16,
-    color: '#81C784',
+    color: 'rgba(255, 255, 255, 0.9)',
     textAlign: 'center',
+    fontWeight: '400',
+    lineHeight: 22,
+    paddingHorizontal: 20,
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   stepIndicatorContainer: {
     flexDirection: 'row',
@@ -744,8 +799,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#2D6A4F',
   },
   formContainer: {
-    paddingHorizontal: 30,
-    paddingTop: 20,
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingTop: 30,
+    marginBottom: 24,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    marginHorizontal: 16,
+    borderRadius: 25,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
+    elevation: 15,
+    backdropFilter: 'blur(10px)',
   },
   backButton: {
     marginBottom: 20,
@@ -775,17 +844,28 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#2D3748',
-    marginBottom: 8,
+    marginBottom: 10,
+    marginLeft: 6,
+    letterSpacing: 0.2,
   },
   input: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 20,
+    paddingVertical: 18,
+    borderRadius: 15,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: 'rgba(102, 126, 234, 0.2)',
     fontSize: 16,
     color: '#2D3748',
+    shadowColor: 'rgba(102, 126, 234, 0.3)',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+    minHeight: 56,
   },
   codeInput: {
     fontSize: 24,
@@ -795,80 +875,126 @@ const styles = StyleSheet.create({
   },
   signupButton: {
     backgroundColor: '#2D6A4F',
-    paddingVertical: 16,
-    borderRadius: 12,
+    paddingVertical: 18,
+    borderRadius: 15,
     alignItems: 'center',
-    marginTop: 20,
+    justifyContent: 'center',
+    marginTop: 30,
+    marginBottom: 30,
     shadowColor: '#2D6A4F',
     shadowOffset: {
       width: 0,
-      height: 4,
+      height: 6,
     },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 8,
+    transform: [{ scale: 1 }],
+    minHeight: 56,
+    overflow: 'hidden',
   },
   signupButtonDisabled: {
     opacity: 0.6,
+    transform: [{ scale: 0.98 }],
   },
   signupButtonText: {
-    color: '#fff',
-    fontSize: 18,
+    color: '#FFFFFF',
+    fontSize: 17,
     fontWeight: '600',
+    letterSpacing: 0.3,
+  },
+  gradientButton: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   dividerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 20,
+    marginVertical: 18,
+    paddingHorizontal: 8,
   },
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: '#E2E8F0',
+    backgroundColor: 'rgba(156, 163, 175, 0.3)',
   },
-  dividerText: {
-    marginHorizontal: 16,
-    fontSize: 14,
-    color: '#718096',
-    fontWeight: '500',
-  },
-  googleButton: {
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 16,
-    borderRadius: 8,
-    alignItems: 'center',
+  dividerCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F8F9FA',
     borderWidth: 1,
-    borderColor: '#E8EAED',
-    flexDirection: 'row',
+    borderColor: 'rgba(156, 163, 175, 0.2)',
+    alignItems: 'center',
     justifyContent: 'center',
+    marginHorizontal: 16,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 1,
+      height: 2,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
     elevation: 2,
   },
-  googleButtonDisabled: {
+  dividerText: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontWeight: '600',
+    letterSpacing: 0.5,
+  },
+  authOptionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    marginBottom: 15,
+    paddingHorizontal: 20,
+  },
+  authOption: {
+    alignItems: 'center',
+    marginHorizontal: 15,
+  },
+  googleCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 3,
+    borderColor: '#2D6A4F',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#2D6A4F',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
+    elevation: 12,
+    marginBottom: 8,
+  },
+  googleCircleDisabled: {
     opacity: 0.6,
+    transform: [{ scale: 0.95 }],
+  },
+  googleIconContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    overflow: 'hidden',
   },
   googleLogoImage: {
-    width: 24,
-    height: 24,
-    marginRight: 12,
+    width: 70,
+    height: 70,
   },
-  googleIcon: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#4285F4',
-    marginRight: 12,
-    fontFamily: 'Arial',
-  },
-  googleButtonText: {
-    color: '#374151',
-    fontSize: 16,
+  googleLabel: {
+    fontSize: 14,
+    color: '#2D6A4F',
     fontWeight: '600',
+    textAlign: 'center',
   },
   resendButton: {
     marginTop: 20,
@@ -913,16 +1039,18 @@ const styles = StyleSheet.create({
   },
   footer: {
     alignItems: 'center',
-    paddingVertical: 40,
-    marginTop: 20,
+    paddingVertical: 30,
+    paddingBottom: Platform.OS === 'ios' ? 40 : 30,
+    marginTop: 'auto',
   },
   footerText: {
     fontSize: 14,
-    color: '#A0AEC0',
-    marginBottom: 5,
+    color: 'rgba(255, 255, 255, 0.7)',
+    marginBottom: 8,
+    fontWeight: '500',
   },
   footerSubtext: {
     fontSize: 12,
-    color: '#CBD5E0',
+    color: 'rgba(255, 255, 255, 0.6)',
   },
 });

@@ -540,8 +540,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 30,
-    paddingVertical: 20,
+    marginTop: 20,
+    paddingVertical: 15,
     marginHorizontal: -24,
   },
   signupLinkText: {
