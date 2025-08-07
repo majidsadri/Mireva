@@ -60,18 +60,47 @@ export default function CookScreen() {
     try {
       const userEmail = await AsyncStorage.getItem('userEmail');
       const userSpecificKey = `savedRecipes_${userEmail}`;
-      let saved = await AsyncStorage.getItem(userSpecificKey);
-      let savedRecipesData = saved ? JSON.parse(saved) : [];
+      let savedRecipesData = [];
 
-      // Migration: Only migrate for sizarta (the original user) to prevent data leakage
-      if (savedRecipesData.length === 0 && userEmail === 'sizarta@gmail.com') {
-        const oldSaved = await AsyncStorage.getItem('savedRecipes');
-        if (oldSaved) {
-          const oldRecipes = JSON.parse(oldSaved);
-          // Migrate old recipes to user-specific storage
-          await AsyncStorage.setItem(userSpecificKey, oldSaved);
-          savedRecipesData = oldRecipes;
-          console.log(`Migrated ${oldRecipes.length} recipes for user ${userEmail} in CookScreen`);
+      // First, try to load from backend API
+      try {
+        const headers = {
+          ...API_CONFIG.getHeaders(),
+          ...(userEmail && { 'X-User-Email': userEmail.trim().toLowerCase() })
+        };
+
+        const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SAVED_RECIPES}`, {
+          method: 'GET',
+          headers,
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          savedRecipesData = data.recipes || [];
+          console.log(`Loaded ${savedRecipesData.length} saved recipes from backend for ${userEmail}`);
+          
+          // Update local storage with backend data (for offline access)
+          await AsyncStorage.setItem(userSpecificKey, JSON.stringify(savedRecipesData));
+        } else {
+          throw new Error(`Backend API failed with status: ${response.status}`);
+        }
+      } catch (backendError) {
+        console.log('Backend failed, falling back to local storage:', backendError.message);
+        
+        // Fallback to local storage
+        let saved = await AsyncStorage.getItem(userSpecificKey);
+        savedRecipesData = saved ? JSON.parse(saved) : [];
+
+        // Migration: Only migrate for sizarta (the original user) to prevent data leakage
+        if (savedRecipesData.length === 0 && userEmail === 'sizarta@gmail.com') {
+          const oldSaved = await AsyncStorage.getItem('savedRecipes');
+          if (oldSaved) {
+            const oldRecipes = JSON.parse(oldSaved);
+            // Migrate old recipes to user-specific storage
+            await AsyncStorage.setItem(userSpecificKey, oldSaved);
+            savedRecipesData = oldRecipes;
+            console.log(`Migrated ${oldRecipes.length} recipes for user ${userEmail} in CookScreen`);
+          }
         }
       }
 
@@ -474,14 +503,47 @@ export default function CookScreen() {
         id: `saved_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
       };
       
+      // First, try to save to backend API
+      let backendSuccess = false;
+      try {
+        const headers = {
+          ...API_CONFIG.getHeaders(),
+          ...(userEmail && { 'X-User-Email': userEmail.trim().toLowerCase() })
+        };
+        
+        const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SAVED_RECIPES}`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(recipeWithTimestamp),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log(`Recipe '${recipe.name}' saved to backend successfully`);
+          backendSuccess = true;
+          
+          // Update the recipe with the backend response data if needed
+          if (data.recipe) {
+            recipeWithTimestamp.id = data.recipe.id || recipeWithTimestamp.id;
+          }
+        } else if (response.status === 409) {
+          // Recipe already exists
+          console.log(`Recipe '${recipe.name}' already exists in backend`);
+          return { success: false, reason: 'Recipe already saved' };
+        } else {
+          throw new Error(`Backend API failed with status: ${response.status}`);
+        }
+      } catch (backendError) {
+        console.log('Backend save failed, continuing with local save:', backendError.message);
+      }
+
+      // Update local state and storage (as backup/cache)
       const updatedSaved = [...savedRecipes, recipeWithTimestamp];
       setSavedRecipes(updatedSaved);
       const userSpecificKey = `savedRecipes_${userEmail}`;
       await AsyncStorage.setItem(userSpecificKey, JSON.stringify(updatedSaved));
 
-      // Note: Suggestions are added in the UI callback to get count for user feedback
-      
-      // Also save to backend log
+      // Keep the existing log-recipe call for backward compatibility
       try {
         const headers = {
           ...API_CONFIG.getHeaders(),
@@ -500,10 +562,10 @@ export default function CookScreen() {
         console.log('Backend logging failed (non-critical):', backendError);
       }
       
-      return true;
+      return { success: true, backendSuccess };
     } catch (error) {
       console.error('Error saving recipe:', error);
-      return false;
+      return { success: false, reason: 'Save failed' };
     }
   };
 
@@ -850,16 +912,17 @@ export default function CookScreen() {
                   );
                 } else {
                   // Save the recipe
-                  const success = await saveRecipe(currentRecipe);
-                  if (success) {
+                  const result = await saveRecipe(currentRecipe);
+                  if (result.success) {
                     // Add ingredients as suggestions for both recommend and search modes
                     const suggestionsCount = currentRecipe.ingredients 
                       ? await addIngredientsToShoppingSuggestions(currentRecipe.ingredients, currentRecipe.name)
                       : 0;
                     
+                    const cloudStatus = result.backendSuccess ? '☁️ Synced to cloud' : '📱 Saved locally (sync when online)';
                     const alertMessage = suggestionsCount > 0
-                      ? `Recipe saved! ${suggestionsCount} ingredients have been added as smart suggestions on your Shop page.`
-                      : `Recipe saved! You can now view the full instructions anytime.`;
+                      ? `Recipe saved! ${suggestionsCount} ingredients have been added as smart suggestions on your Shop page.\n\n${cloudStatus}`
+                      : `Recipe saved! You can now view the full instructions anytime.\n\n${cloudStatus}`;
                     
                     Alert.alert(
                       'Recipe saved!',
@@ -888,7 +951,10 @@ export default function CookScreen() {
                       ]
                     );
                   } else {
-                    Alert.alert('Error', 'Failed to save recipe. Please try again.');
+                    const errorMessage = result.reason === 'Recipe already saved' 
+                      ? 'This recipe is already saved!' 
+                      : 'Failed to save recipe. Please try again.';
+                    Alert.alert('Unable to Save', errorMessage);
                   }
                 }
               }}

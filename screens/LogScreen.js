@@ -50,38 +50,62 @@ export default function LogScreen({ navigation }) {
       const shoppingData = await shoppingResponse.json();
       setShoppingItems(shoppingData.items || []);
 
-      // Load saved recipes from AsyncStorage (for saved but not cooked recipes) - user-specific
+      // Load saved recipes from backend API first, fallback to local storage
       const userSpecificKey = `savedRecipes_${userEmail}`;
-      let saved = await AsyncStorage.getItem(userSpecificKey);
-      let localSavedRecipes = saved ? JSON.parse(saved) : [];
-
-      // One-time cleanup: Remove incorrectly migrated data for non-sizarta users
-      if (userEmail !== 'sizarta@gmail.com' && localSavedRecipes.length > 0) {
-        // Check if this looks like incorrectly migrated sizarta data
-        const hasIncorrectData = localSavedRecipes.some(recipe => 
-          recipe.savedBy === 'sizarta@gmail.com' || 
-          !recipe.savedBy || 
-          recipe.savedBy !== userEmail
-        );
+      let localSavedRecipes = [];
+      
+      try {
+        // First, try to load from backend API
+        const savedRecipesResponse = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SAVED_RECIPES}`, {
+          method: 'GET',
+          headers,
+        });
         
-        if (hasIncorrectData) {
-          await AsyncStorage.removeItem(userSpecificKey);
-          localSavedRecipes = [];
-          console.log(`Cleaned up incorrectly migrated data for user ${userEmail}`);
+        if (savedRecipesResponse.ok) {
+          const savedRecipesData = await savedRecipesResponse.json();
+          localSavedRecipes = savedRecipesData.recipes || [];
+          console.log(`Loaded ${localSavedRecipes.length} saved recipes from backend for ${userEmail}`);
+          
+          // Update local storage with backend data (for offline access)
+          await AsyncStorage.setItem(userSpecificKey, JSON.stringify(localSavedRecipes));
+        } else {
+          throw new Error(`Backend API failed with status: ${savedRecipesResponse.status}`);
         }
-      }
+      } catch (backendError) {
+        console.log('Backend failed for saved recipes, falling back to local storage:', backendError.message);
+        
+        // Fallback to local storage
+        let saved = await AsyncStorage.getItem(userSpecificKey);
+        localSavedRecipes = saved ? JSON.parse(saved) : [];
 
-      // Migration: Only migrate for sizarta (the original user) to prevent data leakage
-      if (localSavedRecipes.length === 0 && userEmail === 'sizarta@gmail.com') {
-        const oldSaved = await AsyncStorage.getItem('savedRecipes');
-        if (oldSaved) {
-          const oldRecipes = JSON.parse(oldSaved);
-          // Migrate old recipes to user-specific storage
-          await AsyncStorage.setItem(userSpecificKey, oldSaved);
-          localSavedRecipes = oldRecipes;
-          // Clear global storage after migration to prevent future leaks
-          await AsyncStorage.removeItem('savedRecipes');
-          console.log(`Migrated ${oldRecipes.length} recipes for user ${userEmail} and cleared global storage`);
+        // One-time cleanup: Remove incorrectly migrated data for non-sizarta users
+        if (userEmail !== 'sizarta@gmail.com' && localSavedRecipes.length > 0) {
+          // Check if this looks like incorrectly migrated sizarta data
+          const hasIncorrectData = localSavedRecipes.some(recipe => 
+            recipe.savedBy === 'sizarta@gmail.com' || 
+            !recipe.savedBy || 
+            recipe.savedBy !== userEmail
+          );
+          
+          if (hasIncorrectData) {
+            await AsyncStorage.removeItem(userSpecificKey);
+            localSavedRecipes = [];
+            console.log(`Cleaned up incorrectly migrated data for user ${userEmail}`);
+          }
+        }
+
+        // Migration: Only migrate for sizarta (the original user) to prevent data leakage
+        if (localSavedRecipes.length === 0 && userEmail === 'sizarta@gmail.com') {
+          const oldSaved = await AsyncStorage.getItem('savedRecipes');
+          if (oldSaved) {
+            const oldRecipes = JSON.parse(oldSaved);
+            // Migrate old recipes to user-specific storage
+            await AsyncStorage.setItem(userSpecificKey, oldSaved);
+            localSavedRecipes = oldRecipes;
+            // Clear global storage after migration to prevent future leaks
+            await AsyncStorage.removeItem('savedRecipes');
+            console.log(`Migrated ${oldRecipes.length} recipes for user ${userEmail} and cleared global storage`);
+          }
         }
       }
 

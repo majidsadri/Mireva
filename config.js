@@ -23,7 +23,8 @@ export const API_CONFIG = {
     RESPOND_PANTRY_REQUEST: '/respond-pantry-request',
     GET_USER_REQUESTS: '/get-user-requests',
     GET_PANTRY_OWNERSHIP: '/get-pantry-ownership',
-    SET_PANTRY_OWNER: '/set-pantry-owner'
+    SET_PANTRY_OWNER: '/set-pantry-owner',
+    SAVED_RECIPES: '/saved-recipes'
   },
   // Default headers for all API calls
   getHeaders: () => ({
