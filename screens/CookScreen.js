@@ -749,7 +749,7 @@ export default function CookScreen() {
               contentContainerStyle={styles.scrollContent}
               decelerationRate="fast"
               snapToInterval={screenWidth}
-              snapToAlignment="start"
+              snapToAlignment="center"
             >
               {recipes.map((recipe, index) => (
                 <View key={index} style={styles.recipeCard}>
@@ -1046,23 +1046,28 @@ const styles = StyleSheet.create({
   },
   recipeContainer: {
     flex: 1,
+    backgroundColor: '#F8F9FA',
+    paddingTop: 20,
+    paddingBottom: 20,
   },
   scrollContent: {
     flexGrow: 1,
+    alignItems: 'center',
   },
   recipeCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
-    padding: 24,
-    marginHorizontal: 10,
-    width: screenWidth - 20,
+    padding: 18,
+    marginHorizontal: 16,
+    marginVertical: 10,
+    width: screenWidth - 32,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.12,
     shadowRadius: 12,
     elevation: 8,
     borderWidth: 1,
-    borderColor: '#F1F5F9',
+    borderColor: '#E2E8F0',
   },
   recipeHeader: {
     flexDirection: 'column',

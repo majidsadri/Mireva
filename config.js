@@ -24,6 +24,7 @@ export const API_CONFIG = {
     GET_USER_REQUESTS: '/get-user-requests',
     GET_PANTRY_OWNERSHIP: '/get-pantry-ownership',
     SET_PANTRY_OWNER: '/set-pantry-owner',
+    UPDATE_USER_PANTRY: '/update-user-pantry',
     SAVED_RECIPES: '/saved-recipes'
   },
   // Default headers for all API calls

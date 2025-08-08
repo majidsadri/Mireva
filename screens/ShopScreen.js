@@ -114,9 +114,15 @@ export default function ShopScreen() {
       setSuggestionsLoading(true);
       console.log('🔄 Loading suggestions...');
       
-      // FORCE CLEAR OLD CACHE - Remove this after fixing cache issue
-      console.log('🧹 FORCE CLEARING CACHE...');
-      await AsyncStorage.removeItem('shopping_suggestions');
+      // Check cache version and clear if outdated
+      const cacheVersion = await AsyncStorage.getItem('shopping_suggestions_version');
+      const CURRENT_VERSION = 'v4-pantry-filtered';
+      
+      if (cacheVersion !== CURRENT_VERSION) {
+        console.log('🧹 Clearing outdated cache (was:', cacheVersion, 'now:', CURRENT_VERSION, ')');
+        await AsyncStorage.removeItem('shopping_suggestions');
+        await AsyncStorage.setItem('shopping_suggestions_version', CURRENT_VERSION);
+      }
       
       // Try to load suggestions from backend first (pantry-based)
       const headers = await getUserHeaders();
@@ -148,11 +154,13 @@ export default function ShopScreen() {
           await AsyncStorage.removeItem('shopping_suggestions');
         }
         
-        setSuggestions(pantrySuggestions);
+        // Additional client-side filtering to ensure no pantry items show up
+        const filteredSuggestions = await filterOutPantryItems(pantrySuggestions);
+        setSuggestions(filteredSuggestions);
         
         // Cache in AsyncStorage for faster loading (with version info)
         const cacheData = {
-          suggestions: pantrySuggestions,
+          suggestions: filteredSuggestions,
           version: data.version || 'v1',
           timestamp: Date.now()
         };
@@ -604,6 +612,45 @@ export default function ShopScreen() {
   };
 
 
+  const filterOutPantryItems = async (suggestions) => {
+    try {
+      // Get current pantry items
+      const headers = await getUserHeaders();
+      const pantryResponse = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PANTRY}`, {
+        method: 'GET',
+        headers,
+      });
+      
+      if (pantryResponse.ok) {
+        const pantryData = await pantryResponse.json();
+        const pantryItemNames = pantryData.map(item => item.name.toLowerCase());
+        
+        console.log('🛡️ Filtering out pantry items:', pantryItemNames);
+        
+        // Filter out any suggestions that match pantry items
+        return suggestions.filter(suggestion => {
+          const suggestionName = suggestion.name.toLowerCase();
+          const isInPantry = pantryItemNames.some(pantryName => 
+            pantryName === suggestionName || 
+            pantryName === suggestionName + 's' || 
+            pantryName + 's' === suggestionName
+          );
+          
+          if (isInPantry) {
+            console.log('❌ Filtered out:', suggestion.name, 'because it\'s in pantry');
+          }
+          
+          return !isInPantry;
+        });
+      }
+      
+      return suggestions;
+    } catch (error) {
+      console.error('Error filtering pantry items:', error);
+      return suggestions;
+    }
+  };
+  
   const getCategoryForItem = (itemName) => {
     const lowercaseName = itemName.toLowerCase();
     const categories = {
@@ -1054,7 +1101,7 @@ const styles = StyleSheet.create({
   coverContainer: {
     position: 'relative',
     height: 120,
-    backgroundColor: '#2D6A4F',
+    backgroundColor: '#064E3B',
   },
   coverImage: {
     width: '100%',
@@ -1067,7 +1114,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -1169,15 +1216,15 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   suggestionCard: {
-    width: 140,
-    minHeight: 160,
+    width: 135,
+    minHeight: 150,
     padding: 0,
-    borderRadius: 16,
+    borderRadius: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 3,
     position: 'relative',
     overflow: 'hidden',
   },
@@ -1198,7 +1245,7 @@ const styles = StyleSheet.create({
   },
   suggestionContent: {
     flex: 1,
-    padding: 12,
+    padding: 10,
     paddingTop: 8,
     justifyContent: 'space-between',
   },
@@ -1279,9 +1326,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#FFF5F0',
-    padding: 15,
-    borderRadius: 12,
-    marginBottom: 10,
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 8,
     borderWidth: 1,
     borderColor: '#FFE4D6',
     shadowColor: '#FF6B35',

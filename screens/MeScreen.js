@@ -901,6 +901,18 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
         {/* Profile Info */}
         <View style={styles.profileSection}>
           <View style={styles.profileWallpaper}>
+            {/* Join Requests Notification Badge */}
+            {isOwner && pendingRequests.length > 0 && (
+              <TouchableOpacity 
+                style={styles.profileNotificationBadge}
+                onPress={showRequestsHandler}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.profileNotificationText}>!</Text>
+                <Text style={styles.profileNotificationCount}>{pendingRequests.length}</Text>
+              </TouchableOpacity>
+            )}
+            
             <View style={styles.avatar}>
               {profileImage ? (
                 <Image source={{ uri: profileImage }} style={styles.avatarImage} />
@@ -912,130 +924,14 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
             </View>
             <Text style={styles.userName}>{userInfo?.name || user?.name || 'User'}</Text>
             <Text style={styles.userEmail}>{userInfo?.email || user?.email || 'user@example.com'}</Text>
+            
+            {/* Pantry Owner Status */}
+            {isOwner && joinedPantry && (
+              <Text style={styles.pantryOwnerBadge}>Pantry Owner • {joinedPantry}</Text>
+            )}
           </View>
         </View>
 
-        {/* Pantry Section */}
-        <View style={styles.pantrySection}>
-          <Text style={styles.sectionTitle}>Current Pantry</Text>
-          
-          {joinedPantry ? (
-            <View>
-              <View style={styles.joinedPantryCard}>
-                <TouchableOpacity style={styles.pantryInfo} onPress={showPantryUsersHandler}>
-                  <Text style={styles.pantryName}>
-                    {joinedPantry}
-                    {isOwner && <Text style={styles.ownerBadge}> Owner</Text>}
-                  </Text>
-                  <Text style={styles.pantryTapHint}>Tap to see members</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.leavePantryButton} onPress={handleLeavePantry}>
-                  <View style={styles.leavePantryIcon}>
-                    <Text style={styles.leavePantryIconText}>Leave</Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
-              
-              {/* Pantry Requests Button - Only show for owners */}
-              {isOwner && (
-                <TouchableOpacity style={styles.requestsButton} onPress={showRequestsHandler}>
-                  <Text style={styles.requestsButtonText}>
-                    Manage Join Requests
-                    {pendingRequests.length > 0 && (
-                      <Text style={styles.requestsBadge}> ({pendingRequests.length})</Text>
-                    )}
-                  </Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          ) : (
-            <View style={styles.noPantryCard}>
-              {!showJoinPantry ? (
-                <>
-                  <Text style={styles.noPantryText}>You haven't joined any pantry yet</Text>
-                  <TouchableOpacity 
-                    style={styles.joinPantryButton} 
-                    onPress={() => setShowJoinPantry(true)}
-                  >
-                    <Text style={styles.joinPantryButtonText}>Join a Pantry</Text>
-                  </TouchableOpacity>
-                </>
-              ) : (
-                <View style={styles.joinPantryForm}>
-                  <Text style={styles.formTitle}>Join Pantry</Text>
-                  <Text style={styles.helpText}>
-                    Search for an existing pantry or create a new one:
-                  </Text>
-                  
-                  <TextInput
-                    style={styles.pantryInput}
-                    placeholder="Search pantry name..."
-                    placeholderTextColor="#999"
-                    value={pantryName}
-                    onChangeText={(text) => {
-                      setPantryName(text);
-                      searchPantries(text);
-                    }}
-                    autoCapitalize="words"
-                  />
-                  
-                  {/* Search results */}
-                  {pantryName.trim().length > 0 && (
-                    <View style={styles.searchResults}>
-                      {loadingPantries ? (
-                        <View style={styles.loadingContainer}>
-                          <ActivityIndicator size="small" color="#2D6A4F" />
-                          <Text style={styles.loadingText}>Searching...</Text>
-                        </View>
-                      ) : (
-                        availablePantries
-                          .filter(pantry => pantry.toLowerCase().includes(pantryName.toLowerCase().trim()))
-                          .map((pantry, index) => (
-                            <TouchableOpacity
-                              key={index}
-                              style={styles.searchResultItem}
-                              onPress={() => setPantryName(pantry)}
-                            >
-                              <Text style={styles.searchResultText}>{pantry}</Text>
-                              <Text style={styles.searchResultSubtext}>Existing pantry</Text>
-                            </TouchableOpacity>
-                          ))
-                      )}
-                      {!loadingPantries && availablePantries.filter(pantry => pantry.toLowerCase().includes(pantryName.toLowerCase().trim())).length === 0 && (
-                        <View style={styles.noResultsContainer}>
-                          <Text style={styles.noResultsText}>No existing pantry found</Text>
-                          <Text style={styles.createNewText}>Tap "Join" to create "{pantryName.trim()}"</Text>
-                        </View>
-                      )}
-                    </View>
-                  )}
-                  <View style={styles.formButtons}>
-                    <TouchableOpacity 
-                      style={styles.cancelButton} 
-                      onPress={() => {
-                        setShowJoinPantry(false);
-                        setPantryName('');
-                      }}
-                    >
-                      <Text style={styles.cancelButtonText}>Cancel</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity 
-                      style={[styles.confirmButton, loading && styles.confirmButtonDisabled]} 
-                      onPress={handleJoinPantry}
-                      disabled={loading}
-                    >
-                      {loading ? (
-                        <ActivityIndicator color="#fff" size="small" />
-                      ) : (
-                        <Text style={styles.confirmButtonText}>Join</Text>
-                      )}
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              )}
-            </View>
-          )}
-        </View>
 
         {/* Dietary Preferences Section */}
         <View style={styles.preferencesSection}>
@@ -1123,6 +1019,27 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
             <Text style={styles.settingLabel}>Pantry Charts</Text>
             <Text style={styles.settingArrow}>›</Text>
           </TouchableOpacity>
+
+          {/* Manage Join Requests - Only show for pantry owners */}
+          {isOwner && joinedPantry && (
+            <TouchableOpacity 
+              style={styles.settingItem}
+              onPress={showRequestsHandler}
+            >
+              <View style={styles.settingIconContainer}>
+                <Text style={styles.settingIconText}>Requests</Text>
+              </View>
+              <View style={styles.settingLabelContainer}>
+                <Text style={styles.settingLabel}>Manage Join Requests</Text>
+                {pendingRequests.length > 0 && (
+                  <View style={styles.requestBadge}>
+                    <Text style={styles.requestBadgeText}>{pendingRequests.length}</Text>
+                  </View>
+                )}
+              </View>
+              <Text style={styles.settingArrow}>›</Text>
+            </TouchableOpacity>
+          )}
 
           <TouchableOpacity 
             style={styles.settingItem}
@@ -1544,23 +1461,23 @@ const styles = StyleSheet.create({
   },
   profileSection: {
     backgroundColor: '#fff',
-    borderRadius: 16,
+    borderRadius: 12,
     marginBottom: 20,
     marginHorizontal: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
-    shadowRadius: 8,
+    shadowRadius: 6,
     elevation: 3,
     borderWidth: 0,
     overflow: 'hidden',
   },
   profileWallpaper: {
     alignItems: 'center',
-    paddingVertical: 25,
-    paddingHorizontal: 16,
+    paddingVertical: 20,
+    paddingHorizontal: 14,
     backgroundColor: '#1A4D3E',
-    borderRadius: 16,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: '#0F3028',
     shadowColor: '#000',
@@ -1568,6 +1485,57 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 3,
+    position: 'relative',
+  },
+  profileNotificationBadge: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    backgroundColor: '#FF4444',
+    borderRadius: 20,
+    width: 36,
+    height: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#FF4444',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 6,
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+  },
+  profileNotificationText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '800',
+    lineHeight: 18,
+  },
+  profileNotificationCount: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    backgroundColor: '#FFFFFF',
+    color: '#FF4444',
+    fontSize: 10,
+    fontWeight: '700',
+    borderRadius: 8,
+    minWidth: 16,
+    height: 16,
+    textAlign: 'center',
+    lineHeight: 16,
+    paddingHorizontal: 4,
+  },
+  pantryOwnerBadge: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '600',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginTop: 8,
+    textAlign: 'center',
   },
   avatar: {
     width: 70,
@@ -1620,16 +1588,16 @@ const styles = StyleSheet.create({
   },
   settingsSection: {
     backgroundColor: '#fff',
-    borderRadius: 12,
-    marginBottom: 20,
+    borderRadius: 10,
+    marginBottom: 16,
     borderWidth: 1,
     borderColor: '#E2E8F0',
   },
   settingItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 20,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#F7FAFC',
   },
@@ -1656,6 +1624,32 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: '#2D3748',
+  },
+  settingLabelContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  requestBadge: {
+    backgroundColor: '#E53E3E',
+    borderRadius: 12,
+    minWidth: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 6,
+    shadowColor: '#E53E3E',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  requestBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '700',
+    textAlign: 'center',
   },
   settingArrow: {
     fontSize: 20,
@@ -1898,9 +1892,9 @@ const styles = StyleSheet.create({
   },
   preferencesSection: {
     backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 20,
+    borderRadius: 10,
+    padding: 16,
+    marginBottom: 16,
     borderWidth: 1,
     borderColor: '#E2E8F0',
   },
