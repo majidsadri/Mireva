@@ -254,25 +254,39 @@
             box-shadow: var(--shadow-lg);
         }
         
-        .social-link-header {
-            color: rgba(255, 255, 255, 0.8);
-            padding: 8px;
-            border-radius: 50%;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* Desktop Social Icons - Simple and horizontal */
+        .desktop-nav .social-link-header {
+            color: rgba(255, 255, 255, 0.8) !important;
+            padding: 8px !important;
+            border-radius: 50% !important;
+            transition: all 0.2s ease !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 36px !important;
+            height: 36px !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
         }
         
-        .social-link-header:hover {
-            color: var(--light-green);
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-1px);
+        .desktop-nav .social-link-header:hover {
+            color: var(--light-green) !important;
+            background: rgba(255, 255, 255, 0.1) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: none !important;
+        }
+        
+        .desktop-nav .social-link-header svg {
+            width: 20px !important;
+            height: 20px !important;
         }
         
         /* Mobile Menu Toggle */
         .menu-toggle {
-            display: none;
+            display: none !important;
             flex-direction: column;
             gap: 4px;
             cursor: pointer;
@@ -1585,11 +1599,11 @@
         
         /* Desktop Navigation - Hide mobile, show desktop */
         .desktop-nav {
-            display: flex;
+            display: flex !important;
         }
         
         .mobile-nav {
-            display: none;
+            display: none !important;
         }
         
         @media (max-width: 768px) {
@@ -1599,7 +1613,7 @@
             
             /* Mobile Navigation - Hide desktop, show mobile */
             .desktop-nav {
-                display: none;
+                display: none !important;
             }
             
             .mobile-nav {
@@ -1920,7 +1934,7 @@
             }
             
             .menu-toggle {
-                display: flex;
+                display: flex !important;
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
