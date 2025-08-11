@@ -20,10 +20,11 @@ const DIET_OPTIONS = [
   'Vegan',
   'Keto',
   'Paleo',
-  'Mediterranean',
   'Low-Carb',
   'Gluten-Free',
   'Dairy-Free',
+  'Nut-Free',
+  'Lactose-Free',
 ];
 
 const CUISINE_OPTIONS = [
@@ -33,7 +34,6 @@ const CUISINE_OPTIONS = [
   'Chinese',
   'Japanese',
   'Mexican',
-  'Mediterranean',
   'American',
   'Thai',
   'French',

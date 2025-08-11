@@ -1916,7 +1916,7 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
         <View style={styles.preferencesSection}>
           <Text style={styles.sectionTitle}>Dietary Preferences</Text>
           <View style={styles.preferencesGrid}>
-            {['None', 'Vegetarian', 'Vegan', 'Keto', 'Paleo', 'Mediterranean', 'Low-Carb', 'Gluten-Free', 'Dairy-Free', 'Diabetic', 'Halal'].map((diet) => (
+            {['None', 'Vegetarian', 'Vegan', 'Keto', 'Paleo', 'Low-Carb', 'Gluten-Free', 'Dairy-Free', 'Nut-Free', 'Lactose-Free', 'Diabetic', 'Halal'].map((diet) => (
               <TouchableOpacity
                 key={diet}
                 style={[
@@ -1944,7 +1944,6 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
               { name: 'Italian', emoji: '🇮🇹' },
               { name: 'Mexican', emoji: '🇲🇽' },
               { name: 'Asian', emoji: '🥢' },
-              { name: 'Mediterranean', emoji: '🇬🇷' },
               { name: 'Indian', emoji: '🇮🇳' },
               { name: 'American', emoji: '🇺🇸' },
               { name: 'French', emoji: '🇫🇷' },

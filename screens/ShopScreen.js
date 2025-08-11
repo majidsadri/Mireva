@@ -435,12 +435,16 @@ export default function ShopScreen() {
             return ['fruits & vegetables', 'grains & pantry', 'produce'].includes(itemCategory) &&
                    !['dairy', 'proteins'].includes(itemCategory);
           }
-          if (dietLower.includes('mediterranean')) {
-            return ['olive oil', 'tomato', 'garlic', 'lemon', 'herbs', 'fish'].some(keyword => itemName.includes(keyword));
-          }
           if (dietLower.includes('vegetarian')) {
             return !['proteins'].includes(itemCategory) || 
                    ['eggs', 'cheese', 'milk'].some(keyword => itemName.includes(keyword));
+          }
+          if (dietLower.includes('nut-free')) {
+            return !['nuts', 'nut', 'almond', 'peanut', 'walnut', 'pecan', 'cashew', 'hazelnut', 'pistachio'].some(keyword => itemName.toLowerCase().includes(keyword));
+          }
+          if (dietLower.includes('lactose-free')) {
+            return !['milk', 'cheese', 'cream', 'butter', 'yogurt', 'lactose'].some(keyword => itemName.toLowerCase().includes(keyword)) ||
+                   ['lactose-free', 'almond milk', 'soy milk', 'oat milk', 'coconut milk'].some(keyword => itemName.toLowerCase().includes(keyword));
           }
           return false;
         });
