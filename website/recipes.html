@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mireva Recipes - Discover Amazing Recipes</title>
+    <meta name="description" content="Discover thousands of amazing recipes with Mireva. Search by ingredients, cuisine, or dietary preferences.">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #a5b4fc;
+            --mireva-purple: #8b5cf6;
+            --mireva-blue: #3b82f6;
+            --mireva-pink: #ec4899;
+            --mireva-teal: #06b6d4;
+            --mireva-green: #059669;
+            --mireva-green-dark: #047857;
+            --mireva-green-darker: #065f46;
+            --mireva-green-darkest: #064e3b;
+            --mireva-green-light: #10b981;
+            --secondary-color: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-light: #94a3b8;
+            --border-color: #e2e8f0;
+            --white: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 10px 10px -5px rgb(0 0 0 / 0.04);
+            --border-radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(29, 78, 61, 0.25) 0%, transparent 60%),
+                radial-gradient(circle at 80% 20%, rgba(29, 78, 61, 0.2) 0%, transparent 60%),
+                radial-gradient(circle at 40% 40%, rgba(29, 78, 61, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 60% 70%, rgba(45, 90, 69, 0.18) 0%, transparent 55%),
+                radial-gradient(circle at 30% 30%, rgba(52, 108, 83, 0.12) 0%, transparent 45%),
+                linear-gradient(135deg, #f8fffe 0%, #f2faf6 25%, #ecf5f0 50%, #e6f0ea 75%, #e0ebe4 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Enhanced Background Elements */
+        .background-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        /* Floating geometric shapes - More Visible */
+        .floating-shape {
+            position: absolute;
+            opacity: 0.4;
+            animation: float 25s ease-in-out infinite;
+            filter: blur(0.2px);
+            box-shadow: 0 4px 20px rgba(29, 78, 61, 0.15);
+        }
+        
+        .shape-circle {
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(29, 78, 61, 0.35), rgba(29, 78, 61, 0.15));
+            border: 1px solid rgba(29, 78, 61, 0.1);
+        }
+        
+        .shape-diamond {
+            transform: rotate(45deg);
+            background: linear-gradient(135deg, rgba(29, 78, 61, 0.3), rgba(29, 78, 61, 0.12));
+            border: 1px solid rgba(29, 78, 61, 0.08);
+        }
+        
+        .shape-oval {
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            background: linear-gradient(90deg, rgba(29, 78, 61, 0.28), rgba(29, 78, 61, 0.1));
+            border: 1px solid rgba(29, 78, 61, 0.06);
+        }
+        
+        /* Enhanced grid overlay */
+        .background-elements::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(29, 78, 61, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(29, 78, 61, 0.08) 1px, transparent 1px);
+            background-size: 60px 60px;
+            opacity: 0.6;
+            animation: gridMove 30s linear infinite;
+        }
+        
+        /* Animated dot pattern overlay */
+        .background-elements::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at center, rgba(29, 78, 61, 0.2) 2px, transparent 2px);
+            background-size: 100px 100px;
+            opacity: 0.3;
+            animation: dotPulse 15s ease-in-out infinite;
+        }
+
+        /* Individual floating shapes */
+        .shape-1 {
+            width: 120px;
+            height: 120px;
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+
+        .shape-2 {
+            width: 80px;
+            height: 80px;
+            top: 20%;
+            right: 15%;
+            animation-delay: -8s;
+        }
+
+        .shape-3 {
+            width: 150px;
+            height: 80px;
+            top: 60%;
+            left: 80%;
+            animation-delay: -15s;
+        }
+
+        .shape-4 {
+            width: 60px;
+            height: 60px;
+            top: 40%;
+            left: 20%;
+            animation-delay: -5s;
+        }
+
+        .shape-5 {
+            width: 100px;
+            height: 100px;
+            top: 75%;
+            right: 25%;
+            animation-delay: -12s;
+        }
+
+        .shape-6 {
+            width: 90px;
+            height: 90px;
+            top: 30%;
+            left: 60%;
+            animation-delay: -3s;
+        }
+
+        .shape-7 {
+            width: 70px;
+            height: 40px;
+            top: 80%;
+            left: 40%;
+            animation-delay: -10s;
+        }
+
+        /* Leaf Pattern Elements - Enhanced Visibility */
+        .leaf-pattern {
+            position: absolute;
+            opacity: 0.25;
+            animation: leafFloat 30s ease-in-out infinite;
+            filter: blur(0.1px);
+            drop-shadow: 0 2px 8px rgba(29, 78, 61, 0.2);
+        }
+
+        .leaf-svg {
+            width: 100%;
+            height: 100%;
+            fill: currentColor;
+        }
+
+        .leaf-1 {
+            width: 60px;
+            height: 80px;
+            color: rgba(29, 78, 61, 0.4);
+            top: 15%;
+            left: 25%;
+            animation-delay: 0s;
+            transform: rotate(25deg);
+        }
+
+        .leaf-2 {
+            width: 45px;
+            height: 60px;
+            color: rgba(29, 78, 61, 0.35);
+            top: 35%;
+            right: 30%;
+            animation-delay: -10s;
+            transform: rotate(-15deg);
+        }
+
+        .leaf-3 {
+            width: 70px;
+            height: 90px;
+            color: rgba(29, 78, 61, 0.32);
+            top: 55%;
+            left: 15%;
+            animation-delay: -20s;
+            transform: rotate(45deg);
+        }
+
+        .leaf-4 {
+            width: 40px;
+            height: 55px;
+            color: rgba(29, 78, 61, 0.38);
+            top: 70%;
+            right: 15%;
+            animation-delay: -5s;
+            transform: rotate(-30deg);
+        }
+
+        .leaf-5 {
+            width: 55px;
+            height: 75px;
+            color: rgba(29, 78, 61, 0.3);
+            top: 25%;
+            left: 70%;
+            animation-delay: -15s;
+            transform: rotate(60deg);
+        }
+
+        .leaf-6 {
+            width: 35px;
+            height: 50px;
+            color: rgba(29, 78, 61, 0.36);
+            top: 45%;
+            right: 45%;
+            animation-delay: -8s;
+            transform: rotate(-45deg);
+        }
+
+        .leaf-7 {
+            width: 50px;
+            height: 70px;
+            color: rgba(29, 78, 61, 0.33);
+            top: 85%;
+            left: 60%;
+            animation-delay: -12s;
+            transform: rotate(15deg);
+        }
+
+        .leaf-8 {
+            width: 65px;
+            height: 85px;
+            color: rgba(29, 78, 61, 0.29);
+            top: 10%;
+            right: 20%;
+            animation-delay: -18s;
+            transform: rotate(-60deg);
+        }
+
+        /* Additional Leaf Patterns for More Coverage */
+        .leaf-9 {
+            width: 45px;
+            height: 65px;
+            color: rgba(29, 78, 61, 0.35);
+            top: 5%;
+            left: 45%;
+            animation-delay: -22s;
+            transform: rotate(35deg);
+        }
+
+        .leaf-10 {
+            width: 55px;
+            height: 70px;
+            color: rgba(29, 78, 61, 0.32);
+            top: 40%;
+            left: 85%;
+            animation-delay: -25s;
+            transform: rotate(-25deg);
+        }
+
+        .leaf-11 {
+            width: 38px;
+            height: 52px;
+            color: rgba(29, 78, 61, 0.38);
+            top: 65%;
+            left: 5%;
+            animation-delay: -28s;
+            transform: rotate(55deg);
+        }
+
+        .leaf-12 {
+            width: 62px;
+            height: 78px;
+            color: rgba(29, 78, 61, 0.3);
+            top: 20%;
+            left: 60%;
+            animation-delay: -30s;
+            transform: rotate(-40deg);
+        }
+
+        .leaf-13 {
+            width: 42px;
+            height: 58px;
+            color: rgba(29, 78, 61, 0.36);
+            top: 50%;
+            right: 10%;
+            animation-delay: -32s;
+            transform: rotate(20deg);
+        }
+
+        .leaf-14 {
+            width: 58px;
+            height: 75px;
+            color: rgba(29, 78, 61, 0.28);
+            top: 75%;
+            left: 35%;
+            animation-delay: -35s;
+            transform: rotate(-55deg);
+        }
+
+        .leaf-15 {
+            width: 48px;
+            height: 64px;
+            color: rgba(29, 78, 61, 0.33);
+            top: 90%;
+            right: 40%;
+            animation-delay: -38s;
+            transform: rotate(40deg);
+        }
+
+        .leaf-16 {
+            width: 52px;
+            height: 68px;
+            color: rgba(29, 78, 61, 0.32);
+            top: 30%;
+            left: 35%;
+            animation-delay: -40s;
+            transform: rotate(-20deg);
+        }
+
+        .leaf-17 {
+            width: 46px;
+            height: 62px;
+            color: rgba(29, 78, 61, 0.35);
+            top: 80%;
+            left: 80%;
+            animation-delay: -42s;
+            transform: rotate(65deg);
+        }
+
+        .leaf-18 {
+            width: 40px;
+            height: 56px;
+            color: rgba(29, 78, 61, 0.29);
+            top: 60%;
+            right: 25%;
+            animation-delay: -45s;
+            transform: rotate(-35deg);
+        }
+
+        @keyframes float {
+            0%, 100% { 
+                transform: translateY(0px) translateX(0px) rotate(0deg) scale(1);
+                opacity: 0.4;
+            }
+            25% { 
+                transform: translateY(-25px) translateX(15px) rotate(90deg) scale(1.1);
+                opacity: 0.6;
+            }
+            50% { 
+                transform: translateY(-15px) translateX(-10px) rotate(180deg) scale(0.9);
+                opacity: 0.3;
+            }
+            75% { 
+                transform: translateY(-35px) translateX(20px) rotate(270deg) scale(1.05);
+                opacity: 0.5;
+            }
+        }
+        
+        @keyframes gridMove {
+            0% { 
+                transform: translate(0, 0);
+                opacity: 0.6;
+            }
+            25% { 
+                transform: translate(20px, 20px);
+                opacity: 0.8;
+            }
+            50% { 
+                transform: translate(40px, 40px);
+                opacity: 0.4;
+            }
+            75% { 
+                transform: translate(60px, 60px);
+                opacity: 0.7;
+            }
+            100% { 
+                transform: translate(80px, 80px);
+                opacity: 0.6;
+            }
+        }
+
+        @keyframes leafFloat {
+            0%, 100% { 
+                transform: translateY(0px) translateX(0px) rotate(0deg) scale(1);
+                opacity: 0.25;
+            }
+            25% { 
+                transform: translateY(-20px) translateX(12px) rotate(8deg) scale(1.05);
+                opacity: 0.4;
+            }
+            50% { 
+                transform: translateY(-12px) translateX(-6px) rotate(-5deg) scale(0.95);
+                opacity: 0.15;
+            }
+            75% { 
+                transform: translateY(-28px) translateX(18px) rotate(12deg) scale(1.1);
+                opacity: 0.35;
+            }
+        }
+
+        @keyframes dotPulse {
+            0%, 100% { 
+                transform: scale(1);
+                opacity: 0.3;
+            }
+            50% { 
+                transform: scale(1.2);
+                opacity: 0.6;
+            }
+        }
+
+        /* Ensure content is above background */
+        .header, main {
+            position: relative;
+            z-index: 10;
+        }
+        
+        /* Responsive background adjustments */
+        @media (max-width: 768px) {
+            .background-elements::before {
+                background-size: 40px 40px;
+                opacity: 0.2;
+            }
+            
+            .floating-shape {
+                opacity: 0.08;
+            }
+            
+            .shape-1, .shape-5 { display: none; }
+            
+            .shape-2, .shape-4, .shape-6 {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .shape-3, .shape-7 {
+                width: 80px;
+                height: 40px;
+            }
+            
+            .leaf-pattern {
+                opacity: 0.05;
+            }
+            
+            .leaf-1, .leaf-3, .leaf-5, .leaf-8, .leaf-9, .leaf-11, .leaf-13, .leaf-15, .leaf-17 { display: none; }
+            
+            .leaf-2, .leaf-4, .leaf-6, .leaf-7, .leaf-10, .leaf-12, .leaf-14, .leaf-16, .leaf-18 {
+                width: 28px;
+                height: 38px;
+            }
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+            .floating-shape, .background-elements::before, .background-elements::after, .leaf-pattern {
+                animation: none;
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Dark Green Professional Header */
+        .header {
+            background: linear-gradient(135deg, var(--mireva-green-darkest) 0%, var(--mireva-green-darker) 100%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(6, 78, 59, 0.3);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 0;
+            position: relative;
+            min-height: 80px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+        }
+
+        .logo-section::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: calc(100% + 2rem);
+            height: calc(100% + 1rem);
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.1) 0%, 
+                rgba(255, 255, 255, 0.05) 50%, 
+                rgba(255, 255, 255, 0.02) 100%
+            );
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: -1;
+        }
+
+        .logo-section:hover::before {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.02);
+        }
+
+        .logo-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 54px;
+            height: 54px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.2) 0%, 
+                rgba(255, 255, 255, 0.15) 50%, 
+                rgba(255, 255, 255, 0.1) 100%
+            );
+            box-shadow: 
+                0 4px 12px rgba(0, 0, 0, 0.1),
+                0 2px 4px rgba(0, 0, 0, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo-container::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.1) 0%, 
+                transparent 50%, 
+                rgba(0, 0, 0, 0.02) 100%
+            );
+            pointer-events: none;
+        }
+
+        .logo-container:hover {
+            transform: translateY(-1px);
+            box-shadow: 
+                0 8px 20px rgba(0, 0, 0, 0.15),
+                0 4px 8px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.25) 0%, 
+                rgba(255, 255, 255, 0.2) 50%, 
+                rgba(255, 255, 255, 0.15) 100%
+            );
+        }
+
+        .logo {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1;
+        }
+
+        .logo-container:hover .logo {
+            transform: scale(1.05);
+        }
+
+        .brand-content {
+            display: flex;
+            flex-direction: column;
+            margin-left: 0.5rem;
+        }
+
+        .brand-text {
+            font-weight: 700;
+            font-size: 1.875rem;
+            color: var(--white);
+            letter-spacing: -0.025em;
+            line-height: 1.2;
+            margin-bottom: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .logo-section:hover .brand-text {
+            color: var(--white);
+            transform: translateX(2px);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-weight: 500;
+            font-size: 0.8125rem;
+            color: rgba(255, 255, 255, 0.9);
+            letter-spacing: 0.075em;
+            text-transform: uppercase;
+            margin-top: -2px;
+            opacity: 0.9;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo-section:hover .subtitle {
+            color: var(--white);
+            opacity: 1;
+            transform: translateX(2px);
+        }
+
+        /* Header bubbles removed for cleaner design */
+
+        /* Header decorations removed for cleaner design */
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 3rem 0;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Search Section */
+        .search-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 
+                0 8px 32px rgba(29, 78, 61, 0.08),
+                0 4px 16px rgba(0, 0, 0, 0.04),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        .search-container {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 3rem 1rem 1rem;
+            font-size: 1.125rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            outline: none;
+            transition: all 0.3s ease;
+            background: var(--white);
+        }
+
+        .search-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgb(99 102 241 / 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            font-size: 1.25rem;
+        }
+
+        .search-filters {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-tag {
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, var(--mireva-green-light), var(--mireva-green));
+            border: 1px solid var(--mireva-green);
+            border-radius: 25px;
+            font-size: 0.875rem;
+            color: var(--white);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(6, 78, 59, 0.2);
+        }
+
+        .filter-tag:hover, .filter-tag.active {
+            background: linear-gradient(135deg, var(--mireva-green-darker), var(--mireva-green-darkest));
+            color: var(--white);
+            border-color: var(--mireva-green-darkest);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(6, 78, 59, 0.3);
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Stats */
+        .stats {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 
+                0 4px 20px rgba(29, 78, 61, 0.06),
+                0 2px 8px rgba(0, 0, 0, 0.03),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .stat-item {
+            padding: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        /* Recipes Grid */
+        .recipes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .recipe-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 
+                0 4px 16px rgba(29, 78, 61, 0.05),
+                0 2px 8px rgba(0, 0, 0, 0.03),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .recipe-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 
+                0 12px 40px rgba(29, 78, 61, 0.12),
+                0 6px 20px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            border-color: rgba(29, 78, 61, 0.1);
+        }
+
+        .recipe-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .recipe-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .recipe-meta {
+            display: flex;
+            gap: 1rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .recipe-content {
+            padding: 1.5rem;
+        }
+
+        .ingredients-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ingredients-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .ingredient-tag {
+            background: var(--secondary-color);
+            color: var(--text-primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .steps-section {
+            margin-bottom: 1rem;
+        }
+
+        .step-item {
+            background: var(--secondary-color);
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .steps-expand-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            background: linear-gradient(135deg, rgba(29, 78, 61, 0.05) 0%, rgba(29, 78, 61, 0.08) 100%);
+            border: 1px solid rgba(29, 78, 61, 0.15);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            font-size: 0.875rem;
+            color: var(--primary-color);
+            font-weight: 500;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .steps-expand-toggle:hover {
+            background: linear-gradient(135deg, rgba(29, 78, 61, 0.08) 0%, rgba(29, 78, 61, 0.12) 100%);
+            border-color: rgba(29, 78, 61, 0.25);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(29, 78, 61, 0.15);
+        }
+        
+        .expand-icon {
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            font-size: 0.75rem;
+        }
+        
+        .steps-expand-toggle.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+        
+        .steps-expand-toggle.expanded .expand-text::before {
+            content: "Hide ";
+        }
+        
+        .steps-expand-toggle.expanded .expand-text {
+            opacity: 0.8;
+        }
+        
+        .steps-full {
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            max-height: 0;
+            opacity: 0;
+        }
+        
+        .steps-full.expanded {
+            max-height: 1000px;
+            opacity: 1;
+            margin-top: 0.5rem;
+        }
+        
+        .steps-full .step-item {
+            animation: slideInUp 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        
+        .steps-full.expanded .step-item {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .steps-full.expanded .step-item:nth-child(1) { animation-delay: 0.1s; }
+        .steps-full.expanded .step-item:nth-child(2) { animation-delay: 0.15s; }
+        .steps-full.expanded .step-item:nth-child(3) { animation-delay: 0.2s; }
+        .steps-full.expanded .step-item:nth-child(4) { animation-delay: 0.25s; }
+        .steps-full.expanded .step-item:nth-child(5) { animation-delay: 0.3s; }
+        
+        @keyframes slideInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .recipe-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+        }
+
+        .recipe-tag {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary-color);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* Loading States */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-state {
+            text-align: center;
+            padding: 3rem;
+            color: #ef4444;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0.75rem 0;
+                min-height: 70px;
+            }
+            
+            .logo-container {
+                width: 48px;
+                height: 48px;
+                border-radius: 12px;
+            }
+            
+            .logo {
+                width: 28px;
+                height: 28px;
+            }
+            
+            .brand-text {
+                font-size: 1.625rem;
+            }
+            
+            .subtitle {
+                font-size: 0.75rem;
+                letter-spacing: 0.05em;
+            }
+            
+            .header-decoration {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .recipes-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .search-section {
+                padding: 1rem;
+                margin: 1rem 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-content {
+                padding: 0.5rem 0;
+                min-height: 65px;
+            }
+            
+            .logo-section {
+                gap: 0.75rem;
+            }
+            
+            .logo-container {
+                width: 44px;
+                height: 44px;
+            }
+            
+            .logo {
+                width: 26px;
+                height: 26px;
+            }
+            
+            .brand-text {
+                font-size: 1.5rem;
+            }
+            
+            .subtitle {
+                font-size: 0.7rem;
+            }
+        }
+
+        /* Fade in animation */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Enhanced Background Elements -->
+    <div class="background-elements">
+        <!-- Floating geometric shapes -->
+        <div class="floating-shape shape-circle shape-1"></div>
+        <div class="floating-shape shape-diamond shape-2"></div>
+        <div class="floating-shape shape-oval shape-3"></div>
+        <div class="floating-shape shape-circle shape-4"></div>
+        <div class="floating-shape shape-diamond shape-5"></div>
+        <div class="floating-shape shape-oval shape-6"></div>
+        <div class="floating-shape shape-circle shape-7"></div>
+        
+        <!-- Leaf patterns -->
+        <div class="leaf-pattern leaf-1">
+            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50,5 Q20,20 15,50 Q20,80 35,95 Q50,110 65,95 Q80,80 85,50 Q80,20 50,5 Z M50,15 Q40,25 35,40 Q40,55 50,65 Q60,55 65,40 Q60,25 50,15 Z"/>
+                <path d="M50,10 L55,45 M45,25 Q50,30 55,25 M45,45 Q50,50 55,45 M45,65 Q50,70 55,65"/>
+            </svg>
+        </div>
+        
+        <div class="leaf-pattern leaf-2">
+            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50,8 Q25,18 18,45 Q22,75 40,92 Q50,105 60,92 Q78,75 82,45 Q75,18 50,8 Z M50,18 Q35,28 30,45 Q35,62 50,75 Q65,62 70,45 Q65,28 50,18 Z"/>
+                <path d="M50,12 L52,50 M42,30 Q47,35 52,30 M42,50 Q47,55 52,50"/>
+            </svg>
+        </div>
+        
+        <div class="leaf-pattern leaf-3">
+            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50,3 Q18,15 12,48 Q18,78 38,98 Q50,115 62,98 Q82,78 88,48 Q82,15 50,3 Z M50,13 Q30,25 25,48 Q30,71 50,88 Q70,71 75,48 Q70,25 50,13 Z"/>
+                <path d="M50,8 L54,55 M40,25 Q45,30 50,25 M58,35 Q53,40 48,35 M40,55 Q45,60 50,55"/>
+            </svg>
+        </div>
+        
+        <div class="leaf-pattern leaf-4">
+            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50,10 Q30,22 25,45 Q28,68 42,85 Q50,95 58,85 Q72,68 75,45 Q70,22 50,10 Z M50,20 Q38,32 35,45 Q38,58 50,70 Q62,58 65,45 Q62,32 50,20 Z"/>
+                <path d="M50,15 L51,60 M43,35 Q48,40 53,35"/>
+            </svg>
+        </div>
+        
+        <div class="leaf-pattern leaf-5">
+            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50,6 Q22,16 16,46 Q20,76 36,94 Q50,108 64,94 Q80,76 84,46 Q78,16 50,6 Z M50,16 Q32,26 28,46 Q32,66 50,82 Q68,66 72,46 Q68,26 50,16 Z"/>
+                <path d="M50,11 L53,52 M41,28 Q46,33 51,28 M44,48 Q49,53 54,48 M41,68 Q46,73 51,68"/>
+            </svg>
+        </div>
+        
+        <div class="leaf-pattern leaf-6">
+            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50,12 Q32,20 28,42 Q30,64 44,78 Q50,88 56,78 Q70,64 72,42 Q68,20 50,12 Z M50,22 Q40,30 38,42 Q40,54 50,65 Q60,54 62,42 Q60,30 50,22 Z"/>
+                <path d="M50,17 L51,55 M45,32 Q50,37 55,32"/>
+            </svg>
+        </div>
+        
+        <div class="leaf-pattern leaf-7">
+            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50,9 Q26,19 20,47 Q24,75 40,91 Q50,102 60,91 Q76,75 80,47 Q74,19 50,9 Z M50,19 Q34,29 30,47 Q34,65 50,78 Q66,65 70,47 Q66,29 50,19 Z"/>
+                <path d="M50,14 L52,53 M42,32 Q47,37 52,32 M45,52 Q50,57 55,52"/>
+            </svg>
+        </div>
+        
+        <div class="leaf-pattern leaf-8">
+            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50,4 Q20,14 14,44 Q18,74 34,94 Q50,110 66,94 Q82,74 86,44 Q80,14 50,4 Z M50,14 Q28,24 24,44 Q28,64 50,84 Q72,64 76,44 Q72,24 50,14 Z"/>
+                <path d="M50,9 L54,58 M38,26 Q43,31 48,26 M55,38 Q50,43 45,38 M38,58 Q43,63 48,58 M58,58 Q53,63 48,58"/>
+            </svg>
+        </div>
+        
+        <!-- Additional Leaf Patterns with Diverse Designs -->
+        <div class="leaf-pattern leaf-9">
+            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50,7 Q28,17 22,42 Q26,67 42,87 Q50,98 58,87 Q74,67 78,42 Q72,17 50,7 Z M50,17 Q36,27 32,42 Q36,57 50,72 Q64,57 68,42 Q64,27 50,17 Z"/>
+                <path d="M50,12 L52,55 M43,28 Q48,33 53,28 M46,48 Q51,53 56,48"/>
+            </svg>
+        </div>
+        
+        <div class="leaf-pattern leaf-10">
+            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50,5 Q24,15 18,45 Q22,75 38,95 Q50,108 62,95 Q78,75 82,45 Q76,15 50,5 Z M50,15 Q32,25 28,45 Q32,65 50,85 Q68,65 72,45 Q68,25 50,15 Z"/>
+                <path d="M50,10 L53,58 M40,30 Q45,35 50,30 M42,55 Q47,60 52,55 M58,35 Q53,40 48,35"/>
+            </svg>
+        </div>
+        
+        <div class="leaf-pattern leaf-11">
+            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50,8 Q30,18 26,40 Q28,62 44,78 Q50,86 56,78 Q72,62 74,40 Q70,18 50,8 Z M50,18 Q38,28 36,40 Q38,52 50,64 Q62,52 64,40 Q62,28 50,18 Z"/>
+                <path d="M50,13 L51,50 M44,25 Q49,30 54,25 M45,45 Q50,50 55,45"/>
+            </svg>
+        </div>
+        
+        <div class="leaf-pattern leaf-12">
+            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50,6 Q22,16 16,46 Q20,76 36,96 Q50,110 64,96 Q80,76 84,46 Q78,16 50,6 Z M50,16 Q30,26 26,46 Q30,66 50,86 Q70,66 74,46 Q70,26 50,16 Z"/>
+                <path d="M50,11 L54,62 M38,28 Q43,33 48,28 M56,40 Q51,45 46,40 M38,60 Q43,65 48,60"/>
+            </svg>
+        </div>
+        
+        <div class="leaf-pattern leaf-13">
+            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50,9 Q32,19 28,41 Q30,63 46,79 Q50,87 54,79 Q70,63 72,41 Q68,19 50,9 Z M50,19 Q40,29 38,41 Q40,53 50,65 Q60,53 62,41 Q60,29 50,19 Z"/>
+                <path d="M50,14 L51,55 M45,32 Q50,37 55,32"/>
+            </svg>
+        </div>
+        
+        <div class="leaf-pattern leaf-14">
+            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50,4 Q26,14 20,44 Q24,74 40,94 Q50,106 60,94 Q76,74 80,44 Q74,14 50,4 Z M50,14 Q34,24 30,44 Q34,64 50,84 Q66,64 70,44 Q66,24 50,14 Z"/>
+                <path d="M50,9 L53,60 M41,26 Q46,31 51,26 M43,46 Q48,51 53,46 M41,66 Q46,71 51,66"/>
+            </svg>
+        </div>
+        
+        <div class="leaf-pattern leaf-15">
+            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50,7 Q34,17 30,39 Q32,61 48,77 Q50,85 52,77 Q68,61 70,39 Q66,17 50,7 Z M50,17 Q42,27 40,39 Q42,51 50,63 Q58,51 60,39 Q58,27 50,17 Z"/>
+                <path d="M50,12 L51,52 M46,30 Q51,35 56,30 M47,50 Q52,55 57,50"/>
+            </svg>
+        </div>
+        
+        <div class="leaf-pattern leaf-16">
+            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50,6 Q28,16 24,43 Q26,70 42,90 Q50,100 58,90 Q74,70 76,43 Q72,16 50,6 Z M50,16 Q36,26 34,43 Q36,60 50,80 Q64,60 66,43 Q64,26 50,16 Z"/>
+                <path d="M50,11 L52,56 M42,29 Q47,34 52,29 M44,49 Q49,54 54,49"/>
+            </svg>
+        </div>
+        
+        <div class="leaf-pattern leaf-17">
+            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50,8 Q30,18 26,42 Q28,66 44,82 Q50,90 56,82 Q72,66 74,42 Q70,18 50,8 Z M50,18 Q38,28 36,42 Q38,56 50,70 Q62,56 64,42 Q62,28 50,18 Z"/>
+                <path d="M50,13 L51,53 M44,31 Q49,36 54,31 M45,51 Q50,56 55,51"/>
+            </svg>
+        </div>
+        
+        <div class="leaf-pattern leaf-18">
+            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50,10 Q36,20 32,40 Q34,60 48,76 Q50,84 52,76 Q66,60 68,40 Q64,20 50,10 Z M50,20 Q44,30 42,40 Q44,50 50,62 Q56,50 58,40 Q56,30 50,20 Z"/>
+                <path d="M50,15 L51,48 M47,28 Q52,33 57,28 M48,48 Q53,53 58,48"/>
+            </svg>
+        </div>
+    </div>
+
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo-section">
+                    <div class="logo-container">
+                        <img src="mireva-logo.png" alt="Mireva Logo" class="logo">
+                    </div>
+                    <div class="brand-content">
+                        <div class="brand-text">Mireva</div>
+                        <div class="subtitle">Recipe Collection</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <h1>Discover Amazing Recipes</h1>
+            <p>Explore thousands of carefully curated recipes from renowned culinary sources. Find your next favorite dish with our intelligent search and filtering system.</p>
+        </section>
+
+        <section class="search-section">
+            <div class="search-container">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    class="search-input" 
+                    placeholder="Search recipes, ingredients, or cuisines..."
+                    autocomplete="off"
+                >
+                <i class="fas fa-search search-icon"></i>
+            </div>
+            
+            <div class="search-filters">
+                <div class="filter-tag" data-filter="">All Recipes</div>
+                <div class="filter-tag" data-filter="quick">Quick & Easy</div>
+                <div class="filter-tag" data-filter="healthy">Healthy</div>
+                <div class="filter-tag" data-filter="persian">Persian</div>
+                <div class="filter-tag" data-filter="italian">Italian</div>
+                <div class="filter-tag" data-filter="chinese">Chinese</div>
+                <div class="filter-tag" data-filter="indian">Indian</div>
+                <div class="filter-tag" data-filter="mexican">Mexican</div>
+                <div class="filter-tag" data-filter="french">French</div>
+                <div class="filter-tag" data-filter="japanese">Japanese</div>
+                <div class="filter-tag" data-filter="thai">Thai</div>
+                <div class="filter-tag" data-filter="vegetarian">Vegetarian</div>
+                <div class="filter-tag" data-filter="dessert">Desserts</div>
+            </div>
+        </section>
+
+        <section id="stats" class="stats">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>Loading recipe database...</p>
+            </div>
+        </section>
+
+        <section id="recipesContainer" class="recipes-grid">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>Loading delicious recipes...</p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        class RecipeApp {
+            constructor() {
+                // Use relative URLs to always match current domain - prevents cross-domain issues
+                this.apiBase = window.location.protocol + '//' + window.location.host;
+                this.currentQuery = '';
+                this.currentFilter = '';
+                this.recipes = [];
+                this.isLoading = false;
+                
+                this.init();
+            }
+            
+            formatDate(dateString) {
+                try {
+                    if (!dateString) return 'Recently';
+                    
+                    // Handle different date formats
+                    const date = new Date(dateString);
+                    
+                    // Check if date is valid
+                    if (isNaN(date.getTime())) {
+                        return 'Recently';
+                    }
+                    
+                    // Format the date
+                    return date.toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    });
+                } catch (error) {
+                    console.warn('Date formatting error:', error);
+                    return 'Recently';
+                }
+            }
+
+            init() {
+                this.loadStats();
+                this.loadRecipes();
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                // Search input with debouncing
+                const searchInput = document.getElementById('searchInput');
+                let searchTimeout;
+                
+                searchInput.addEventListener('input', (e) => {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        this.currentQuery = e.target.value;
+                        this.loadRecipes();
+                    }, 500);
+                });
+
+                // Filter tags
+                const filterTags = document.querySelectorAll('.filter-tag');
+                filterTags.forEach(tag => {
+                    tag.addEventListener('click', () => {
+                        // Remove active class from all tags
+                        filterTags.forEach(t => t.classList.remove('active'));
+                        // Add active class to clicked tag
+                        tag.classList.add('active');
+                        
+                        this.currentFilter = tag.dataset.filter;
+                        this.currentQuery = this.currentFilter;
+                        searchInput.value = this.currentFilter;
+                        this.loadRecipes();
+                    });
+                });
+
+                // Set default active filter
+                filterTags[0].classList.add('active');
+            }
+
+            async loadStats() {
+                try {
+                    // Primary API call
+                    let response = await fetch(`${this.apiBase}/api/recipes/stats?t=${Date.now()}`);
+                    
+                    // Fallback to alternative domain if primary fails
+                    if (!response.ok && this.apiBase.includes('www.')) {
+                        console.log('Trying fallback API endpoint...');
+                        response = await fetch(`https://mireva.life/api/recipes/stats?t=${Date.now()}`);
+                    }
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    const data = await response.json();
+                    
+                    document.getElementById('stats').innerHTML = `
+                        <div class="stats-grid fade-in">
+                            <div class="stat-item">
+                                <div class="stat-number">${data.total_recipes.toLocaleString()}</div>
+                                <div class="stat-label">Total Recipes</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">Complete</div>
+                                <div class="stat-label">Collection</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">${this.formatDate(data.metadata.generation_date)}</div>
+                                <div class="stat-label">Last Updated</div>
+                            </div>
+                        </div>
+                    `;
+                } catch (error) {
+                    console.error('Error loading stats:', error);
+                    document.getElementById('stats').innerHTML = `
+                        <div class="error-state">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                            <p>Unable to load statistics</p>
+                        </div>
+                    `;
+                }
+            }
+
+            async loadRecipes() {
+                if (this.isLoading) return;
+                
+                this.isLoading = true;
+                const container = document.getElementById('recipesContainer');
+                
+                container.innerHTML = `
+                    <div class="loading" style="grid-column: 1 / -1;">
+                        <div class="loading-spinner"></div>
+                        <p>Finding perfect recipes...</p>
+                    </div>
+                `;
+
+                try {
+                    let url;
+                    if (this.currentQuery) {
+                        url = `${this.apiBase}/api/recipes/search?q=${encodeURIComponent(this.currentQuery)}&limit=50&t=${Date.now()}`;
+                    } else {
+                        url = `${this.apiBase}/api/recipes/search?limit=24&t=${Date.now()}`;
+                    }
+
+                    let response = await fetch(url);
+                    
+                    // Fallback to alternative domain if primary fails
+                    if (!response.ok && this.apiBase.includes('www.')) {
+                        console.log('Trying fallback API endpoint for recipes...');
+                        const fallbackUrl = url.replace('https://www.mireva.life', 'https://mireva.life');
+                        response = await fetch(fallbackUrl);
+                    }
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    const recipes = await response.json();
+                    
+                    this.recipes = recipes;
+                    this.displayRecipes(recipes);
+                } catch (error) {
+                    console.error('Error loading recipes:', error);
+                    container.innerHTML = `
+                        <div class="error-state" style="grid-column: 1 / -1;">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                            <p>Unable to load recipes. Please check if the API is running.</p>
+                            <p style="font-size: 0.875rem; margin-top: 0.5rem;">Error: ${error.message}</p>
+                        </div>
+                    `;
+                } finally {
+                    this.isLoading = false;
+                }
+            }
+
+            displayRecipes(recipes) {
+                const container = document.getElementById('recipesContainer');
+                
+                if (!recipes || recipes.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state" style="grid-column: 1 / -1;">
+                            <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                            <p>No recipes found</p>
+                            <p style="font-size: 0.875rem; margin-top: 0.5rem;">Try adjusting your search terms</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = recipes.map(recipe => this.createRecipeCard(recipe)).join('');
+                
+                // Add event listeners for expand/collapse functionality
+                this.setupStepExpansion();
+            }
+            
+            setupStepExpansion() {
+                // Remove existing listeners to avoid duplicates
+                document.querySelectorAll('.steps-expand-toggle').forEach(toggle => {
+                    const newToggle = toggle.cloneNode(true);
+                    toggle.parentNode.replaceChild(newToggle, toggle);
+                });
+                
+                // Add new listeners
+                document.querySelectorAll('.steps-expand-toggle').forEach(toggle => {
+                    toggle.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        const recipeId = toggle.dataset.recipeId;
+                        const stepsContainer = toggle.closest('.steps-container');
+                        const stepsFullDiv = stepsContainer.querySelector('.steps-full');
+                        const expandIcon = toggle.querySelector('.expand-icon');
+                        const expandText = toggle.querySelector('.expand-text');
+                        
+                        if (toggle.classList.contains('expanded')) {
+                            // Collapse
+                            toggle.classList.remove('expanded');
+                            stepsFullDiv.classList.remove('expanded');
+                            
+                            // Update text
+                            expandText.textContent = expandText.textContent.replace('Hide ', '');
+                            
+                            // Hide after animation
+                            setTimeout(() => {
+                                if (!toggle.classList.contains('expanded')) {
+                                    stepsFullDiv.style.display = 'none';
+                                }
+                            }, 400);
+                            
+                        } else {
+                            // Expand
+                            toggle.classList.add('expanded');
+                            stepsFullDiv.style.display = 'block';
+                            
+                            // Trigger reflow for animation
+                            stepsFullDiv.offsetHeight;
+                            
+                            setTimeout(() => {
+                                stepsFullDiv.classList.add('expanded');
+                            }, 10);
+                        }
+                    });
+                    
+                    // Add touch support for mobile
+                    toggle.addEventListener('touchend', (e) => {
+                        e.preventDefault();
+                        toggle.click();
+                    });
+                });
+            }
+
+            createRecipeCard(recipe) {
+                const ingredients = recipe.ingredients || [];
+                const steps = recipe.steps || [];
+                const tags = recipe.tags || [];
+                
+                return `
+                    <div class="recipe-card fade-in">
+                        <div class="recipe-header">
+                            <h3 class="recipe-title">${this.escapeHtml(this.cleanRecipeName(recipe.name))}</h3>
+                            <div class="recipe-meta">
+                                <div class="meta-item">
+                                    <i class="far fa-clock"></i>
+                                    <span>${recipe.minutes || 0} min</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-list-ol"></i>
+                                    <span>${recipe.n_steps || 0} steps</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-shopping-basket"></i>
+                                    <span>${recipe.n_ingredients || 0} items</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="recipe-content">
+                            ${ingredients.length > 0 ? `
+                                <div class="ingredients-section">
+                                    <div class="section-title">Ingredients</div>
+                                    <div class="ingredients-list">
+                                        ${ingredients.slice(0, 8).map(ing => 
+                                            `<span class="ingredient-tag">${this.escapeHtml(ing)}</span>`
+                                        ).join('')}
+                                        ${ingredients.length > 8 ? `<span class="ingredient-tag">+${ingredients.length - 8} more</span>` : ''}
+                                    </div>
+                                </div>
+                            ` : ''}
+                            
+                            ${steps.length > 0 ? `
+                                <div class="steps-section">
+                                    <div class="section-title">Instructions Preview</div>
+                                    <div class="steps-container" data-recipe-id="${recipe.id}">
+                                        <div class="steps-preview">
+                                            ${steps.slice(0, 3).map((step, i) => 
+                                                `<div class="step-item">${i + 1}. ${this.escapeHtml(this.truncateText(step, 120))}</div>`
+                                            ).join('')}
+                                        </div>
+                                        ${steps.length > 3 ? `
+                                            <div class="steps-expand-toggle" data-recipe-id="${recipe.id}">
+                                                <span class="expand-text">...and ${steps.length - 3} more steps</span>
+                                                <i class="fas fa-chevron-down expand-icon"></i>
+                                            </div>
+                                            <div class="steps-full" style="display: none;">
+                                                ${steps.slice(3).map((step, i) => 
+                                                    `<div class="step-item">${i + 4}. ${this.escapeHtml(step)}</div>`
+                                                ).join('')}
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            ` : ''}
+                            
+                            ${tags.length > 0 ? `
+                                <div class="recipe-tags">
+                                    ${tags.slice(0, 6).map(tag => 
+                                        `<span class="recipe-tag">${this.escapeHtml(tag)}</span>`
+                                    ).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
+            escapeHtml(text) {
+                const map = {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                };
+                return text.replace(/[&<>"']/g, (m) => map[m]);
+            }
+
+            truncateText(text, maxLength) {
+                if (text.length <= maxLength) return text;
+                return text.substring(0, maxLength) + '...';
+            }
+            
+            cleanRecipeName(name) {
+                if (!name) return 'Unnamed Recipe';
+                
+                // Convert numbered styles to descriptive names
+                const styleVariations = [
+                    'Classic', 'Traditional', 'Modern', 'Authentic', 'Homestyle', 'Gourmet',
+                    'Quick', 'Easy', 'Healthy', 'Light', 'Hearty', 'Rustic', 'Elegant',
+                    'Spicy', 'Mild', 'Creamy', 'Crispy', 'Tender', 'Aromatic', 'Rich',
+                    'Fresh', 'Savory', 'Zesty', 'Smoky', 'Tangy', 'Sweet', 'Bold',
+                    'Delicate', 'Robust', 'Comforting', 'Restaurant-Style', 'Bistro',
+                    'Cafe', 'Street-Food', 'Fusion', 'Regional', 'Seasonal', 'Holiday',
+                    'Weekend', 'Weeknight', 'Family', 'Party', 'Casual', 'Special'
+                ];
+                
+                // Replace "Style {number}" with descriptive variations
+                const styleMatch = name.match(/^(.+?)\s+Style\s+(\d+)$/);
+                if (styleMatch) {
+                    const baseName = styleMatch[1];
+                    const number = parseInt(styleMatch[2]);
+                    const styleIndex = (number - 1) % styleVariations.length;
+                    return `${styleVariations[styleIndex]} ${baseName}`;
+                }
+                
+                return name;
+            }
+        }
+
+        // Initialize app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new RecipeApp();
+        });
+    </script>
+</body>
+</html>

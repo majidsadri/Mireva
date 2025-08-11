@@ -1101,7 +1101,7 @@ const styles = StyleSheet.create({
   coverContainer: {
     position: 'relative',
     height: 120,
-    backgroundColor: '#064E3B',
+    backgroundColor: '#2D6A4F',
   },
   coverImage: {
     width: '100%',
@@ -1114,7 +1114,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    backgroundColor: 'rgba(15, 59, 47, 0.98)',
     justifyContent: 'center',
     alignItems: 'center',
   },

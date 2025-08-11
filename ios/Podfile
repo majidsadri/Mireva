@@ -8,11 +8,12 @@ require Pod::Executable.execute_command('node', ['-p',
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
-linkage = ENV['USE_FRAMEWORKS']
-if linkage != nil
-  Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
-  use_frameworks! :linkage => linkage.to_sym
-end
+# Force static linking to avoid framework copying sandbox issues
+# linkage = ENV['USE_FRAMEWORKS']
+# if linkage != nil
+#   Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
+#   use_frameworks! :linkage => linkage.to_sym
+# end
 
 target 'Mireva' do
   config = use_native_modules!
@@ -20,7 +21,10 @@ target 'Mireva' do
   use_react_native!(
     :path => config[:reactNativePath],
     # An absolute path to your application root.
-    :app_path => "#{Pod::Config.instance.installation_root}/.."
+    :app_path => "#{Pod::Config.instance.installation_root}/..",
+    # Temporarily disable Hermes to avoid sandbox framework copying issues
+    :hermes_enabled => false,
+    :production => true
   )
 
   post_install do |installer|
@@ -31,5 +35,28 @@ target 'Mireva' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+    
+    # Ensure dSYM files are generated for all configurations
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['DEBUG_INFORMATION_FORMAT'] = 'dwarf-with-dsym'
+        config.build_settings['ONLY_ACTIVE_ARCH'] = 'NO'
+        config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
+        
+        # Fix deployment target issues - set minimum iOS version to 13.0 for compatibility
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+        
+        # Suppress deprecation warnings
+        config.build_settings['GCC_WARN_DEPRECATED_DECLARATIONS'] = 'NO'
+        config.build_settings['CLANG_WARN_DEPRECATED'] = 'NO'
+        
+        # Fix Swift compilation issues for Google dependencies
+        if target.name == 'GTMAppAuth' || target.name == 'GoogleSignIn'
+          config.build_settings['SWIFT_VERSION'] = '5.0'
+          config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'NO'
+          config.build_settings['DEFINES_MODULE'] = 'YES'
+        end
+      end
+    end
   end
 end

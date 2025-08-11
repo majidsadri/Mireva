@@ -38,6 +38,25 @@ server {
         try_files \$uri \$uri/ =404;
     }
 
+    # Recipe API routes on www subdomain  
+    location /api/recipes {
+        proxy_pass http://127.0.0.1:5002;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        
+        # CORS headers
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, DELETE, OPTIONS' always;
+        add_header 'Access-Control-Allow-Headers' 'Content-Type, Accept, Origin, ngrok-skip-browser-warning' always;
+        add_header 'Access-Control-Allow-Credentials' 'true' always;
+        
+        if (\$request_method = 'OPTIONS') {
+            return 204;
+        }
+    }
+
     # Cache static assets
     location ~* \.(jpg|jpeg|png|gif|ico|css|js)$ {
         expires 1y;
@@ -59,6 +78,26 @@ server {
     ssl_certificate /etc/letsencrypt/live/mireva.life/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/mireva.life/privkey.pem;
 
+    # Recipe API routes
+    location /api/recipes {
+        proxy_pass http://127.0.0.1:5002;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        
+        # CORS headers
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, DELETE, OPTIONS' always;
+        add_header 'Access-Control-Allow-Headers' 'Content-Type, Accept, Origin, ngrok-skip-browser-warning' always;
+        add_header 'Access-Control-Allow-Credentials' 'true' always;
+        
+        if (\$request_method = 'OPTIONS') {
+            return 204;
+        }
+    }
+
+    # Pantry API routes (if any - keeping for backward compatibility)
     location / {
         proxy_pass http://127.0.0.1:5001;
         proxy_set_header Host \$host;
@@ -67,9 +106,10 @@ server {
         proxy_set_header X-Forwarded-Proto \$scheme;
         
         # CORS headers
-        add_header 'Access-Control-Allow-Origin' '*';
-        add_header 'Access-Control-Allow-Methods' 'GET, POST, DELETE, OPTIONS';
-        add_header 'Access-Control-Allow-Headers' 'Content-Type, ngrok-skip-browser-warning';
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, DELETE, OPTIONS' always;
+        add_header 'Access-Control-Allow-Headers' 'Content-Type, Accept, Origin, ngrok-skip-browser-warning' always;
+        add_header 'Access-Control-Allow-Credentials' 'true' always;
         
         if (\$request_method = 'OPTIONS') {
             return 204;

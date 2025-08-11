@@ -1,0 +1,47 @@
+{
+  "total_recipes": 13484,
+  "original_count": 13717,
+  "removed_count": 233,
+  "filter_criteria": "cooking_time <= 180 minutes (3 hours)",
+  "sources": {
+    "Food.com (existing)": 2791,
+    "Generated Chinese": 1495,
+    "Generated French": 1495,
+    "Generated Indian": 1495,
+    "Generated Italian": 1495,
+    "Generated Japanese": 1495,
+    "Generated Mexican": 1495,
+    "Generated Thai": 1495,
+    "Authentic Persian": 12,
+    "Persian Tehrani": 45,
+    "Persian Isfahani": 44,
+    "Persian Shirazi": 43,
+    "Persian Gilaki": 42,
+    "Persian Azerbaijani": 42
+  },
+  "cuisines": {
+    "American": 2791,
+    "Chinese": 1495,
+    "French": 1495,
+    "Indian": 1495,
+    "Italian": 1495,
+    "Japanese": 1495,
+    "Mexican": 1495,
+    "Thai": 1495,
+    "Persian": 228
+  },
+  "categories": {
+    "Main Dish": 2791,
+    "Rice": 939,
+    "Main": 3092,
+    "Soup": 1815,
+    "Appetizer": 1516,
+    "Vegetarian": 619,
+    "Dessert": 1217,
+    "Bread": 299,
+    "Pasta": 299,
+    "Pizza": 299,
+    "Noodles": 299,
+    "Salad": 299
+  }
+}

@@ -19,7 +19,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import requests
 from math import radians, sin, cos, sqrt, atan2
 import ast
-import time
 
 client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 

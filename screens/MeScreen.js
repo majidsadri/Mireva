@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
   TextInput,
   ActivityIndicator,
   Modal,
+  Animated,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { launchImageLibrary } from 'react-native-image-picker';
@@ -18,6 +19,31 @@ import { API_CONFIG } from '../config';
 import ChartsScreen from './ChartsScreen';
 
 export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
+  const animatedValue1 = useRef(new Animated.Value(0)).current;
+  const animatedValue2 = useRef(new Animated.Value(0)).current;
+  const animatedValue3 = useRef(new Animated.Value(0)).current;
+  const animatedValue4 = useRef(new Animated.Value(0)).current;
+  const animatedValue5 = useRef(new Animated.Value(0)).current;
+  const animatedValue6 = useRef(new Animated.Value(0)).current;
+  const animatedValue7 = useRef(new Animated.Value(0)).current;
+  const animatedValue8 = useRef(new Animated.Value(0)).current;
+  const animatedValue9 = useRef(new Animated.Value(0)).current;
+  const animatedValue10 = useRef(new Animated.Value(0)).current;
+  const animatedValue11 = useRef(new Animated.Value(0)).current;
+  const animatedValue12 = useRef(new Animated.Value(0)).current;
+  const animatedValue13 = useRef(new Animated.Value(0)).current;
+  const animatedValue14 = useRef(new Animated.Value(0)).current;
+  const animatedValue15 = useRef(new Animated.Value(0)).current;
+  const animatedValue16 = useRef(new Animated.Value(0)).current;
+  const animatedValue17 = useRef(new Animated.Value(0)).current;
+  const animatedValue18 = useRef(new Animated.Value(0)).current;
+  const animatedValue19 = useRef(new Animated.Value(0)).current;
+  const animatedValue20 = useRef(new Animated.Value(0)).current;
+  const animatedValue21 = useRef(new Animated.Value(0)).current;
+  const animatedValue22 = useRef(new Animated.Value(0)).current;
+  const animatedValue23 = useRef(new Animated.Value(0)).current;
+  const animatedValue24 = useRef(new Animated.Value(0)).current;
+  
   const [joinedPantry, setJoinedPantry] = useState(null);
   const [showJoinPantry, setShowJoinPantry] = useState(false);
   const [pantryName, setPantryName] = useState('');
@@ -56,6 +82,372 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
     loadPendingRequests();
     loadUserRequests();
     loadPantryOwnership();
+    
+    // Start background circle animations
+    const startAnimations = () => {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(animatedValue1, {
+            toValue: 1,
+            duration: 3000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animatedValue1, {
+            toValue: 0,
+            duration: 3000,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+      
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(animatedValue2, {
+            toValue: 1,
+            duration: 4000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animatedValue2, {
+            toValue: 0,
+            duration: 4000,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+      
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(animatedValue3, {
+            toValue: 1,
+            duration: 5000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animatedValue3, {
+            toValue: 0,
+            duration: 5000,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+      
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(animatedValue4, {
+            toValue: 1,
+            duration: 3500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animatedValue4, {
+            toValue: 0,
+            duration: 3500,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+      
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(animatedValue5, {
+            toValue: 1,
+            duration: 4500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animatedValue5, {
+            toValue: 0,
+            duration: 4500,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+      
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(animatedValue6, {
+            toValue: 1,
+            duration: 2800,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animatedValue6, {
+            toValue: 0,
+            duration: 2800,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+      
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(animatedValue7, {
+            toValue: 1,
+            duration: 3200,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animatedValue7, {
+            toValue: 0,
+            duration: 3200,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+      
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(animatedValue8, {
+            toValue: 1,
+            duration: 2500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animatedValue8, {
+            toValue: 0,
+            duration: 2500,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+      
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(animatedValue9, {
+            toValue: 1,
+            duration: 2200,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animatedValue9, {
+            toValue: 0,
+            duration: 2200,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+      
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(animatedValue10, {
+            toValue: 1,
+            duration: 3800,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animatedValue10, {
+            toValue: 0,
+            duration: 3800,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+      
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(animatedValue11, {
+            toValue: 1,
+            duration: 2900,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animatedValue11, {
+            toValue: 0,
+            duration: 2900,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+      
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(animatedValue12, {
+            toValue: 1,
+            duration: 3400,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animatedValue12, {
+            toValue: 0,
+            duration: 3400,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+      
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(animatedValue13, {
+            toValue: 1,
+            duration: 1800,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animatedValue13, {
+            toValue: 0,
+            duration: 1800,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+      
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(animatedValue14, {
+            toValue: 1,
+            duration: 2600,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animatedValue14, {
+            toValue: 0,
+            duration: 2600,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+      
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(animatedValue15, {
+            toValue: 1,
+            duration: 4200,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animatedValue15, {
+            toValue: 0,
+            duration: 4200,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+      
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(animatedValue16, {
+            toValue: 1,
+            duration: 1900,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animatedValue16, {
+            toValue: 0,
+            duration: 1900,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+      
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(animatedValue17, {
+            toValue: 1,
+            duration: 3100,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animatedValue17, {
+            toValue: 0,
+            duration: 3100,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+      
+      // EXTRA BUBBLE ANIMATIONS!
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(animatedValue18, {
+            toValue: 1,
+            duration: 1500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animatedValue18, {
+            toValue: 0,
+            duration: 1500,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+      
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(animatedValue19, {
+            toValue: 1,
+            duration: 2100,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animatedValue19, {
+            toValue: 0,
+            duration: 2100,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+      
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(animatedValue20, {
+            toValue: 1,
+            duration: 1700,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animatedValue20, {
+            toValue: 0,
+            duration: 1700,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+      
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(animatedValue21, {
+            toValue: 1,
+            duration: 2400,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animatedValue21, {
+            toValue: 0,
+            duration: 2400,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+      
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(animatedValue22, {
+            toValue: 1,
+            duration: 1600,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animatedValue22, {
+            toValue: 0,
+            duration: 1600,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+      
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(animatedValue23, {
+            toValue: 1,
+            duration: 2700,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animatedValue23, {
+            toValue: 0,
+            duration: 2700,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+      
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(animatedValue24, {
+            toValue: 1,
+            duration: 1400,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animatedValue24, {
+            toValue: 0,
+            duration: 1400,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+    };
+    
+    startAnimations();
   }, []);
 
   // Check ownership whenever joinedPantry changes
@@ -897,8 +1289,594 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
   };
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.content}>
-        {/* Profile Info */}
+      {/* Header Section - Full width like pantry header */}
+      <View style={styles.meHeaderSection}>
+        {/* Gradient-like overlay elements */}
+        <View style={styles.meGradientOverlay1} />
+        <View style={styles.meGradientOverlay2} />
+        <View style={styles.meGradientOverlay3} />
+        
+        {/* Animated Background Circles */}
+        <Animated.View style={[
+          styles.meBackgroundCircle1,
+          {
+            transform: [
+              {
+                translateY: animatedValue1.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, -15],
+                }),
+              },
+            ],
+            opacity: animatedValue1.interpolate({
+              inputRange: [0, 0.5, 1],
+              outputRange: [0.3, 0.6, 0.3],
+            }),
+          },
+        ]} />
+        
+        <Animated.View style={[
+          styles.meBackgroundCircle2,
+          {
+            transform: [
+              {
+                translateX: animatedValue2.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, 20],
+                }),
+              },
+            ],
+            opacity: animatedValue2.interpolate({
+              inputRange: [0, 0.5, 1],
+              outputRange: [0.2, 0.5, 0.2],
+            }),
+          },
+        ]} />
+        
+        <Animated.View style={[
+          styles.meBackgroundCircle3,
+          {
+            transform: [
+              {
+                translateY: animatedValue3.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, 10],
+                }),
+              },
+              {
+                rotate: animatedValue3.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ['0deg', '360deg'],
+                }),
+              },
+            ],
+            opacity: animatedValue3.interpolate({
+              inputRange: [0, 0.5, 1],
+              outputRange: [0.1, 0.4, 0.1],
+            }),
+          },
+        ]} />
+        
+        <Animated.View style={[
+          styles.meBackgroundCircle4,
+          {
+            transform: [
+              {
+                translateX: animatedValue4.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, -25],
+                }),
+              },
+              {
+                scale: animatedValue4.interpolate({
+                  inputRange: [0, 0.5, 1],
+                  outputRange: [1, 1.2, 1],
+                }),
+              },
+            ],
+            opacity: animatedValue4.interpolate({
+              inputRange: [0, 0.5, 1],
+              outputRange: [0.2, 0.4, 0.2],
+            }),
+          },
+        ]} />
+        
+        <Animated.View style={[
+          styles.meBackgroundCircle5,
+          {
+            transform: [
+              {
+                translateY: animatedValue5.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, -20],
+                }),
+              },
+              {
+                rotate: animatedValue5.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ['0deg', '-180deg'],
+                }),
+              },
+            ],
+            opacity: animatedValue5.interpolate({
+              inputRange: [0, 0.5, 1],
+              outputRange: [0.15, 0.35, 0.15],
+            }),
+          },
+        ]} />
+        
+        {/* Additional Bubble Circles */}
+        <Animated.View style={[
+          styles.meBubbleCircle1,
+          {
+            transform: [
+              {
+                translateY: animatedValue6.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, -30],
+                }),
+              },
+              {
+                scale: animatedValue6.interpolate({
+                  inputRange: [0, 0.5, 1],
+                  outputRange: [0.8, 1.1, 0.8],
+                }),
+              },
+            ],
+            opacity: animatedValue6.interpolate({
+              inputRange: [0, 0.5, 1],
+              outputRange: [0.1, 0.3, 0.1],
+            }),
+          },
+        ]} />
+        
+        <Animated.View style={[
+          styles.meBubbleCircle2,
+          {
+            transform: [
+              {
+                translateX: animatedValue7.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, 15],
+                }),
+              },
+              {
+                translateY: animatedValue7.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, -10],
+                }),
+              },
+            ],
+            opacity: animatedValue7.interpolate({
+              inputRange: [0, 0.5, 1],
+              outputRange: [0.08, 0.25, 0.08],
+            }),
+          },
+        ]} />
+        
+        <Animated.View style={[
+          styles.meBubbleCircle3,
+          {
+            transform: [
+              {
+                rotate: animatedValue8.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ['0deg', '120deg'],
+                }),
+              },
+              {
+                scale: animatedValue8.interpolate({
+                  inputRange: [0, 0.5, 1],
+                  outputRange: [1, 1.3, 1],
+                }),
+              },
+            ],
+            opacity: animatedValue8.interpolate({
+              inputRange: [0, 0.5, 1],
+              outputRange: [0.05, 0.2, 0.05],
+            }),
+          },
+        ]} />
+        
+        {/* More Small Bubble Circles */}
+        <Animated.View style={[
+          styles.meBubbleCircle4,
+          {
+            transform: [
+              {
+                translateY: animatedValue9.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, -35],
+                }),
+              },
+              {
+                scale: animatedValue9.interpolate({
+                  inputRange: [0, 0.3, 0.7, 1],
+                  outputRange: [0.6, 1, 0.8, 0.6],
+                }),
+              },
+            ],
+            opacity: animatedValue9.interpolate({
+              inputRange: [0, 0.4, 0.8, 1],
+              outputRange: [0.05, 0.2, 0.15, 0.05],
+            }),
+          },
+        ]} />
+        
+        <Animated.View style={[
+          styles.meBubbleCircle5,
+          {
+            transform: [
+              {
+                translateX: animatedValue10.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, -20],
+                }),
+              },
+              {
+                rotate: animatedValue10.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ['0deg', '90deg'],
+                }),
+              },
+            ],
+            opacity: animatedValue10.interpolate({
+              inputRange: [0, 0.5, 1],
+              outputRange: [0.03, 0.15, 0.03],
+            }),
+          },
+        ]} />
+        
+        <Animated.View style={[
+          styles.meBubbleCircle6,
+          {
+            transform: [
+              {
+                translateY: animatedValue11.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, 12],
+                }),
+              },
+              {
+                scale: animatedValue11.interpolate({
+                  inputRange: [0, 0.5, 1],
+                  outputRange: [0.9, 1.4, 0.9],
+                }),
+              },
+            ],
+            opacity: animatedValue11.interpolate({
+              inputRange: [0, 0.3, 0.7, 1],
+              outputRange: [0.08, 0.25, 0.18, 0.08],
+            }),
+          },
+        ]} />
+        
+        <Animated.View style={[
+          styles.meBubbleCircle7,
+          {
+            transform: [
+              {
+                translateX: animatedValue12.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, 18],
+                }),
+              },
+              {
+                translateY: animatedValue12.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, -25],
+                }),
+              },
+              {
+                rotate: animatedValue12.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ['0deg', '-45deg'],
+                }),
+              },
+            ],
+            opacity: animatedValue12.interpolate({
+              inputRange: [0, 0.4, 0.9, 1],
+              outputRange: [0.04, 0.18, 0.12, 0.04],
+            }),
+          },
+        ]} />
+        
+        {/* Even More Tiny Bubble Circles */}
+        <Animated.View style={[
+          styles.meTinyBubble1,
+          {
+            transform: [
+              {
+                translateY: animatedValue13.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, -40],
+                }),
+              },
+              {
+                scale: animatedValue13.interpolate({
+                  inputRange: [0, 0.2, 0.8, 1],
+                  outputRange: [0.5, 1.2, 0.7, 0.5],
+                }),
+              },
+            ],
+            opacity: animatedValue13.interpolate({
+              inputRange: [0, 0.3, 0.7, 1],
+              outputRange: [0.02, 0.15, 0.08, 0.02],
+            }),
+          },
+        ]} />
+        
+        <Animated.View style={[
+          styles.meTinyBubble2,
+          {
+            transform: [
+              {
+                translateX: animatedValue14.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, 30],
+                }),
+              },
+              {
+                rotate: animatedValue14.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ['0deg', '180deg'],
+                }),
+              },
+            ],
+            opacity: animatedValue14.interpolate({
+              inputRange: [0, 0.5, 1],
+              outputRange: [0.03, 0.12, 0.03],
+            }),
+          },
+        ]} />
+        
+        <Animated.View style={[
+          styles.meTinyBubble3,
+          {
+            transform: [
+              {
+                translateY: animatedValue15.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, 20],
+                }),
+              },
+              {
+                scale: animatedValue15.interpolate({
+                  inputRange: [0, 0.5, 1],
+                  outputRange: [0.8, 1.5, 0.8],
+                }),
+              },
+            ],
+            opacity: animatedValue15.interpolate({
+              inputRange: [0, 0.4, 0.9, 1],
+              outputRange: [0.04, 0.18, 0.10, 0.04],
+            }),
+          },
+        ]} />
+        
+        <Animated.View style={[
+          styles.meTinyBubble4,
+          {
+            transform: [
+              {
+                translateX: animatedValue16.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, -15],
+                }),
+              },
+              {
+                translateY: animatedValue16.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, -30],
+                }),
+              },
+            ],
+            opacity: animatedValue16.interpolate({
+              inputRange: [0, 0.6, 1],
+              outputRange: [0.05, 0.20, 0.05],
+            }),
+          },
+        ]} />
+        
+        <Animated.View style={[
+          styles.meTinyBubble5,
+          {
+            transform: [
+              {
+                rotate: animatedValue17.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ['0deg', '-270deg'],
+                }),
+              },
+              {
+                scale: animatedValue17.interpolate({
+                  inputRange: [0, 0.3, 0.7, 1],
+                  outputRange: [1, 0.6, 1.3, 1],
+                }),
+              },
+            ],
+            opacity: animatedValue17.interpolate({
+              inputRange: [0, 0.4, 0.8, 1],
+              outputRange: [0.06, 0.22, 0.14, 0.06],
+            }),
+          },
+        ]} />
+        
+        {/* ULTIMATE EXTRA BUBBLE CIRCLES! */}
+        <Animated.View style={[
+          styles.meUltraBubble1,
+          {
+            transform: [
+              {
+                translateY: animatedValue18.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, -50],
+                }),
+              },
+              {
+                scale: animatedValue18.interpolate({
+                  inputRange: [0, 0.1, 0.4, 0.7, 1],
+                  outputRange: [0.3, 1.5, 0.8, 1.2, 0.3],
+                }),
+              },
+            ],
+            opacity: animatedValue18.interpolate({
+              inputRange: [0, 0.2, 0.8, 1],
+              outputRange: [0.01, 0.12, 0.08, 0.01],
+            }),
+          },
+        ]} />
+        
+        <Animated.View style={[
+          styles.meUltraBubble2,
+          {
+            transform: [
+              {
+                translateX: animatedValue19.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, 35],
+                }),
+              },
+              {
+                rotate: animatedValue19.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ['0deg', '360deg'],
+                }),
+              },
+            ],
+            opacity: animatedValue19.interpolate({
+              inputRange: [0, 0.3, 0.9, 1],
+              outputRange: [0.02, 0.15, 0.10, 0.02],
+            }),
+          },
+        ]} />
+        
+        <Animated.View style={[
+          styles.meUltraBubble3,
+          {
+            transform: [
+              {
+                translateY: animatedValue20.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, 25],
+                }),
+              },
+              {
+                scale: animatedValue20.interpolate({
+                  inputRange: [0, 0.5, 1],
+                  outputRange: [0.6, 1.8, 0.6],
+                }),
+              },
+            ],
+            opacity: animatedValue20.interpolate({
+              inputRange: [0, 0.4, 1],
+              outputRange: [0.03, 0.18, 0.03],
+            }),
+          },
+        ]} />
+        
+        <Animated.View style={[
+          styles.meUltraBubble4,
+          {
+            transform: [
+              {
+                translateX: animatedValue21.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, -40],
+                }),
+              },
+              {
+                translateY: animatedValue21.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, -20],
+                }),
+              },
+              {
+                rotate: animatedValue21.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ['0deg', '-150deg'],
+                }),
+              },
+            ],
+            opacity: animatedValue21.interpolate({
+              inputRange: [0, 0.5, 1],
+              outputRange: [0.04, 0.20, 0.04],
+            }),
+          },
+        ]} />
+        
+        <Animated.View style={[
+          styles.meUltraBubble5,
+          {
+            transform: [
+              {
+                scale: animatedValue22.interpolate({
+                  inputRange: [0, 0.2, 0.6, 0.9, 1],
+                  outputRange: [0.4, 1.3, 0.7, 1.6, 0.4],
+                }),
+              },
+              {
+                rotate: animatedValue22.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ['0deg', '720deg'],
+                }),
+              },
+            ],
+            opacity: animatedValue22.interpolate({
+              inputRange: [0, 0.3, 0.7, 1],
+              outputRange: [0.05, 0.25, 0.15, 0.05],
+            }),
+          },
+        ]} />
+        
+        <Animated.View style={[
+          styles.meUltraBubble6,
+          {
+            transform: [
+              {
+                translateY: animatedValue23.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, -35],
+                }),
+              },
+              {
+                translateX: animatedValue23.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, 20],
+                }),
+              },
+            ],
+            opacity: animatedValue23.interpolate({
+              inputRange: [0, 0.4, 0.8, 1],
+              outputRange: [0.02, 0.14, 0.09, 0.02],
+            }),
+          },
+        ]} />
+        
+        <Animated.View style={[
+          styles.meUltraBubble7,
+          {
+            transform: [
+              {
+                scale: animatedValue24.interpolate({
+                  inputRange: [0, 0.3, 0.7, 1],
+                  outputRange: [0.2, 1.4, 0.9, 0.2],
+                }),
+              },
+              {
+                translateY: animatedValue24.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, -45],
+                }),
+              },
+            ],
+            opacity: animatedValue24.interpolate({
+              inputRange: [0, 0.2, 0.6, 1],
+              outputRange: [0.06, 0.22, 0.16, 0.06],
+            }),
+          },
+        ]} />
+        
         <View style={styles.profileSection}>
           <View style={styles.profileWallpaper}>
             {/* Join Requests Notification Badge */}
@@ -931,8 +1909,9 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
             )}
           </View>
         </View>
+      </View>
 
-
+      <ScrollView style={styles.content}>
         {/* Dietary Preferences Section */}
         <View style={styles.preferencesSection}>
           <Text style={styles.sectionTitle}>Dietary Preferences</Text>
@@ -1454,38 +2433,331 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F8F9FA',
   },
+  // Header Section - Full width edge-to-edge
+  meHeaderSection: {
+    backgroundColor: '#0F3B2F',
+    background: 'linear-gradient(135deg, #064E3B 0%, #052E22 50%, #041F17 100%)',
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 16,
+    marginHorizontal: 0,
+    marginTop: 0,
+    position: 'relative',
+    overflow: 'hidden',
+    shadowColor: 'rgba(0, 0, 0, 0.4)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    elevation: 8,
+    borderRadius: 0,
+    width: '100%',
+  },
+  meGradientOverlay1: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(6, 78, 59, 0.9)',
+    zIndex: 1,
+  },
+  meGradientOverlay2: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(5, 46, 34, 0.6)',
+    zIndex: 2,
+  },
+  meGradientOverlay3: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(4, 31, 23, 0.3)',
+    zIndex: 3,
+  },
+  // Animated Background Circles for Me Header
+  meBackgroundCircle1: {
+    position: 'absolute',
+    top: -30,
+    right: -20,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    zIndex: 1,
+  },
+  meBackgroundCircle2: {
+    position: 'absolute',
+    bottom: -40,
+    left: -30,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    zIndex: 1,
+  },
+  meBackgroundCircle3: {
+    position: 'absolute',
+    top: 30,
+    left: '70%',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    zIndex: 1,
+  },
+  meBackgroundCircle4: {
+    position: 'absolute',
+    top: -20,
+    left: '30%',
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    zIndex: 1,
+  },
+  meBackgroundCircle5: {
+    position: 'absolute',
+    bottom: -10,
+    right: -15,
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    zIndex: 1,
+  },
+  // Additional Bubble Circles
+  meBubbleCircle1: {
+    position: 'absolute',
+    top: 10,
+    left: '15%',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    zIndex: 1,
+  },
+  meBubbleCircle2: {
+    position: 'absolute',
+    bottom: 20,
+    left: '60%',
+    width: 35,
+    height: 35,
+    borderRadius: 17.5,
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    zIndex: 1,
+  },
+  meBubbleCircle3: {
+    position: 'absolute',
+    top: 50,
+    right: '25%',
+    width: 45,
+    height: 45,
+    borderRadius: 22.5,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    zIndex: 1,
+  },
+  meBubbleCircle4: {
+    position: 'absolute',
+    top: 5,
+    left: '50%',
+    width: 25,
+    height: 25,
+    borderRadius: 12.5,
+    backgroundColor: 'rgba(255, 255, 255, 0.07)',
+    zIndex: 1,
+  },
+  meBubbleCircle5: {
+    position: 'absolute',
+    bottom: 5,
+    right: '10%',
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    zIndex: 1,
+  },
+  meBubbleCircle6: {
+    position: 'absolute',
+    top: 35,
+    left: '5%',
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255, 255, 255, 0.09)',
+    zIndex: 1,
+  },
+  meBubbleCircle7: {
+    position: 'absolute',
+    bottom: 30,
+    right: '45%',
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    zIndex: 1,
+  },
+  // Tiny Bubble Circles
+  meTinyBubble1: {
+    position: 'absolute',
+    top: 15,
+    left: '80%',
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    zIndex: 1,
+  },
+  meTinyBubble2: {
+    position: 'absolute',
+    bottom: 40,
+    left: '25%',
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    zIndex: 1,
+  },
+  meTinyBubble3: {
+    position: 'absolute',
+    top: 60,
+    left: '40%',
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.10)',
+    zIndex: 1,
+  },
+  meTinyBubble4: {
+    position: 'absolute',
+    top: 25,
+    right: '35%',
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: 'rgba(255, 255, 255, 0.07)',
+    zIndex: 1,
+  },
+  meTinyBubble5: {
+    position: 'absolute',
+    bottom: 15,
+    right: '20%',
+    width: 15,
+    height: 15,
+    borderRadius: 7.5,
+    backgroundColor: 'rgba(255, 255, 255, 0.09)',
+    zIndex: 1,
+  },
+  // ULTIMATE EXTRA BUBBLE CIRCLES! 🫧✨
+  meUltraBubble1: {
+    position: 'absolute',
+    top: 8,
+    left: '90%',
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    zIndex: 1,
+  },
+  meUltraBubble2: {
+    position: 'absolute',
+    bottom: 8,
+    left: '8%',
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    zIndex: 1,
+  },
+  meUltraBubble3: {
+    position: 'absolute',
+    top: 45,
+    left: '85%',
+    width: 11,
+    height: 11,
+    borderRadius: 5.5,
+    backgroundColor: 'rgba(255, 255, 255, 0.11)',
+    zIndex: 1,
+  },
+  meUltraBubble4: {
+    position: 'absolute',
+    top: 32,
+    left: '12%',
+    width: 17,
+    height: 17,
+    borderRadius: 8.5,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    zIndex: 1,
+  },
+  meUltraBubble5: {
+    position: 'absolute',
+    top: 55,
+    left: '55%',
+    width: 13,
+    height: 13,
+    borderRadius: 6.5,
+    backgroundColor: 'rgba(255, 255, 255, 0.10)',
+    zIndex: 1,
+  },
+  meUltraBubble6: {
+    position: 'absolute',
+    bottom: 25,
+    right: '8%',
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.07)',
+    zIndex: 1,
+  },
+  meUltraBubble7: {
+    position: 'absolute',
+    top: 18,
+    left: '65%',
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: 'rgba(255, 255, 255, 0.13)',
+    zIndex: 1,
+  },
   content: {
     flex: 1,
     paddingHorizontal: 20,
     paddingTop: 20,
   },
   profileSection: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    marginBottom: 20,
-    marginHorizontal: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    elevation: 3,
+    backgroundColor: 'transparent',
+    borderRadius: 0,
+    marginBottom: 0,
+    marginHorizontal: 0,
+    shadowColor: 'transparent',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
     borderWidth: 0,
-    overflow: 'hidden',
+    overflow: 'visible',
+    zIndex: 4,
+    position: 'relative',
   },
   profileWallpaper: {
     alignItems: 'center',
     paddingVertical: 20,
     paddingHorizontal: 14,
-    backgroundColor: '#1A4D3E',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#0F3028',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
+    backgroundColor: 'transparent',
+    borderRadius: 0,
+    borderWidth: 0,
+    borderColor: 'transparent',
+    shadowColor: 'transparent',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
     position: 'relative',
+    zIndex: 5,
   },
   profileNotificationBadge: {
     position: 'absolute',

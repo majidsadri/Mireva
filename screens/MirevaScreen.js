@@ -1341,6 +1341,91 @@ export default function MirevaScreen() {
           <View style={styles.pantryGradientOverlay2} />
           <View style={styles.pantryGradientOverlay3} />
           
+          {/* Animated Background Circles */}
+          <Animated.View style={[
+            styles.pantryBackgroundCircle1,
+            {
+              transform: [
+                {
+                  translateY: animatedValue1.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0, -15],
+                  }),
+                },
+                {
+                  scale: animatedValue1.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [1, 1.1],
+                  }),
+                },
+              ],
+            },
+          ]} />
+          <Animated.View style={[
+            styles.pantryBackgroundCircle2,
+            {
+              transform: [
+                {
+                  translateX: animatedValue2.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0, 12],
+                  }),
+                },
+              ],
+            },
+          ]} />
+          <Animated.View style={[
+            styles.pantryBackgroundCircle3,
+            {
+              transform: [
+                {
+                  translateY: animatedValue3.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0, 8],
+                  }),
+                },
+                {
+                  rotate: animatedValue3.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: ['0deg', '120deg'],
+                  }),
+                },
+              ],
+            },
+          ]} />
+          <Animated.View style={[
+            styles.pantryBackgroundCircle4,
+            {
+              transform: [
+                {
+                  scale: animatedValue4.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [1, 0.9],
+                  }),
+                },
+                {
+                  translateX: animatedValue4.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0, -8],
+                  }),
+                },
+              ],
+            },
+          ]} />
+          <Animated.View style={[
+            styles.pantryBackgroundCircle5,
+            {
+              transform: [
+                {
+                  translateY: animatedValue5.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0, -10],
+                  }),
+                },
+              ],
+            },
+          ]} />
+          
           <View style={styles.pantryHeaderCard}>
             <View style={styles.pantryHeader}>
               <TouchableOpacity style={styles.pantryMainInfo} onPress={showPantryUsersHandler}>
@@ -1704,8 +1789,82 @@ export default function MirevaScreen() {
       )}
 
       {/* Content Area */}
-      <ScrollView style={styles.contentContainer} showsVerticalScrollIndicator={false}>
-        {pantryItems.length === 0 ? (
+      <View style={styles.contentWrapper}>
+        {/* Animated Background Circles for Content */}
+        <Animated.View style={[
+          styles.contentBackgroundCircle1,
+          {
+            transform: [
+              {
+                translateY: animatedValue6.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, -20],
+                }),
+              },
+            ],
+          },
+        ]} />
+        <Animated.View style={[
+          styles.contentBackgroundCircle2,
+          {
+            transform: [
+              {
+                translateX: animatedValue7.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, 15],
+                }),
+              },
+            ],
+          },
+        ]} />
+        <Animated.View style={[
+          styles.contentBackgroundCircle3,
+          {
+            transform: [
+              {
+                scale: animatedValue1.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [1, 1.15],
+                }),
+              },
+            ],
+          },
+        ]} />
+        <Animated.View style={[
+          styles.contentBackgroundCircle4,
+          {
+            transform: [
+              {
+                translateY: animatedValue2.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, 25],
+                }),
+              },
+              {
+                translateX: animatedValue3.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, -10],
+                }),
+              },
+            ],
+          },
+        ]} />
+        <Animated.View style={[
+          styles.contentBackgroundCircle5,
+          {
+            transform: [
+              {
+                rotate: animatedValue4.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ['0deg', '180deg'],
+                }),
+              },
+            ],
+          },
+        ]} />
+        
+        <ScrollView style={styles.contentContainer} showsVerticalScrollIndicator={false}>
+          {pantryItems.length === 0 ? (
           <View />
         ) : (
           <View style={styles.itemsGridContainer}>
@@ -1753,8 +1912,9 @@ export default function MirevaScreen() {
           </View>
         )}
         
-        <View style={styles.bottomPadding} />
-      </ScrollView>
+          <View style={styles.bottomPadding} />
+        </ScrollView>
+      </View>
       
       {/* Manual Add Modal */}
       <Modal
@@ -2380,64 +2540,112 @@ const styles = StyleSheet.create({
   },
   // Modern Pantry Card Styles
   pantryHeaderSection: {
-    backgroundColor: '#10B981',
-    background: 'linear-gradient(135deg, #10B981 0%, #065F46 50%, #064E3B 100%)',
-    paddingHorizontal: 24,
-    paddingTop: 32,
-    paddingBottom: 32,
+    backgroundColor: '#0F3B2F',
+    background: 'linear-gradient(135deg, #064E3B 0%, #052E22 50%, #041F17 100%)',
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 16,
     position: 'relative',
     overflow: 'hidden',
-    shadowColor: 'rgba(0, 0, 0, 0.25)',
-    shadowOffset: { width: 0, height: 8 },
+    shadowColor: 'rgba(0, 0, 0, 0.4)',
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 1,
-    shadowRadius: 16,
-    elevation: 12,
+    shadowRadius: 12,
+    elevation: 8,
+    width: '100%',
   },
   pantryGradientOverlay1: {
     position: 'absolute',
-    top: -50,
-    left: -50,
-    width: 200,
-    height: 200,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    borderRadius: 100,
-    blur: 20,
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '40%',
+    backgroundColor: 'rgba(6, 78, 59, 0.08)',
+    borderRadius: 0,
   },
   pantryGradientOverlay2: {
     position: 'absolute',
-    bottom: -30,
-    right: -40,
-    width: 150,
-    height: 150,
-    backgroundColor: 'rgba(6, 78, 59, 0.3)',
-    borderRadius: 75,
-    blur: 15,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: '30%',
+    backgroundColor: 'rgba(4, 31, 23, 0.7)',
+    borderRadius: 0,
   },
   pantryGradientOverlay3: {
     position: 'absolute',
-    top: '30%',
-    left: '70%',
+    top: '20%',
+    right: -50,
+    width: 150,
+    height: 150,
+    backgroundColor: 'rgba(16, 185, 129, 0.06)',
+    borderRadius: 75,
+  },
+  pantryBackgroundCircle1: {
+    position: 'absolute',
     width: 80,
     height: 80,
-    backgroundColor: 'rgba(34, 197, 94, 0.15)',
     borderRadius: 40,
-    blur: 10,
+    backgroundColor: 'rgba(16, 185, 129, 0.08)',
+    top: '10%',
+    right: -20,
+    opacity: 0.6,
+  },
+  pantryBackgroundCircle2: {
+    position: 'absolute',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'rgba(6, 78, 59, 0.12)',
+    bottom: '15%',
+    left: -15,
+    opacity: 0.5,
+  },
+  pantryBackgroundCircle3: {
+    position: 'absolute',
+    width: 45,
+    height: 45,
+    borderRadius: 22.5,
+    backgroundColor: 'rgba(34, 197, 94, 0.10)',
+    top: '60%',
+    right: '20%',
+    opacity: 0.7,
+  },
+  pantryBackgroundCircle4: {
+    position: 'absolute',
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: 'rgba(4, 31, 23, 0.15)',
+    top: '30%',
+    left: -25,
+    opacity: 0.4,
+  },
+  pantryBackgroundCircle5: {
+    position: 'absolute',
+    width: 55,
+    height: 55,
+    borderRadius: 27.5,
+    backgroundColor: 'rgba(16, 185, 129, 0.06)',
+    bottom: '30%',
+    right: '10%',
+    opacity: 0.5,
   },
   pantryHeaderCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     backdropFilter: 'blur(20px)',
-    borderRadius: 24,
-    padding: 28,
-    shadowColor: 'rgba(0, 0, 0, 0.2)',
-    shadowOffset: { width: 0, height: 8 },
+    borderRadius: 16,
+    padding: 16,
+    shadowColor: 'rgba(0, 0, 0, 0.3)',
+    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 1,
-    shadowRadius: 20,
-    elevation: 8,
+    shadowRadius: 8,
+    elevation: 5,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.25)',
+    borderColor: 'rgba(255, 255, 255, 0.1)',
     zIndex: 10,
     position: 'relative',
-    marginHorizontal: 4,
+    marginHorizontal: 8,
   },
   welcomeHeaderSection: {
     backgroundColor: '#0F3B2F',
@@ -2633,18 +2841,21 @@ const styles = StyleSheet.create({
   },
   pantryHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
+    paddingTop: 4,
   },
   pantryMainInfo: {
     flex: 1,
     alignItems: 'flex-start',
-    paddingVertical: 4,
+    paddingVertical: 0,
+    paddingRight: 16,
   },
   pantryActions: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
+    alignItems: 'flex-start',
+    gap: 16,
+    marginTop: 4,
   },
   modernPantryName: {
     fontSize: 32,
@@ -2755,18 +2966,21 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   circularManageButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#10B981',
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backdropFilter: 'blur(15px)',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#10B981',
+    shadowColor: 'rgba(0, 0, 0, 0.2)',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 6,
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    elevation: 8,
     position: 'relative',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   circularButtonIcon: {
     fontSize: 18,
@@ -2779,19 +2993,20 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   modernLeaveButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(248, 113, 113, 0.9)',
+    backdropFilter: 'blur(10px)',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.18)',
-    shadowColor: 'rgba(0, 0, 0, 0.3)',
-    shadowOffset: { width: 0, height: 3 },
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    shadowColor: 'rgba(248, 113, 113, 0.4)',
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 1,
-    shadowRadius: 6,
-    elevation: 4,
+    shadowRadius: 8,
+    elevation: 6,
   },
   modernLeaveIcon: {
     fontSize: 20,
@@ -3305,9 +3520,65 @@ const styles = StyleSheet.create({
     backgroundColor: '#E2E8F0',
     marginHorizontal: 16,
   },
+  contentWrapper: {
+    flex: 1,
+    position: 'relative',
+    overflow: 'hidden',
+    backgroundColor: '#F8F9FA',
+  },
   contentContainer: {
     flex: 1,
     paddingTop: 20,
+  },
+  contentBackgroundCircle1: {
+    position: 'absolute',
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    top: 50,
+    right: -40,
+    opacity: 0.8,
+  },
+  contentBackgroundCircle2: {
+    position: 'absolute',
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: 'rgba(6, 78, 59, 0.12)',
+    top: 200,
+    left: -30,
+    opacity: 0.7,
+  },
+  contentBackgroundCircle3: {
+    position: 'absolute',
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+    top: 350,
+    right: -60,
+    opacity: 0.6,
+  },
+  contentBackgroundCircle4: {
+    position: 'absolute',
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'rgba(16, 185, 129, 0.13)',
+    bottom: 100,
+    left: -40,
+    opacity: 0.7,
+  },
+  contentBackgroundCircle5: {
+    position: 'absolute',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: 'rgba(6, 78, 59, 0.14)',
+    bottom: 250,
+    right: 20,
+    opacity: 0.6,
   },
   categoriesContainer: {
     paddingHorizontal: 12,
