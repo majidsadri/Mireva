@@ -15,6 +15,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { API_CONFIG } from '../config';
+import { images } from '../assets';
 import BiometricAuth from '../utils/BiometricAuth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
@@ -262,6 +263,7 @@ export default function SigninScreen({ onSignin, onGoToSignup }) {
             <Image
               source={require('../assets/IMG_4544.png')}
               style={styles.logo}
+              resizeMode="contain"
             />
             <Text style={styles.title}>Sign In</Text>
             <Text style={styles.subtitle}>Access your account to continue</Text>

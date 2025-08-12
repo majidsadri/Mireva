@@ -23,6 +23,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
 import { API_CONFIG } from '../config';
+import { images } from '../assets';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { launchCamera } from 'react-native-image-picker';
 import axios from 'axios';
@@ -193,6 +194,9 @@ export default function MirevaScreen() {
   // Pantry management states
   const [joinedPantry, setJoinedPantry] = useState(null);
   const [isOwner, setIsOwner] = useState(false);
+  const [showTutorialModal, setShowTutorialModal] = useState(false);
+  const [tutorialStep, setTutorialStep] = useState(0);
+  const [logoImageError, setLogoImageError] = useState(false);
   const [pendingRequests, setPendingRequests] = useState([]);
   const [pantryUsers, setPantryUsers] = useState([]);
   const [loadingPantryUsers, setLoadingPantryUsers] = useState(false);
@@ -1628,15 +1632,38 @@ export default function MirevaScreen() {
             ]} />
             
             <View style={styles.welcomeScreen}>
-              <View style={styles.welcomeIconContainer}>
+              <TouchableOpacity 
+                style={styles.welcomeIconContainer}
+                onPress={() => setShowTutorialModal(true)}
+                activeOpacity={0.8}
+              >
                 <View style={styles.welcomeIcon}>
-                  <Image 
-                    source={require('../assets/mireva-logo.png')} 
-                    style={styles.welcomeIconImage}
-                    resizeMode="contain"
-                  />
+                  {/* Beautiful Mireva Logo */}
+                  <View style={{
+                    width: 90,
+                    height: 90,
+                    borderRadius: 22,
+                    backgroundColor: '#10B981',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    shadowColor: '#10B981',
+                    shadowOffset: { width: 0, height: 6 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 12,
+                    elevation: 8,
+                  }}>
+                    <Text style={{
+                      fontSize: 42,
+                      fontWeight: '900',
+                      color: '#FFFFFF',
+                      fontFamily: 'System',
+                      letterSpacing: 0.5,
+                    }}>
+                      M
+                    </Text>
+                  </View>
                 </View>
-              </View>
+              </TouchableOpacity>
               
               <View style={styles.welcomeActions}>
                 <TouchableOpacity style={styles.welcomeCreateButton} onPress={() => setShowCreatePantryModal(true)}>
@@ -2456,6 +2483,167 @@ export default function MirevaScreen() {
           </ScrollView>
         </SafeAreaView>
       </Modal>
+
+      {/* Tutorial Modal */}
+      <Modal
+        visible={showTutorialModal}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setShowTutorialModal(false)}
+      >
+        <View style={styles.tutorialOverlay}>
+          <View style={styles.tutorialContainer}>
+            <View style={styles.tutorialHeader}>
+              <Text style={styles.tutorialTitle}>Welcome to Mireva!</Text>
+              <TouchableOpacity 
+                onPress={() => setShowTutorialModal(false)}
+                style={styles.tutorialCloseButton}
+              >
+                <Text style={styles.tutorialCloseText}>×</Text>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.tutorialContent} showsVerticalScrollIndicator={false}>
+              {tutorialStep === 0 && (
+                <View style={styles.tutorialStep}>
+                  <View style={styles.tutorialIconContainer}>
+                    <Image 
+                      source={images.mirevaLogo}
+                      style={styles.tutorialLogoIcon}
+                      resizeMode="contain"
+                      fadeDuration={0}
+                      onError={(error) => console.log('Tutorial image error:', error)}
+                      onLoad={() => console.log('Tutorial image loaded')}
+                    />
+                  </View>
+                  <Text style={styles.tutorialStepTitle}>Create or Join a Pantry</Text>
+                  <Text style={styles.tutorialStepDescription}>
+                    Start by creating your own pantry or joining an existing family pantry. 
+                    Share ingredients with family members and keep everyone updated on what's available.
+                  </Text>
+                  <View style={styles.tutorialFeatures}>
+                    <Text style={styles.tutorialFeature}>Share pantry with family members</Text>
+                    <Text style={styles.tutorialFeature}>Real-time sync across devices</Text>
+                    <Text style={styles.tutorialFeature}>Track expiration dates</Text>
+                  </View>
+                </View>
+              )}
+
+              {tutorialStep === 1 && (
+                <View style={styles.tutorialStep}>
+                  <View style={styles.tutorialIconContainer}>
+                    <Text style={styles.tutorialStepIcon}>+</Text>
+                  </View>
+                  <Text style={styles.tutorialStepTitle}>Add Items Easily</Text>
+                  <Text style={styles.tutorialStepDescription}>
+                    Add ingredients to your pantry in multiple ways. Use our smart camera to scan items 
+                    or add them manually with automatic categorization.
+                  </Text>
+                  <View style={styles.tutorialFeatures}>
+                    <Text style={styles.tutorialFeature}>Smart camera scanning</Text>
+                    <Text style={styles.tutorialFeature}>Manual entry with auto-complete</Text>
+                    <Text style={styles.tutorialFeature}>Automatic categorization</Text>
+                  </View>
+                </View>
+              )}
+
+              {tutorialStep === 2 && (
+                <View style={styles.tutorialStep}>
+                  <View style={styles.tutorialIconContainer}>
+                    <Text style={styles.tutorialStepIcon}>★</Text>
+                  </View>
+                  <Text style={styles.tutorialStepTitle}>Discover Recipes</Text>
+                  <Text style={styles.tutorialStepDescription}>
+                    Get personalized recipe recommendations based on what's in your pantry. 
+                    Our AI suggests meals that match your dietary preferences and available ingredients.
+                  </Text>
+                  <View style={styles.tutorialFeatures}>
+                    <Text style={styles.tutorialFeature}>AI-powered recommendations</Text>
+                    <Text style={styles.tutorialFeature}>Dietary preference matching</Text>
+                    <Text style={styles.tutorialFeature}>Cuisine-specific suggestions</Text>
+                  </View>
+                </View>
+              )}
+
+              {tutorialStep === 3 && (
+                <View style={styles.tutorialStep}>
+                  <View style={styles.tutorialIconContainer}>
+                    <Text style={styles.tutorialStepIcon}>◉</Text>
+                  </View>
+                  <Text style={styles.tutorialStepTitle}>Smart Shopping Lists</Text>
+                  <Text style={styles.tutorialStepDescription}>
+                    Never forget what to buy! Get intelligent shopping suggestions based on your 
+                    saved recipes, expired items, and dietary preferences.
+                  </Text>
+                  <View style={styles.tutorialFeatures}>
+                    <Text style={styles.tutorialFeature}>Smart suggestions from recipes</Text>
+                    <Text style={styles.tutorialFeature}>Expired item replacements</Text>
+                    <Text style={styles.tutorialFeature}>Diet-specific recommendations</Text>
+                  </View>
+                </View>
+              )}
+
+              {tutorialStep === 4 && (
+                <View style={styles.tutorialStep}>
+                  <View style={styles.tutorialIconContainer}>
+                    <Text style={styles.tutorialStepIcon}>✓</Text>
+                  </View>
+                  <Text style={styles.tutorialStepTitle}>Ready to Start!</Text>
+                  <Text style={styles.tutorialStepDescription}>
+                    You're all set to make the most of Mireva! Start by creating your first pantry 
+                    and discover how easy it is to manage your ingredients and find amazing recipes.
+                  </Text>
+                  <TouchableOpacity 
+                    style={styles.tutorialGetStartedButton}
+                    onPress={() => {
+                      setShowTutorialModal(false);
+                      setShowCreatePantryModal(true);
+                    }}
+                  >
+                    <Text style={styles.tutorialGetStartedText}>Create Your First Pantry</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </ScrollView>
+
+            <View style={styles.tutorialProgress}>
+              <View style={styles.tutorialDots}>
+                {[0, 1, 2, 3, 4].map((step) => (
+                  <View 
+                    key={step}
+                    style={[
+                      styles.tutorialDot,
+                      tutorialStep === step && styles.tutorialDotActive
+                    ]}
+                  />
+                ))}
+              </View>
+            </View>
+            
+            <View style={styles.tutorialNavigation}>
+              {tutorialStep > 0 ? (
+                <TouchableOpacity 
+                  style={styles.tutorialPrevButton}
+                  onPress={() => setTutorialStep(tutorialStep - 1)}
+                >
+                  <Text style={styles.tutorialPrevText}>‹</Text>
+                </TouchableOpacity>
+              ) : (
+                <View style={styles.tutorialButtonPlaceholder} />
+              )}
+              
+              {tutorialStep < 4 && (
+                <TouchableOpacity 
+                  style={styles.tutorialNextButton}
+                  onPress={() => setTutorialStep(tutorialStep + 1)}
+                >
+                  <Text style={styles.tutorialNextText}>›</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -2952,33 +3140,82 @@ const styles = StyleSheet.create({
   },
   welcomeIconContainer: {
     marginBottom: 60,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 20,
-    elevation: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 44,
+    minHeight: 44,
   },
   welcomeIcon: {
     width: 140,
     height: 140,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 32,
+    backgroundColor: '#F0FDF4',
+    borderRadius: 40,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#10B981',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.2,
     shadowRadius: 20,
-    elevation: 8,
+    elevation: 10,
+    borderWidth: 2,
+    borderColor: '#E6FFFA',
   },
   welcomeIconText: {
     fontSize: 50,
     lineHeight: 50,
   },
   welcomeIconImage: {
-    width: 80,
-    height: 80,
-    tintColor: '#10B981',
+    width: 90,
+    height: 90,
+    backgroundColor: 'transparent',
+  },
+  welcomeIconFallback: {
+    fontSize: 60,
+    fontWeight: 'bold',
+    color: '#10B981',
+  },
+  leafIcon: {
+    width: 60,
+    height: 60,
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  leafPart1: {
+    position: 'absolute',
+    width: 25,
+    height: 40,
+    backgroundColor: '#064E3B',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+    borderBottomLeftRadius: 25,
+    transform: [{ rotate: '-20deg' }],
+    left: 10,
+    top: 5,
+  },
+  leafPart2: {
+    position: 'absolute',
+    width: 20,
+    height: 30,
+    backgroundColor: '#10B981',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    borderBottomRightRadius: 20,
+    transform: [{ rotate: '30deg' }],
+    right: 8,
+    top: 10,
+  },
+  leafPart3: {
+    position: 'absolute',
+    width: 18,
+    height: 25,
+    backgroundColor: '#34D399',
+    borderTopLeftRadius: 18,
+    borderTopRightRadius: 18,
+    borderBottomRightRadius: 18,
+    transform: [{ rotate: '60deg' }],
+    right: 5,
+    bottom: 8,
   },
   welcomeTitle: {
     fontSize: 28,
@@ -4553,5 +4790,244 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#718096',
     textAlign: 'center',
+  },
+  // Tutorial Modal Styles
+  tutorialOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  tutorialContainer: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    width: '90%',
+    height: '70%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
+    elevation: 10,
+    overflow: 'hidden',
+  },
+  tutorialHeader: {
+    backgroundColor: '#10B981',
+    paddingVertical: 20,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+    position: 'relative',
+  },
+  tutorialCloseButton: {
+    position: 'absolute',
+    right: 16,
+    top: 16,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tutorialTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  tutorialSubtitle: {
+    fontSize: 16,
+    color: '#ffffff',
+    opacity: 0.9,
+    textAlign: 'center',
+  },
+  tutorialContent: {
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingTop: 32,
+    paddingBottom: 20,
+  },
+  tutorialStep: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 300,
+  },
+  tutorialIconContainer: {
+    width: 100,
+    height: 100,
+    backgroundColor: '#F0FDF4',
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+    shadowColor: '#10B981',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
+    borderWidth: 2,
+    borderColor: '#E6FFFA',
+  },
+  tutorialStepTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1F2937',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  tutorialStepDescription: {
+    fontSize: 16,
+    color: '#6B7280',
+    lineHeight: 24,
+    textAlign: 'center',
+    paddingHorizontal: 16,
+  },
+  tutorialProgress: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 20,
+    paddingHorizontal: 24,
+    borderTopWidth: 1,
+    borderTopColor: '#F3F4F6',
+  },
+  tutorialProgressDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginHorizontal: 4,
+    backgroundColor: '#E5E7EB',
+  },
+  tutorialProgressDotActive: {
+    backgroundColor: '#10B981',
+    width: 24,
+  },
+  tutorialNavigation: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingBottom: 24,
+  },
+  tutorialButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    minWidth: 80,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tutorialButtonPrimary: {
+    backgroundColor: '#10B981',
+  },
+  tutorialButtonSecondary: {
+    backgroundColor: '#F3F4F6',
+  },
+  tutorialButtonDisabled: {
+    backgroundColor: '#E5E7EB',
+    opacity: 0.6,
+  },
+  tutorialButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#ffffff',
+  },
+  tutorialButtonTextSecondary: {
+    color: '#6B7280',
+  },
+  tutorialGetStartedButton: {
+    backgroundColor: '#10B981',
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 16,
+    marginHorizontal: 24,
+    marginBottom: 24,
+    shadowColor: '#10B981',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  tutorialGetStartedText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    textAlign: 'center',
+  },
+  tutorialCloseText: {
+    fontSize: 18,
+    color: '#ffffff',
+    fontWeight: 'bold',
+  },
+  tutorialStepIcon: {
+    fontSize: 40,
+    color: '#10B981',
+    fontWeight: 'bold',
+    textShadowColor: 'rgba(16, 185, 129, 0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  tutorialLogoIcon: {
+    width: 60,
+    height: 60,
+  },
+  tutorialFeatures: {
+    marginTop: 20,
+    alignItems: 'flex-start',
+    width: '100%',
+  },
+  tutorialFeature: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginBottom: 8,
+    textAlign: 'left',
+    paddingLeft: 8,
+  },
+  tutorialDots: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tutorialDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#E5E7EB',
+    marginHorizontal: 4,
+  },
+  tutorialDotActive: {
+    backgroundColor: '#10B981',
+    width: 16,
+  },
+  tutorialPrevButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F3F4F6',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tutorialNextButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#10B981',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tutorialButtonPlaceholder: {
+    width: 40,
+    height: 40,
+  },
+  tutorialPrevText: {
+    fontSize: 24,
+    color: '#6B7280',
+    fontWeight: 'bold',
+  },
+  tutorialNextText: {
+    fontSize: 24,
+    color: '#ffffff',
+    fontWeight: 'bold',
   },
 });

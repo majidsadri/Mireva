@@ -18,9 +18,48 @@ import SigninScreen from './screens/SigninScreen';
 import SignupScreen from './screens/SignupScreen';
 import ErrorBoundary from './ErrorBoundary';
 import { API_CONFIG } from './config';
+import { images } from './assets';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
+
+// Mireva Tab Icon Component - Nice M Logo
+function MirevaTabIcon({ focused }) {
+  return (
+    <View style={{
+      width: 35,
+      height: 35,
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}>
+      <View style={{
+        width: 32,
+        height: 32,
+        borderRadius: 8,
+        backgroundColor: focused ? '#2D6A4F' : '#F8F9FA',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 2,
+        borderColor: focused ? '#2D6A4F' : '#E2E8F0',
+        shadowColor: focused ? '#2D6A4F' : '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: focused ? 0.3 : 0.1,
+        shadowRadius: 4,
+        elevation: focused ? 4 : 2,
+      }}>
+        <Text style={{
+          fontSize: 20,
+          fontWeight: '900',
+          color: focused ? '#FFFFFF' : '#2D6A4F',
+          fontFamily: 'System',
+          letterSpacing: 0.5,
+        }}>
+          M
+        </Text>
+      </View>
+    </View>
+  );
+}
 
 // Log Stack Navigator
 function LogStack() {
@@ -39,11 +78,11 @@ function LogStack() {
 
 // Import icons explicitly
 const icons = {
-  mireva: require('./assets/mireva-logo.png'),
-  shop: require('./assets/tobuy.png'),
-  cook: require('./assets/recipes.png'),
-  log: require('./assets/journal.png'),
-  me: require('./assets/profile.png'),
+  mireva: images.mirevaLogo,
+  shop: images.tobuy,
+  cook: images.recipes,
+  log: images.journal,
+  me: images.profile,
 };
 
 export default function App() {
@@ -158,52 +197,7 @@ export default function App() {
           tabBarIcon: ({ focused, color, size }) => {
             // Special handling for Mireva tab - always show logo
             if (route.name === 'Mireva') {
-              // Try to load image, fallback to custom icon if it fails
-              const [imageError, setImageError] = React.useState(false);
-              
-              if (!imageError) {
-                return (
-                  <View style={{
-                    width: 35,
-                    height: 35,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                    <Image
-                      source={icons.mireva}
-                      style={{
-                        width: 30,
-                        height: 30,
-                        resizeMode: 'contain',
-                        opacity: focused ? 1.0 : 0.6,
-                      }}
-                      onError={() => setImageError(true)}
-                    />
-                  </View>
-                );
-              }
-              
-              // Fallback: Custom "M" icon
-              return (
-                <View style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 8,
-                  backgroundColor: focused ? '#2D6A4F' : '#E2E8F0',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderWidth: 2,
-                  borderColor: focused ? '#2D6A4F' : '#9CA3AF',
-                }}>
-                  <Text style={{
-                    fontSize: 18,
-                    fontWeight: 'bold',
-                    color: focused ? '#FFFFFF' : '#6B7280',
-                  }}>
-                    M
-                  </Text>
-                </View>
-              );
+              return <MirevaTabIcon focused={focused} />;
             }
 
             // Special handling for Me tab - profile image or custom person icon

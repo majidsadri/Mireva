@@ -15,6 +15,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { API_CONFIG } from '../config';
+import { images } from '../assets';
 import BiometricAuth from '../utils/BiometricAuth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
@@ -448,9 +449,12 @@ export default function SignupScreen({ onSignup, onBackToSignin }) {
             ) : (
               <View style={styles.googleIconContainer}>
                 <Image 
-                  source={require('../assets/google-logo.jpg')}
+                  source={images.googleLogo}
                   style={styles.googleLogoImage}
                   resizeMode="contain"
+                  onError={(error) => console.log('Signup Google logo error:', error)}
+                  onLoad={() => console.log('Signup Google logo loaded')}
+                  fadeDuration={0}
                 />
               </View>
             )}
@@ -655,8 +659,12 @@ export default function SignupScreen({ onSignup, onBackToSignin }) {
             {/* Header with logo */}
             <View style={styles.header}>
               <Image
-                source={require('../assets/IMG_4544.png')}
+                source={images.headerLogo}
                 style={styles.logo}
+                resizeMode="contain"
+                onError={(error) => console.log('Signup header logo error:', error)}
+                onLoad={() => console.log('Signup header logo loaded')}
+                fadeDuration={0}
               />
               <Text style={styles.title}>Join Mireva</Text>
               <Text style={styles.subtitle}>
