@@ -444,7 +444,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(15, 59, 47, 1.0)',
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,

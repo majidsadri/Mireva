@@ -127,9 +127,9 @@ export default function ShopScreen() {
       // Try to load suggestions from backend first (pantry-based)
       const headers = await getUserHeaders();
       console.log('📤 Request headers:', headers);
-      console.log('🔍 Making request to:', `${API_CONFIG.BASE_URL}/pantry-suggestions`);
+      console.log('🔍 Making request to:', `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SHOPPING_SUGGESTIONS}`);
       
-      const response = await fetch(`${API_CONFIG.BASE_URL}/pantry-suggestions`, {
+      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SHOPPING_SUGGESTIONS}`, {
         method: 'GET',
         headers,
       });
@@ -507,24 +507,7 @@ export default function ShopScreen() {
       });
       
       if (intelligentSuggestions.length > 0) {
-        // Save to backend for pantry-wide sharing
-        try {
-          const headers = await getUserHeaders();
-          const response = await fetch(`${API_CONFIG.BASE_URL}/pantry-suggestions`, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({ suggestions: intelligentSuggestions }),
-          });
-          
-          if (response.ok) {
-            console.log('Suggestions saved to backend for pantry sharing');
-          } else {
-            console.warn('Failed to save suggestions to backend, using local storage');
-          }
-        } catch (error) {
-          console.error('Error saving suggestions to backend:', error);
-        }
-        
+        // For shopping suggestions, we don't save to backend - they're generated dynamically
         // Always cache locally and update state
         await AsyncStorage.setItem('shopping_suggestions', JSON.stringify(intelligentSuggestions));
         setSuggestions(intelligentSuggestions);
@@ -814,23 +797,7 @@ export default function ShopScreen() {
     const updatedSuggestions = suggestions.filter(s => s.id !== suggestion.id);
     setSuggestions(updatedSuggestions);
     
-    // Update backend to remove suggestion for all pantry users
-    try {
-      const headers = await getUserHeaders();
-      const response = await fetch(`${API_CONFIG.BASE_URL}/pantry-suggestions`, {
-        method: 'DELETE',
-        headers,
-        body: JSON.stringify({ suggestionId: suggestion.id }),
-      });
-      
-      if (response.ok) {
-        console.log('Suggestion removed from backend for all pantry users');
-      } else {
-        console.warn('Failed to remove suggestion from backend');
-      }
-    } catch (error) {
-      console.error('Error removing suggestion from backend:', error);
-    }
+    // For shopping suggestions, removal is local only since they're generated dynamically
     
     // Update local cache
     try {
@@ -841,24 +808,7 @@ export default function ShopScreen() {
   };
 
   const clearAllSuggestions = async () => {
-    try {
-      // Clear from backend for all pantry users
-      const headers = await getUserHeaders();
-      const response = await fetch(`${API_CONFIG.BASE_URL}/pantry-suggestions`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ suggestions: [] }),
-      });
-      
-      if (response.ok) {
-        console.log('Suggestions cleared from backend for all pantry users');
-      } else {
-        console.warn('Failed to clear suggestions from backend');
-      }
-    } catch (error) {
-      console.error('Error clearing suggestions from backend:', error);
-    }
-    
+    // For shopping suggestions, clearing is local only since they're generated dynamically
     // Clear local state and cache
     setSuggestions([]);
     await AsyncStorage.removeItem('shopping_suggestions');
@@ -1118,7 +1068,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(15, 59, 47, 0.98)',
+    backgroundColor: 'rgba(15, 59, 47, 1.0)',
     justifyContent: 'center',
     alignItems: 'center',
   },

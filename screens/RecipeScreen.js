@@ -95,40 +95,72 @@ export default function RecipeScreen() {
 
   if (loading) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#007AFF" />
-        <Text style={styles.loadingText}>Finding recipes for you...</Text>
-      </View>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.coverContainer}>
+          <Text style={styles.title}>Recipe Recommendations</Text>
+          <Text style={styles.subtitle}>
+            AI-powered recipes • From your pantry
+          </Text>
+        </View>
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color="#007AFF" />
+          <Text style={styles.loadingText}>Finding recipes for you...</Text>
+        </View>
+      </SafeAreaView>
     );
   }
 
   if (error) {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.errorText}>{error}</Text>
-        <TouchableOpacity style={styles.retryButton} onPress={fetchRecipes}>
-          <Text style={styles.retryButtonText}>Try Again</Text>
-        </TouchableOpacity>
-      </View>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.coverContainer}>
+          <Text style={styles.title}>Recipe Recommendations</Text>
+          <Text style={styles.subtitle}>
+            AI-powered recipes • From your pantry
+          </Text>
+        </View>
+        <View style={styles.centered}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={fetchRecipes}>
+            <Text style={styles.retryButtonText}>Try Again</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
     );
   }
 
   if (!recipes.length) {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.errorText}>No recipes found</Text>
-        <TouchableOpacity style={styles.retryButton} onPress={fetchRecipes}>
-          <Text style={styles.retryButtonText}>Try Again</Text>
-        </TouchableOpacity>
-      </View>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.coverContainer}>
+          <Text style={styles.title}>Recipe Recommendations</Text>
+          <Text style={styles.subtitle}>
+            AI-powered recipes • From your pantry
+          </Text>
+        </View>
+        <View style={styles.centered}>
+          <Text style={styles.errorText}>No recipes found</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={fetchRecipes}>
+            <Text style={styles.retryButtonText}>Try Again</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
     );
   }
 
   const currentRecipe = recipes[currentRecipeIndex];
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#f5f5f5' }}>
-    <ScrollView style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      {/* Header with solid green background */}
+      <View style={styles.coverContainer}>
+        <Text style={styles.title}>Recipe Recommendations</Text>
+        <Text style={styles.subtitle}>
+          AI-powered recipes • From your pantry
+        </Text>
+      </View>
+
+      <ScrollView style={styles.scrollContainer}>
       <View style={styles.recipeCard}>
         <Text style={styles.recipeName}>{currentRecipe.name}</Text>
         <Text style={styles.recipeDescription}>{currentRecipe.description}</Text>
@@ -162,7 +194,7 @@ export default function RecipeScreen() {
           </View>
         )}
       </View>
-    </ScrollView>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -170,7 +202,33 @@ export default function RecipeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#F8F9FA',
+  },
+  coverContainer: {
+    height: 120,
+    backgroundColor: '#2D6A4F',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 4,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#FFFFFF',
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 4,
+  },
+  scrollContainer: {
+    flex: 1,
+    backgroundColor: '#F8F9FA',
   },
   centered: {
     flex: 1,

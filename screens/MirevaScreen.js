@@ -1199,9 +1199,10 @@ export default function MirevaScreen() {
               });
 
               if (response.ok) {
-                // Update local state
+                // Update local state and clear all pantry-related data
                 await AsyncStorage.removeItem('pantryName');
                 setPantryName('');
+                setPantryItems([]);
                 setPantryUsers([]);
                 setPendingRequests([]);
                 setIsOwner(false);
@@ -1336,10 +1337,8 @@ export default function MirevaScreen() {
       {/* Pantry Header Section */}
       {pantryName ? (
         <View style={styles.pantryHeaderSection}>
-          {/* Gradient-like overlay elements for pantry card */}
-          <View style={styles.pantryGradientOverlay1} />
-          <View style={styles.pantryGradientOverlay2} />
-          <View style={styles.pantryGradientOverlay3} />
+          {/* Single background overlay */}
+          <View style={styles.pantryBackgroundOverlay} />
           
           {/* Animated Background Circles */}
           <Animated.View style={[
@@ -1388,38 +1387,6 @@ export default function MirevaScreen() {
                   rotate: animatedValue3.interpolate({
                     inputRange: [0, 1],
                     outputRange: ['0deg', '120deg'],
-                  }),
-                },
-              ],
-            },
-          ]} />
-          <Animated.View style={[
-            styles.pantryBackgroundCircle4,
-            {
-              transform: [
-                {
-                  scale: animatedValue4.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [1, 0.9],
-                  }),
-                },
-                {
-                  translateX: animatedValue4.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [0, -8],
-                  }),
-                },
-              ],
-            },
-          ]} />
-          <Animated.View style={[
-            styles.pantryBackgroundCircle5,
-            {
-              transform: [
-                {
-                  translateY: animatedValue5.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [0, -10],
                   }),
                 },
               ],
@@ -2554,41 +2521,23 @@ const styles = StyleSheet.create({
     elevation: 8,
     width: '100%',
   },
-  pantryGradientOverlay1: {
+  pantryBackgroundOverlay: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    height: '40%',
-    backgroundColor: 'rgba(6, 78, 59, 0.08)',
-    borderRadius: 0,
-  },
-  pantryGradientOverlay2: {
-    position: 'absolute',
     bottom: 0,
-    left: 0,
-    right: 0,
-    height: '30%',
-    backgroundColor: 'rgba(4, 31, 23, 0.7)',
+    backgroundColor: 'rgba(16, 185, 129, 0.12)',
     borderRadius: 0,
-  },
-  pantryGradientOverlay3: {
-    position: 'absolute',
-    top: '20%',
-    right: -50,
-    width: 150,
-    height: 150,
-    backgroundColor: 'rgba(16, 185, 129, 0.06)',
-    borderRadius: 75,
   },
   pantryBackgroundCircle1: {
     position: 'absolute',
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: 'rgba(16, 185, 129, 0.08)',
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'rgba(16, 185, 129, 0.12)',
     top: '10%',
-    right: -20,
+    right: -30,
     opacity: 0.6,
   },
   pantryBackgroundCircle2: {
@@ -2596,44 +2545,23 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: 'rgba(6, 78, 59, 0.12)',
+    backgroundColor: 'rgba(16, 185, 129, 0.12)',
     bottom: '15%',
     left: -15,
     opacity: 0.5,
   },
   pantryBackgroundCircle3: {
     position: 'absolute',
-    width: 45,
-    height: 45,
-    borderRadius: 22.5,
-    backgroundColor: 'rgba(34, 197, 94, 0.10)',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(16, 185, 129, 0.12)',
     top: '60%',
     right: '20%',
     opacity: 0.7,
   },
-  pantryBackgroundCircle4: {
-    position: 'absolute',
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: 'rgba(4, 31, 23, 0.15)',
-    top: '30%',
-    left: -25,
-    opacity: 0.4,
-  },
-  pantryBackgroundCircle5: {
-    position: 'absolute',
-    width: 55,
-    height: 55,
-    borderRadius: 27.5,
-    backgroundColor: 'rgba(16, 185, 129, 0.06)',
-    bottom: '30%',
-    right: '10%',
-    opacity: 0.5,
-  },
   pantryHeaderCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    backdropFilter: 'blur(20px)',
+    backgroundColor: '#052E22',
     borderRadius: 16,
     padding: 16,
     shadowColor: 'rgba(0, 0, 0, 0.3)',
@@ -2667,7 +2595,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: '40%',
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    backgroundColor: 'rgba(16, 185, 129, 0.12)',
     borderRadius: 0,
   },
   gradientOverlay2: {
@@ -2676,7 +2604,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: '30%',
-    backgroundColor: 'rgba(6, 78, 59, 0.8)',
+    backgroundColor: 'rgba(16, 185, 129, 0.12)',
     borderRadius: 0,
   },
   gradientOverlay3: {
@@ -2685,7 +2613,7 @@ const styles = StyleSheet.create({
     right: -50,
     width: 150,
     height: 150,
-    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+    backgroundColor: 'rgba(16, 185, 129, 0.12)',
     borderRadius: 75,
   },
   welcomeHeaderContent: {
@@ -3535,7 +3463,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    backgroundColor: 'rgba(16, 185, 129, 0.12)',
     top: 50,
     right: -40,
     opacity: 0.8,
@@ -3545,7 +3473,7 @@ const styles = StyleSheet.create({
     width: 90,
     height: 90,
     borderRadius: 45,
-    backgroundColor: 'rgba(6, 78, 59, 0.12)',
+    backgroundColor: 'rgba(16, 185, 129, 0.12)',
     top: 200,
     left: -30,
     opacity: 0.7,
@@ -3555,7 +3483,7 @@ const styles = StyleSheet.create({
     width: 150,
     height: 150,
     borderRadius: 75,
-    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+    backgroundColor: 'rgba(16, 185, 129, 0.12)',
     top: 350,
     right: -60,
     opacity: 0.6,
@@ -3565,7 +3493,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: 'rgba(16, 185, 129, 0.13)',
+    backgroundColor: 'rgba(16, 185, 129, 0.12)',
     bottom: 100,
     left: -40,
     opacity: 0.7,
@@ -3575,7 +3503,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: 'rgba(6, 78, 59, 0.14)',
+    backgroundColor: 'rgba(16, 185, 129, 0.12)',
     bottom: 250,
     right: 20,
     opacity: 0.6,
@@ -3734,20 +3662,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     maxWidth: 340,
     width: '100%',
-  },
-  welcomeIconContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: '#F0FDF4',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 24,
-    shadowColor: '#22C55E',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 4,
   },
   welcomeIconShape: {
     width: 40,
