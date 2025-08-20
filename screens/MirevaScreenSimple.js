@@ -7,6 +7,7 @@ import {
   Image,
   ScrollView,
 } from 'react-native';
+import { images } from '../assets';
 
 export default function MirevaScreenSimple() {
   return (
@@ -14,7 +15,7 @@ export default function MirevaScreenSimple() {
       {/* Header with logo */}
       <View style={styles.header}>
         <Image
-          source={require('../assets/mireva-logo.png')}
+          source={images.mirevaLogo}
           style={styles.logo}
         />
         <Text style={styles.welcomeText}>

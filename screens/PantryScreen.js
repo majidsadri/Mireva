@@ -27,6 +27,7 @@ import { Picker } from '@react-native-picker/picker';
 import axios from 'axios';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import { API_CONFIG } from '../config';
+import { images } from '../assets';
 
 
 const MEASUREMENTS = [
@@ -381,7 +382,7 @@ const PantryScreen = () => {
       >
         <View style={styles.header}>
           <Image
-            source={require('../assets/mireva-logo.png')}
+            source={images.mirevaLogo}
             style={styles.logo}
             resizeMode="contain"
           />

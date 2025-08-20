@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_CONFIG } from '../config';
+import { images } from '../assets';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -604,7 +605,7 @@ export default function CookScreen() {
       {/* Top Cover Image */}
       <View style={styles.coverContainer}>
         <Image
-          source={require('../assets/Mireva-top.png')}
+          source={images.mirevaTop}
           style={styles.coverImage}
         />
         <View style={styles.coverOverlay}>

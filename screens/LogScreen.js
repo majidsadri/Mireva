@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_CONFIG } from '../config';
+import { images } from '../assets';
 
 export default function LogScreen({ navigation }) {
   const [pantryItems, setPantryItems] = useState([]);
@@ -322,7 +323,7 @@ export default function LogScreen({ navigation }) {
       {/* Top Cover Image */}
       <View style={styles.coverContainer}>
         <Image
-          source={require('../assets/Mireva-top.png')}
+          source={images.mirevaTop}
           style={styles.coverImage}
         />
         <View style={styles.coverOverlay}>

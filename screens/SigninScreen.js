@@ -261,7 +261,7 @@ export default function SigninScreen({ onSignin, onGoToSignup }) {
           {/* Header with logo */}
           <View style={styles.header}>
             <Image
-              source={require('../assets/IMG_4544.png')}
+              source={images.headerLogo}
               style={styles.logo}
               resizeMode="contain"
             />
@@ -285,7 +285,7 @@ export default function SigninScreen({ onSignin, onGoToSignup }) {
               ) : (
                 <View style={styles.googleIconContainer}>
                   <Image 
-                    source={require('../assets/google-logo.jpg')}
+                    source={images.googleLogo}
                     style={styles.googleLogoImage}
                     resizeMode="contain"
                   />
@@ -308,7 +308,7 @@ export default function SigninScreen({ onSignin, onGoToSignup }) {
                 ) : (
                   <View style={styles.biometricIconContainer}>
                     <Image 
-                      source={require('../assets/face-id-logo.png.png')}
+                      source={images.faceIdLogo}
                       style={styles.faceIdImage}
                       resizeMode="contain"
                     />

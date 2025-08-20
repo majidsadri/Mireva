@@ -17,6 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { API_CONFIG } from '../config';
 import ChartsScreen from './ChartsScreen';
+import { images } from '../assets';
 
 export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
   const animatedValue1 = useRef(new Animated.Value(0)).current;
@@ -2058,7 +2059,7 @@ export default function MeScreen({ user, onSignout, onProfileImageUpdate }) {
             </TouchableOpacity>
             
             <Image
-              source={require('../assets/mireva-logo.png')}
+              source={images.mirevaLogo}
               style={styles.modalLogo}
             />
             

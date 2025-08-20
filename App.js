@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
-import { View, Text, Image } from 'react-native';
+import { View, Text, Image, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Screens
@@ -76,34 +76,53 @@ function LogStack() {
   );
 }
 
-// Import icons explicitly
-const icons = {
-  mireva: images.mirevaLogo,
-  shop: images.tobuy,
-  cook: images.recipes,
-  log: images.journal,
-  me: images.profile,
-};
+// Note: Tab icons are custom drawn components, not using image assets
+// Removed unused icons object that was referencing non-existent assets
 
 export default function App() {
+  console.log('=== APP COMPONENT RENDERING ===');
+  
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showSignup, setShowSignup] = useState(false);
   const [userProfileImage, setUserProfileImage] = useState(null);
 
+  console.log('State initialized:', { user, isLoading, showSignup });
+
   useEffect(() => {
+    console.log('useEffect running - will check auth status');
     checkAuthStatus();
   }, []);
 
   const checkAuthStatus = async () => {
     try {
-      // Check if there's a stored user
-      const userData = await AsyncStorage.getItem('userData');
+      console.log('Checking auth status...');
+      
+      // Add timeout to prevent hanging
+      const timeout = new Promise((resolve) => {
+        setTimeout(() => {
+          console.log('Auth check timeout reached');
+          resolve(null);
+        }, 3000); // 3 second timeout
+      });
+      
+      const authCheck = AsyncStorage.getItem('userData');
+      
+      // Race between auth check and timeout
+      const userData = await Promise.race([authCheck, timeout]);
+      
+      console.log('User data from storage:', userData);
       if (userData) {
-        const parsedUser = JSON.parse(userData);
-        setUser(parsedUser);
-        await loadUserProfileImage(parsedUser.email);
+        try {
+          const parsedUser = JSON.parse(userData);
+          setUser(parsedUser);
+          // Don't await profile image loading - do it async
+          loadUserProfileImage(parsedUser.email).catch(console.log);
+        } catch (parseError) {
+          console.error('Error parsing user data:', parseError);
+        }
       }
+      console.log('Setting isLoading to false');
       setIsLoading(false);
     } catch (error) {
       console.error('Error checking auth status:', error);
@@ -169,6 +188,20 @@ export default function App() {
   const handleBackToSignin = () => {
     setShowSignup(false);
   };
+
+  console.log('About to render, isLoading:', isLoading, 'user:', user);
+
+  // Show loading screen while checking auth status
+  if (isLoading) {
+    console.log('Rendering loading screen');
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFFFFF' }}>
+        <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#2D6A4F', marginBottom: 20 }}>Mireva</Text>
+        <ActivityIndicator size="large" color="#2D6A4F" />
+        <Text style={{ fontSize: 14, color: '#666', marginTop: 20 }}>Loading...</Text>
+      </View>
+    );
+  }
 
   // Show auth screens if not authenticated
   if (!user) {

@@ -36,6 +36,32 @@ target 'Mireva' do
       # :ccache_enabled => true
     )
     
+    # Fix sandbox permission issues in Pods-Mireva-resources.sh
+    pods_target_path = "Pods/Target Support Files/Pods-Mireva/Pods-Mireva-resources.sh"
+    if File.exist?(pods_target_path)
+      script_content = File.read(pods_target_path)
+      
+      # Replace realpath command which doesn't work on macOS
+      script_content.gsub!('$(realpath -mq "${0}")', '${0}')
+      
+      # Change RESOURCES_TO_COPY to use DERIVED_FILE_DIR to avoid sandbox violations
+      script_content.gsub!('RESOURCES_TO_COPY=${PODS_ROOT}/resources-to-copy-${TARGETNAME}.txt', 
+                          'RESOURCES_TO_COPY="${DERIVED_FILE_DIR}/resources-to-copy-${TARGETNAME}.txt"')
+      
+      # Add mkdir for DERIVED_FILE_DIR after the RESOURCES_TO_COPY line
+      script_content.gsub!(/RESOURCES_TO_COPY=.*?\n>/m, 
+                          "RESOURCES_TO_COPY=\"${DERIVED_FILE_DIR}/resources-to-copy-${TARGETNAME}.txt\"\nmkdir -p \"$(dirname \"$RESOURCES_TO_COPY\")\" 2>/dev/null || true\n>")
+      
+      # Suppress errors on file operations
+      script_content.gsub!('echo "$RESOURCE_PATH" >> "$RESOURCES_TO_COPY"', 
+                          'echo "$RESOURCE_PATH" >> "$RESOURCES_TO_COPY" 2>/dev/null || true')
+      script_content.gsub!('rm -f "$RESOURCES_TO_COPY"', 
+                          'rm -f "$RESOURCES_TO_COPY" 2>/dev/null || true')
+      
+      File.write(pods_target_path, script_content)
+      puts "Fixed sandbox permission issues in Pods-Mireva-resources.sh"
+    end
+    
     # Ensure dSYM files are generated for all configurations
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|

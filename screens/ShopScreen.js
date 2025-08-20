@@ -17,6 +17,7 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_CONFIG } from '../config';
+import { images } from '../assets';
 
 export default function ShopScreen() {
   const [shoppingItems, setShoppingItems] = useState([]);
@@ -842,7 +843,7 @@ export default function ShopScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.coverContainer}>
         <Image
-          source={require('../assets/Mireva-top.png')}
+          source={images.mirevaTop}
           style={styles.coverImage}
         />
         <View style={styles.coverOverlay}>
