@@ -15,6 +15,8 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_CONFIG } from '../config';
+import { COLORS } from './PantryScreen.styles';
+import { getFoodIcon } from '../utils/foodIcons';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -35,6 +37,9 @@ export default function CookScreen() {
   const [cachedSearchResults, setCachedSearchResults] = useState([]);
   const [lastSearchQuery, setLastSearchQuery] = useState('');
   const [backendError, setBackendError] = useState(false);
+  const [expandedInstructions, setExpandedInstructions] = useState({});
+  const [initialRecipeCount, setInitialRecipeCount] = useState(0);
+  const [autoLoadTriggerIndex, setAutoLoadTriggerIndex] = useState(1);
 
   useEffect(() => {
     loadInitialData();
@@ -228,6 +233,9 @@ export default function CookScreen() {
       if (recommendData.recipes && recommendData.recipes.length > 0) {
         console.log('Setting recipes:', recommendData.recipes.length, 'recipes');
         setRecipes(recommendData.recipes);
+        // Set initial recipe count and auto-load trigger
+        setInitialRecipeCount(recommendData.recipes.length);
+        setAutoLoadTriggerIndex(1); // Trigger on 2nd recipe (index 1)
         // Cache the recommendations
         setCachedRecommendations(recommendData.recipes);
         setLastRecommendationTime(Date.now());
@@ -288,6 +296,12 @@ export default function CookScreen() {
         );
         const updatedRecipes = [...recipes, ...newRecipes];
         setRecipes(updatedRecipes);
+        
+        // Update auto-load trigger to the first newly loaded recipe
+        if (newRecipes.length > 0) {
+          setAutoLoadTriggerIndex(recipes.length); // Set trigger on first new recipe
+        }
+        
         // Update cache with the expanded list
         setCachedRecommendations(updatedRecipes);
         setLastRecommendationTime(Date.now());
@@ -741,10 +755,19 @@ export default function CookScreen() {
               horizontal
               pagingEnabled
               showsHorizontalScrollIndicator={false}
-              onMomentumScrollEnd={(event) => {
+              onScroll={(event) => {
                 const newIndex = Math.round(event.nativeEvent.contentOffset.x / screenWidth);
+                if (newIndex !== currentRecipeIndex) {
                 setCurrentRecipeIndex(newIndex);
+                  
+                  // Auto-load trigger for recommended mode
+                  if (mode === 'recommend' && newIndex === autoLoadTriggerIndex && !loadingMore) {
+                    console.log('Auto-load trigger activated at recipe index:', newIndex);
+                    loadMoreRecipes();
+                  }
+                }
               }}
+              scrollEventThrottle={16}
               ref={scrollViewRef}
               contentContainerStyle={styles.scrollContent}
               decelerationRate="fast"
@@ -785,39 +808,77 @@ export default function CookScreen() {
                   {/* Enhanced Ingredients Section */}
                   <View style={styles.ingredientsSection}>
                     <View style={styles.sectionHeader}>
-                      <Text style={styles.sectionTitle}>Ingredients</Text>
+                      <View style={styles.titleWithCount}>
                       <View style={styles.ingredientCount}>
                         <Text style={styles.ingredientCountText}>
                           {recipe.ingredients?.length || 0}
                         </Text>
                       </View>
+                        <Text style={styles.sectionTitle}>Ingredients</Text>
+                      </View>
+                      {mode === 'recommend' && index === recipes.length - 1 && (
+                        <TouchableOpacity 
+                          style={styles.miniMoreButton}
+                          onPress={loadMoreRecipes}
+                          disabled={loadingMore}
+                        >
+                          {loadingMore ? (
+                            <ActivityIndicator size="small" color="#FFFFFF" />
+                          ) : (
+                            <Text style={styles.miniMoreButtonText}>More</Text>
+                          )}
+                        </TouchableOpacity>
+                      )}
                     </View>
                     <View style={styles.ingredientsList}>
-                      {recipe.ingredients && recipe.ingredients.slice(0, 8).map((ingredient, idx) => (
+                      {recipe.ingredients && recipe.ingredients.map((ingredient, idx) => (
                         <View key={idx} style={[
                           styles.ingredientPill,
                           colorScheme === 'dark' ? styles.ingredientPillDark : styles.ingredientPillLight
                         ]}>
+                          <View style={styles.ingredientContent}>
+                            <Text style={styles.ingredientIcon}>{getFoodIcon(ingredient)}</Text>
                           <Text style={[
                             styles.ingredientText,
                             colorScheme === 'dark' ? styles.ingredientTextDark : styles.ingredientTextLight
                           ]}>{ingredient}</Text>
+                          </View>
                         </View>
                       ))}
-                      {recipe.ingredients && recipe.ingredients.length > 8 && (
-                        <View style={[
-                          styles.moreIngredientsPill,
-                          colorScheme === 'dark' ? styles.moreIngredientsPillDark : styles.moreIngredientsPillLight
-                        ]}>
-                          <Text style={[
-                            styles.moreIngredientsText,
-                            colorScheme === 'dark' ? styles.moreIngredientsTextDark : styles.moreIngredientsTextLight
-                          ]}>
-                            +{recipe.ingredients.length - 8} more
+                    </View>
+                  </View>
+                  
+                  {/* Instructions Section */}
+                  <View style={styles.instructionsSection}>
+                    <TouchableOpacity
+                      style={styles.instructionsHeader}
+                      onPress={() => setExpandedInstructions(prev => ({
+                        ...prev,
+                        [index]: !prev[index]
+                      }))}
+                    >
+                      <Text style={styles.instructionsTitle}>📋 Cooking Instructions</Text>
+                      <Text style={styles.expandIcon}>
+                        {expandedInstructions[index] ? '▼' : '▶'}
                           </Text>
+                    </TouchableOpacity>
+                    
+                    {expandedInstructions[index] && (
+                      <View style={styles.instructionsContent}>
+                        {recipe.instructions ? (
+                          recipe.instructions.split(/\d+\./).filter(step => step.trim()).map((step, stepIndex) => (
+                            <View key={stepIndex} style={styles.instructionStep}>
+                              <Text style={styles.instructionStepNumber}>{stepIndex + 1}.</Text>
+                              <Text style={styles.instructionStepText}>{step.trim()}</Text>
                         </View>
+                          ))
+                        ) : (
+                          <Text style={styles.instructionsText}>
+                            No detailed instructions available for this recipe.
+                          </Text>
                       )}
                     </View>
+                    )}
                   </View>
                 </View>
               ))}
@@ -825,12 +886,12 @@ export default function CookScreen() {
 
             {/* Page Indicator */}
             <View style={styles.pageIndicator}>
-              {recipes.map((_, index) => (
+              {recipes.slice(0, 5).map((_, index) => (
                 <View
                   key={index}
                   style={[
                     styles.dot,
-                    index === currentRecipeIndex && styles.activeDot
+                    (index === currentRecipeIndex || (currentRecipeIndex >= 5 && index === 4)) && styles.activeDot
                   ]}
                 />
               ))}
@@ -987,12 +1048,12 @@ export default function CookScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: COLORS.background,
   },
   coverContainer: {
     position: 'relative',
     height: 120,
-    backgroundColor: '#2D6A4F',
+    backgroundColor: COLORS.primary,
   },
   coverImage: {
     width: '100%',
@@ -1046,28 +1107,29 @@ const styles = StyleSheet.create({
   },
   recipeContainer: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: COLORS.background,
     paddingTop: 20,
     paddingBottom: 20,
   },
   scrollContent: {
     flexGrow: 1,
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
   recipeCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.surface,
     borderRadius: 16,
     padding: 18,
     marginHorizontal: 16,
     marginVertical: 10,
     width: screenWidth - 32,
+    minHeight: 400,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.12,
     shadowRadius: 12,
     elevation: 8,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: COLORS.border,
   },
   recipeHeader: {
     flexDirection: 'column',
@@ -1082,7 +1144,7 @@ const styles = StyleSheet.create({
   recipeTitle: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#1A365D',
+    color: COLORS.text,
     flex: 1,
     lineHeight: 28,
   },
@@ -1123,7 +1185,7 @@ const styles = StyleSheet.create({
   },
   recipeDescription: {
     fontSize: 16,
-    color: '#4A5568',
+    color: COLORS.textSecondary,
     lineHeight: 24,
     fontWeight: '400',
   },
@@ -1164,7 +1226,7 @@ const styles = StyleSheet.create({
   statText: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#2D6A4F',
+    color: COLORS.primary,
     textAlign: 'center',
   },
   statSubtext: {
@@ -1184,11 +1246,16 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#2D6A4F',
+    color: COLORS.primary,
     letterSpacing: 0.3,
   },
+  titleWithCount: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
   ingredientCount: {
-    backgroundColor: '#2D6A4F',
+    backgroundColor: COLORS.primary,
     borderRadius: 12,
     minWidth: 24,
     height: 24,
@@ -1201,11 +1268,32 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#FFFFFF',
   },
+  miniMoreButton: {
+    backgroundColor: COLORS.warning,
+    borderRadius: 16,
+    minWidth: 80,
+    height: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    shadowColor: COLORS.warning,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  miniMoreButtonText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    textAlign: 'center',
+  },
   ingredientsList: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
     marginTop: 4,
+    marginBottom: 8,
   },
   ingredientPill: {
     borderRadius: 20,
@@ -1214,9 +1302,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 4,
   },
+  ingredientContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  ingredientIcon: {
+    fontSize: 14,
+  },
   ingredientPillLight: {
     backgroundColor: '#F0FDF4',
-    borderColor: '#D1FAE5',
+    borderColor: COLORS.border,
   },
   ingredientPillDark: {
     backgroundColor: '#1F2937',
@@ -1228,7 +1324,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   ingredientTextLight: {
-    color: '#2D6A4F',
+    color: COLORS.primary,
   },
   ingredientTextDark: {
     color: '#FFFFFF',
@@ -1242,7 +1338,7 @@ const styles = StyleSheet.create({
   },
   moreIngredientsPillLight: {
     backgroundColor: '#F3F4F6',
-    borderColor: '#E5E7EB',
+    borderColor: COLORS.border,
   },
   moreIngredientsPillDark: {
     backgroundColor: '#374151',
@@ -1267,7 +1363,7 @@ const styles = StyleSheet.create({
   ratingTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#2D3748',
+    color: COLORS.text,
     textAlign: 'center',
   },
   centered: {
@@ -1277,17 +1373,17 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 10,
     fontSize: 16,
-    color: '#2D6A4F',
+    color: COLORS.primary,
   },
   noRecipesText: {
     fontSize: 18,
-    color: '#718096',
+    color: COLORS.textSecondary,
     textAlign: 'center',
     marginHorizontal: 40,
     marginBottom: 20,
   },
   refreshButton: {
-    backgroundColor: '#2D6A4F',
+    backgroundColor: COLORS.primary,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
@@ -1299,14 +1395,17 @@ const styles = StyleSheet.create({
   },
   navigationSection: {
     borderTopWidth: 1,
-    borderTopColor: '#E2E8F0',
+    borderTopColor: COLORS.border,
     paddingTop: 20,
+    marginTop: 20,
   },
   pageIndicator: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 20,
+    marginTop: 20,
+    zIndex: 1,
   },
   dot: {
     width: 8,
@@ -1316,7 +1415,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   activeDot: {
-    backgroundColor: '#2D6A4F',
+    backgroundColor: COLORS.primary,
     width: 10,
     height: 10,
     borderRadius: 5,
@@ -1334,7 +1433,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   navButton: {
-    backgroundColor: '#2D6A4F',
+    backgroundColor: COLORS.primary,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
@@ -1351,18 +1450,50 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   instructionsSection: {
-    marginTop: 10,
+    marginTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+    paddingTop: 16,
+    marginBottom: 20,
+  },
+  instructionsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: COLORS.background,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   instructionsTitle: {
     fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.primary,
+    flex: 1,
+  },
+  expandIcon: {
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#2D6A4F',
-    marginBottom: 10,
+    color: COLORS.primary,
+    marginLeft: 8,
+  },
+  instructionsContent: {
+    marginTop: 12,
+    padding: 16,
+    backgroundColor: COLORS.background,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    zIndex: 2,
+    elevation: 3,
   },
   instructionsText: {
     fontSize: 14,
-    color: '#4A5568',
+    color: COLORS.textSecondary,
     lineHeight: 20,
+    textAlign: 'left',
   },
   circularButtonsContainer: {
     flexDirection: 'row',
@@ -1370,13 +1501,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 20,
     marginTop: 20,
-    marginBottom: 10,
+    marginBottom: 20,
   },
   circularButton: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#E6FFFA',
+    backgroundColor: COLORS.surface,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -1385,24 +1516,24 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 5,
     borderWidth: 2,
-    borderColor: '#38B2AC',
+    borderColor: COLORS.primary,
   },
   loadMoreButton: {
-    backgroundColor: '#F56500',
-    borderColor: '#E53E3E',
+    backgroundColor: COLORS.warning,
+    borderColor: COLORS.warning,
   },
   saveButton: {
-    backgroundColor: '#2D6A4F',
-    borderColor: '#1F4E3D',
+    backgroundColor: COLORS.primary,
+    borderColor: COLORS.primary,
   },
   saveButtonSaved: {
-    backgroundColor: '#48BB78',
-    borderColor: '#38A169',
+    backgroundColor: COLORS.success,
+    borderColor: COLORS.success,
   },
   circularButtonText: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#2D6A4F',
+    color: COLORS.primary,
     textAlign: 'center',
   },
   savedButtonText: {
@@ -1417,11 +1548,11 @@ const styles = StyleSheet.create({
   
   // Enhanced styles for controls
   controlsContainer: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.surface,
     paddingVertical: 20,
     paddingHorizontal: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: COLORS.border,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
@@ -1430,7 +1561,7 @@ const styles = StyleSheet.create({
   },
   modeToggle: {
     flexDirection: 'row',
-    backgroundColor: '#F1F5F9',
+    backgroundColor: COLORS.background,
     borderRadius: 16,
     padding: 6,
     marginBottom: 16,
@@ -1448,8 +1579,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modeButtonActive: {
-    backgroundColor: '#48BB78',
-    shadowColor: '#48BB78',
+    backgroundColor: COLORS.primary,
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
@@ -1458,7 +1589,7 @@ const styles = StyleSheet.create({
   modeButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#64748B',
+    color: COLORS.textSecondary,
   },
   modeButtonTextActive: {
     color: '#FFFFFF',
@@ -1471,24 +1602,24 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: COLORS.background,
     borderRadius: 16,
     paddingHorizontal: 20,
     paddingVertical: 16,
     fontSize: 16,
     borderWidth: 2,
-    borderColor: '#E2E8F0',
-    color: '#2D3748',
+    borderColor: COLORS.border,
+    color: COLORS.text,
     fontWeight: '500',
   },
   searchButton: {
-    backgroundColor: '#4299E1',
+    backgroundColor: COLORS.primary,
     paddingHorizontal: 24,
     paddingVertical: 16,
     borderRadius: 16,
     minWidth: 90,
     alignItems: 'center',
-    shadowColor: '#4299E1',
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
@@ -1527,7 +1658,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 40,
     paddingVertical: 60,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.surface,
     margin: 20,
     borderRadius: 16,
     shadowColor: '#000',
@@ -1543,24 +1674,24 @@ const styles = StyleSheet.create({
   errorTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#2D3748',
+    color: COLORS.text,
     marginBottom: 12,
     textAlign: 'center',
   },
   errorMessage: {
     fontSize: 16,
-    color: '#718096',
+    color: COLORS.textSecondary,
     textAlign: 'center',
     lineHeight: 24,
     marginBottom: 30,
   },
   retryButton: {
-    backgroundColor: '#2D6A4F',
+    backgroundColor: COLORS.primary,
     paddingHorizontal: 32,
     paddingVertical: 16,
     borderRadius: 12,
     marginBottom: 30,
-    shadowColor: '#2D6A4F',
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -1579,12 +1710,12 @@ const styles = StyleSheet.create({
   offlineTipsTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#2D3748',
+    color: COLORS.text,
     marginBottom: 12,
   },
   offlineTip: {
     fontSize: 14,
-    color: '#4A5568',
+    color: COLORS.textSecondary,
     marginBottom: 8,
     lineHeight: 20,
   },
@@ -1602,20 +1733,20 @@ const styles = StyleSheet.create({
   searchPlaceholderTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#2D3748',
+    color: COLORS.text,
     marginBottom: 12,
     textAlign: 'center',
   },
   searchPlaceholderText: {
     fontSize: 16,
-    color: '#718096',
+    color: COLORS.textSecondary,
     textAlign: 'center',
     lineHeight: 24,
     marginBottom: 30,
   },
   searchExamples: {
     alignItems: 'flex-start',
-    backgroundColor: '#F7FAFC',
+    backgroundColor: COLORS.background,
     borderRadius: 12,
     padding: 20,
     width: '100%',
@@ -1623,12 +1754,12 @@ const styles = StyleSheet.create({
   searchExamplesTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#2D3748',
+    color: COLORS.text,
     marginBottom: 12,
   },
   searchExample: {
     fontSize: 14,
-    color: '#718096',
+    color: COLORS.textSecondary,
     marginBottom: 6,
   },
   
@@ -1641,17 +1772,40 @@ const styles = StyleSheet.create({
     marginTop: 8,
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#38B2AC',
-    shadowColor: '#38B2AC',
+    borderColor: COLORS.primary,
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 4,
     elevation: 3,
   },
   refreshButtonText: {
-    color: '#2D6A4F',
+    color: COLORS.primary,
     fontSize: 14,
     fontWeight: '700',
     letterSpacing: 0.2,
+  },
+  instructionStep: {
+    flexDirection: 'row',
+    marginBottom: 12,
+    alignItems: 'flex-start',
+  },
+  instructionStepNumber: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.primary,
+    marginRight: 8,
+    minWidth: 20,
+  },
+  instructionStepText: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    lineHeight: 20,
+    flex: 1,
+  },
+  titleWithCount: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
 });
