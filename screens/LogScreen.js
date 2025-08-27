@@ -309,13 +309,13 @@ export default function LogScreen({ navigation }) {
   };
 
   const navigateToPantry = () => {
-    // Navigate to the parent tab navigator, then to Mireva tab
-    navigation.getParent()?.navigate('Mireva');
+    // Navigate back to MainTabs, then to Mireva tab
+    navigation.navigate('MainTabs', { screen: 'Mireva' });
   };
 
   const navigateToShopping = () => {
-    // Navigate to the parent tab navigator, then to Shop tab
-    navigation.getParent()?.navigate('Shop');
+    // Navigate back to MainTabs, then to Shop tab
+    navigation.navigate('MainTabs', { screen: 'Shop' });
   };
 
   return (

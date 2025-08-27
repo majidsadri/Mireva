@@ -1401,7 +1401,7 @@ export default function MirevaScreen() {
             <View style={styles.pantryHeader}>
               <TouchableOpacity style={styles.pantryMainInfo} onPress={showPantryUsersHandler}>
                 <Text style={styles.modernPantryName}>{pantryName}</Text>
-                <Text style={styles.modernOwnerBadge}>Owner</Text>
+                {isOwner && <Text style={styles.modernOwnerBadge}>Owner</Text>}
                 <Text style={styles.modernMemberCount}>{pantryUsers.length > 0 ? pantryUsers.length : 1} members</Text>
               </TouchableOpacity>
               
