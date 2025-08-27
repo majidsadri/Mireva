@@ -518,9 +518,32 @@ const styles = StyleSheet.create({
     elevation: 6,
     marginLeft: 10,
   },
-  modernLogIcon: {
-    fontSize: 22,
-    color: 'rgba(255, 255, 255, 0.9)',
+  logIconContainer: {
+    width: 24,
+    height: 24,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    borderRadius: 4,
+    padding: 4,
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+  },
+  logIconLine1: {
+    width: 14,
+    height: 2,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 1,
+  },
+  logIconLine2: {
+    width: 14,
+    height: 2,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 1,
+  },
+  logIconLine3: {
+    width: 10,
+    height: 2,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 1,
   },
   welcomeScreen: {
     alignItems: 'center',

@@ -332,7 +332,10 @@ export default function LogScreen({ navigation }) {
             style={styles.backButton} 
             onPress={() => navigation.goBack()}
           >
-            <Text style={styles.backButtonText}>‹</Text>
+            <View style={styles.backArrowContainer}>
+              <View style={styles.backArrowLine} />
+              <View style={styles.backArrowHead} />
+            </View>
           </TouchableOpacity>
           <Text style={styles.title}>Activity Log</Text>
           <Text style={styles.subtitle}>
@@ -691,21 +694,38 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    top: 10,
+    top: 40,
     left: 20,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.3)',
   },
-  backButtonText: {
-    fontSize: 24,
-    color: '#FFFFFF',
-    fontWeight: '400',
-    marginLeft: -2,
+  backArrowContainer: {
+    width: 20,
+    height: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  backArrowLine: {
+    position: 'absolute',
+    width: 14,
+    height: 2,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 1,
+  },
+  backArrowHead: {
+    position: 'absolute',
+    left: 3,
+    width: 10,
+    height: 10,
+    borderLeftWidth: 2,
+    borderBottomWidth: 2,
+    borderColor: '#FFFFFF',
+    transform: [{ rotate: '45deg' }],
   },
 });

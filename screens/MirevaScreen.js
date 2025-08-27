@@ -1363,7 +1363,11 @@ export default function MirevaScreen() {
                   style={styles.modernLogButton} 
                   onPress={() => navigation?.navigate('Log')}
                 >
-                  <Text style={styles.modernLogIcon}>📋</Text>
+                  <View style={styles.logIconContainer}>
+                    <View style={styles.logIconLine1} />
+                    <View style={styles.logIconLine2} />
+                    <View style={styles.logIconLine3} />
+                  </View>
                 </TouchableOpacity>
               </View>
             </View>
