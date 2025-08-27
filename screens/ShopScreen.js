@@ -13,6 +13,7 @@ import {
   Share,
   Linking,
   Modal,
+  RefreshControl,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -27,16 +28,44 @@ export default function ShopScreen() {
   const [suggestionsLoading, setSuggestionsLoading] = useState(false);
   const [addingItem, setAddingItem] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   
   const textInputRef = useRef(null);
+  const pollingInterval = useRef(null);
 
   useEffect(() => {
     loadShoppingList();
+    
+    // Set up polling for real-time updates every 5 seconds
+    pollingInterval.current = setInterval(() => {
+      loadShoppingList(true); // silent refresh
+    }, 5000);
+    
+    // Cleanup interval on unmount
+    return () => {
+      if (pollingInterval.current) {
+        clearInterval(pollingInterval.current);
+      }
+    };
   }, []);
 
   useFocusEffect(
     React.useCallback(() => {
+      // Refresh both shopping list and suggestions when screen gains focus
+      loadShoppingList();
       loadSuggestions();
+      
+      // Resume polling when screen is focused
+      pollingInterval.current = setInterval(() => {
+        loadShoppingList(true); // silent refresh
+      }, 5000);
+      
+      // Clear polling when screen loses focus
+      return () => {
+        if (pollingInterval.current) {
+          clearInterval(pollingInterval.current);
+        }
+      };
     }, [])
   );
 
@@ -81,9 +110,11 @@ export default function ShopScreen() {
     };
   };
 
-  const loadShoppingList = async () => {
+  const loadShoppingList = async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) {
+        setLoading(true);
+      }
       const headers = await getUserHeaders();
       
       const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SHOPPING_LIST}`, {
@@ -106,7 +137,10 @@ export default function ShopScreen() {
       console.error('Error loading shopping list:', error);
       setShoppingItems([]);
     } finally {
-      setLoading(false);
+      if (!silent) {
+        setLoading(false);
+      }
+      setRefreshing(false);
     }
   };
 
@@ -673,6 +707,12 @@ export default function ShopScreen() {
 
     try {
       setAddingItem(true);
+      
+      // Pause polling during add operation
+      if (pollingInterval.current) {
+        clearInterval(pollingInterval.current);
+      }
+      
       const headers = await getUserHeaders();
       
       const newItem = {
@@ -702,11 +742,23 @@ export default function ShopScreen() {
       Alert.alert('Error', error.message);
     } finally {
       setAddingItem(false);
+      
+      // Resume polling after add operation
+      setTimeout(() => {
+        pollingInterval.current = setInterval(() => {
+          loadShoppingList(true);
+        }, 5000);
+      }, 1000);
     }
   };
 
   const deleteItem = async (itemId) => {
     try {
+      // Pause polling during delete operation
+      if (pollingInterval.current) {
+        clearInterval(pollingInterval.current);
+      }
+      
       const headers = await getUserHeaders();
       const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SHOPPING_LIST}?id=${itemId}`, {
         method: 'DELETE',
@@ -721,11 +773,23 @@ export default function ShopScreen() {
     } catch (error) {
       console.error('Error deleting item:', error);
       Alert.alert('Error', 'Failed to remove item from shopping list');
+    } finally {
+      // Resume polling after delete operation
+      setTimeout(() => {
+        pollingInterval.current = setInterval(() => {
+          loadShoppingList(true);
+        }, 5000);
+      }, 1000);
     }
   };
 
   const togglePurchased = async (itemId) => {
     try {
+      // Clear polling temporarily to avoid conflicts
+      if (pollingInterval.current) {
+        clearInterval(pollingInterval.current);
+      }
+      
       // Find the current item to get its current purchased state
       const currentItem = shoppingItems.find(item => item.id === itemId);
       const newPurchasedState = !currentItem?.purchased;
@@ -826,6 +890,13 @@ export default function ShopScreen() {
             : item
         )
       );
+    } finally {
+      // Resume polling after operation completes
+      setTimeout(() => {
+        pollingInterval.current = setInterval(() => {
+          loadShoppingList(true);
+        }, 5000);
+      }, 1000); // Wait 1 second before resuming to avoid immediate conflict
     }
   };
 
@@ -1002,7 +1073,20 @@ export default function ShopScreen() {
         {loading ? (
           <ActivityIndicator size="large" color="#2D6A4F" style={styles.loader} />
         ) : (
-          <ScrollView style={styles.itemsList}>
+          <ScrollView 
+            style={styles.itemsList}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={() => {
+                  setRefreshing(true);
+                  loadShoppingList();
+                }}
+                tintColor="#2D6A4F"
+                colors={['#2D6A4F']}
+              />
+            }
+          >
             {shoppingItems.map((item) => (
               <View key={item.id} style={[
                 styles.itemCard,
