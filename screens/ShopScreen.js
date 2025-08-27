@@ -36,6 +36,9 @@ export default function ShopScreen() {
   useEffect(() => {
     loadShoppingList();
     
+    // Force refresh suggestions on mount to apply new cleaning logic
+    forceRefreshSuggestions();
+    
     // Set up polling for real-time updates every 5 seconds
     pollingInterval.current = setInterval(() => {
       loadShoppingList(true); // silent refresh
@@ -72,6 +75,7 @@ export default function ShopScreen() {
   const forceRefreshSuggestions = async () => {
     // Clear cache and reload from backend
     await AsyncStorage.removeItem('shopping_suggestions');
+    await AsyncStorage.removeItem('shopping_suggestions_version');
     await loadSuggestions();
   };
 
@@ -189,8 +193,12 @@ export default function ShopScreen() {
           await AsyncStorage.removeItem('shopping_suggestions');
         }
         
-        // Additional client-side filtering to ensure no pantry items show up
-        const filteredSuggestions = await filterOutPantryItems(pantrySuggestions);
+        // Clean suggestion names to remove quantities and filter out pantry items
+        const cleanedSuggestions = pantrySuggestions.map(suggestion => ({
+          ...suggestion,
+          name: cleanIngredientName(suggestion.name)
+        }));
+        const filteredSuggestions = await filterOutPantryItems(cleanedSuggestions);
         setSuggestions(filteredSuggestions);
         
         // Cache in AsyncStorage for faster loading (with version info)
@@ -561,27 +569,33 @@ export default function ShopScreen() {
   const cleanIngredientName = (ingredient) => {
     let cleaned = String(ingredient).trim();
     
-    // Remove quantities and measurements
-    cleaned = cleaned.replace(/^\d+(\.\d+)?\s*/, '');
-    cleaned = cleaned.replace(/^\d*\/\d+\s*/, '');
-    cleaned = cleaned.replace(/^\d+\s+\d+\/\d+\s*/, '');
-    
-    const measurements = [
-      'cups?', 'tbsp', 'tsp', 'oz', 'lbs?', 'kg', 'g', 'ml', 'l',
-      'cloves?', 'slices?', 'pieces?', 'cans?', 'bottles?'
-    ];
-    
-    measurements.forEach(measurement => {
-      const regex = new RegExp(`\\b${measurement}\\b`, 'gi');
-      cleaned = cleaned.replace(regex, '');
-    });
+    // Remove all quantity patterns more thoroughly
+    // Remove fractions like 1/2, 1/4, 3/4, etc.
+    cleaned = cleaned.replace(/\b\d+\/\d+\s*(cup|cups|tbsp|tsp|tablespoon|teaspoon|pound|lb|oz|ounce|gram|g|kg|ml|l|liter|quart|qt|pint|pt|gallon|gal)?\s*/gi, '');
+    // Remove mixed numbers like 1 1/2
+    cleaned = cleaned.replace(/\b\d+\s+\d+\/\d+\s*(cup|cups|tbsp|tsp|tablespoon|teaspoon|pound|lb|oz|ounce|gram|g|kg|ml|l|liter|quart|qt|pint|pt|gallon|gal)?\s*/gi, '');
+    // Remove whole numbers with units
+    cleaned = cleaned.replace(/\b\d+(\.\d+)?\s*(cup|cups|tbsp|tsp|tablespoon|teaspoon|pound|lb|oz|ounce|gram|g|kg|ml|l|liter|quart|qt|pint|pt|gallon|gal|clove|cloves|slice|slices|piece|pieces|can|cans|bottle|bottles|bunch|bunches|package|packages|bag|bags)?\s*/gi, '');
+    // Remove standalone measurement words
+    cleaned = cleaned.replace(/\b(cup|cups|tbsp|tsp|tablespoon|teaspoon|pound|lb|oz|ounce|gram|g|kg|ml|l|liter|quart|qt|pint|pt|gallon|gal|of)\b\s*/gi, '');
     
     // Remove common phrases
     cleaned = cleaned.replace(/\s*to taste\s*$/gi, '');
     cleaned = cleaned.replace(/\s*as needed\s*$/gi, '');
     cleaned = cleaned.replace(/\s*for seasoning\s*$/gi, '');
+    cleaned = cleaned.replace(/\s*optional\s*$/gi, '');
+    cleaned = cleaned.replace(/\s*fresh(ly)?\s*/gi, ' ');
+    cleaned = cleaned.replace(/\s*dried\s*/gi, ' ');
+    cleaned = cleaned.replace(/\s*chopped\s*/gi, '');
+    cleaned = cleaned.replace(/\s*diced\s*/gi, '');
+    cleaned = cleaned.replace(/\s*minced\s*/gi, '');
+    cleaned = cleaned.replace(/\s*sliced\s*/gi, '');
+    cleaned = cleaned.replace(/\s*grated\s*/gi, '');
     
-    return cleaned.trim();
+    // Clean up extra spaces
+    cleaned = cleaned.replace(/\s+/g, ' ').trim();
+    
+    return cleaned;
   };
 
   const parseIngredientList = (ingredient) => {
