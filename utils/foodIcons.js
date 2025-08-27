@@ -8,7 +8,15 @@ import foodIconsData from '../assets/food-icons.json';
 export const getFoodIcon = (itemName) => {
   if (!itemName) return '🍽️'; // Default food icon
   
-  const normalizedName = itemName.toLowerCase().trim();
+  let normalizedName = itemName.toLowerCase().trim();
+  
+  // Remove common prefixes that don't affect the food type
+  const prefixesToRemove = ['bunch of', 'bundle of', 'pack of', 'bag of', 'box of', 'can of', 'bottle of', 'jar of'];
+  for (const prefix of prefixesToRemove) {
+    if (normalizedName.startsWith(prefix + ' ')) {
+      normalizedName = normalizedName.substring(prefix.length + 1).trim();
+    }
+  }
   
   // Create a priority list of matches (most specific first)
   const matches = [];

@@ -327,6 +327,13 @@ export default function LogScreen({ navigation }) {
           style={styles.coverImage}
         />
         <View style={styles.coverOverlay}>
+          {/* Back Button */}
+          <TouchableOpacity 
+            style={styles.backButton} 
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={styles.backButtonText}>‹</Text>
+          </TouchableOpacity>
           <Text style={styles.title}>Activity Log</Text>
           <Text style={styles.subtitle}>
             Track your food journey • {activities.length} activities
@@ -681,5 +688,24 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: '#2D6A4F',
     fontStyle: 'italic',
+  },
+  backButton: {
+    position: 'absolute',
+    top: 10,
+    left: 20,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  backButtonText: {
+    fontSize: 24,
+    color: '#FFFFFF',
+    fontWeight: '400',
+    marginLeft: -2,
   },
 });

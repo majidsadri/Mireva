@@ -739,7 +739,7 @@ export default function ShopScreen() {
         )
       );
       
-      // Update backend
+      // Update shopping list backend
       const headers = await getUserHeaders();
       const response = await fetch(`${API_CONFIG.BASE_URL}/shopping/list/${itemId}`, {
         method: 'PUT',
@@ -752,6 +752,66 @@ export default function ShopScreen() {
       
       if (!response.ok) {
         throw new Error('Failed to update item on server');
+      }
+      
+      // Add to or remove from pantry based on purchase state
+      if (newPurchasedState) {
+        // Add to pantry when checked
+        console.log(`Adding ${currentItem.name} to pantry...`);
+        
+        // Set a default expiry date (30 days from now)
+        const expiryDate = new Date();
+        expiryDate.setDate(expiryDate.getDate() + 30);
+        
+        const pantryResponse = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PANTRY}`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            name: currentItem.name,
+            amount: 1,
+            measurement: 'unit',
+            expiry: expiryDate.toISOString().split('T')[0],
+            shoppingItemId: itemId // Track which shopping item this came from
+          }),
+        });
+        
+        if (!pantryResponse.ok) {
+          console.error('Failed to add item to pantry');
+          // Don't throw error - allow shopping list to update even if pantry fails
+        } else {
+          console.log(`✅ Added ${currentItem.name} to pantry`);
+        }
+      } else {
+        // Remove from pantry when unchecked
+        console.log(`Removing ${currentItem.name} from pantry...`);
+        
+        // First get pantry items to find the one to delete
+        const pantryGetResponse = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PANTRY}`, {
+          method: 'GET',
+          headers,
+        });
+        
+        if (pantryGetResponse.ok) {
+          const pantryItems = await pantryGetResponse.json();
+          // Find the pantry item that matches this shopping item
+          const pantryItem = pantryItems.find(item => 
+            item.name.toLowerCase() === currentItem.name.toLowerCase() ||
+            item.shoppingItemId === itemId
+          );
+          
+          if (pantryItem) {
+            const deleteResponse = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PANTRY}/${pantryItem.id}`, {
+              method: 'DELETE',
+              headers,
+            });
+            
+            if (deleteResponse.ok) {
+              console.log(`✅ Removed ${currentItem.name} from pantry`);
+            } else {
+              console.error('Failed to remove item from pantry');
+            }
+          }
+        }
       }
       
       console.log(`Item ${itemId} marked as ${newPurchasedState ? 'purchased' : 'not purchased'}`);

@@ -1418,6 +1418,14 @@ export default function MirevaScreen() {
                 <TouchableOpacity style={styles.modernLeaveButton} onPress={leavePantryHandler}>
                   <Text style={styles.modernLeaveIcon}>×</Text>
                 </TouchableOpacity>
+                
+                {/* Log Button */}
+                <TouchableOpacity 
+                  style={styles.modernLogButton} 
+                  onPress={() => navigation?.navigate('Log')}
+                >
+                  <Text style={styles.modernLogIcon}>📋</Text>
+                </TouchableOpacity>
               </View>
             </View>
           </View>
@@ -3129,6 +3137,27 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.9)',
     fontWeight: '300',
     lineHeight: 20,
+  },
+  modernLogButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(34, 197, 94, 0.9)', // Green for logs
+    backdropFilter: 'blur(10px)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    shadowColor: 'rgba(34, 197, 94, 0.4)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+    marginLeft: 10,
+  },
+  modernLogIcon: {
+    fontSize: 22,
+    color: 'rgba(255, 255, 255, 0.9)',
   },
   welcomeScreen: {
     alignItems: 'center',

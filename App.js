@@ -7,7 +7,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Screens
 import MirevaScreen from './screens/MirevaScreen';
-import MirevaScreenSimple from './screens/MirevaScreenSimple';
 import ShopScreen from './screens/ShopScreen';
 import CookScreen from './screens/CookScreen';
 import LogScreen from './screens/LogScreen';
@@ -61,20 +60,7 @@ function MirevaTabIcon({ focused }) {
   );
 }
 
-// Log Stack Navigator
-function LogStack() {
-  return (
-    
-    <Stack.Navigator
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
-      <Stack.Screen name="LogMain" component={LogScreen} />
-      <Stack.Screen name="SavedRecipes" component={SavedRecipesScreen} />
-    </Stack.Navigator>
-  );
-}
+// Removed Log Stack Navigator - Log is now accessed from Pantry/Mireva screen
 
 // Note: Tab icons are custom drawn components, not using image assets
 // Removed unused icons object that was referencing non-existent assets
@@ -222,11 +208,13 @@ export default function App() {
     }
   }
 
-  return (
-    <ErrorBoundary>
-      <NavigationContainer>
-        <Tab.Navigator
-        screenOptions={({ route }) => ({
+  // Create a Root Stack Navigator
+  const RootStack = () => (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="MainTabs">
+        {() => (
+          <Tab.Navigator
+          screenOptions={({ route }) => ({
           tabBarIcon: ({ focused, color, size }) => {
             // Special handling for Mireva tab - always show logo
             if (route.name === 'Mireva') {
@@ -604,12 +592,22 @@ export default function App() {
         <Tab.Screen name="Mireva" component={MirevaScreen} />
         <Tab.Screen name="Shop" component={ShopScreen} />
         <Tab.Screen name="Cook" component={CookScreen} />
-        <Tab.Screen name="Log" component={LogStack} />
         <Tab.Screen 
           name="Me" 
           children={() => <MeScreen user={user} onSignout={handleSignout} onProfileImageUpdate={setUserProfileImage} />} 
         />
-        </Tab.Navigator>
+          </Tab.Navigator>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="Log" component={LogScreen} />
+      <Stack.Screen name="SavedRecipes" component={SavedRecipesScreen} />
+    </Stack.Navigator>
+  );
+
+  return (
+    <ErrorBoundary>
+      <NavigationContainer>
+        <RootStack />
       </NavigationContainer>
     </ErrorBoundary>
   );
