@@ -26,14 +26,14 @@ const Stack = createStackNavigator();
 function MirevaTabIcon({ focused }) {
   return (
     <View style={{
-      width: 35,
-      height: 35,
+      width: 40,
+      height: 40,
       alignItems: 'center',
       justifyContent: 'center',
     }}>
       <View style={{
-        width: 32,
-        height: 32,
+        width: 38,
+        height: 38,
         borderRadius: 8,
         backgroundColor: focused ? '#2D6A4F' : '#F8F9FA',
         alignItems: 'center',
@@ -47,7 +47,7 @@ function MirevaTabIcon({ focused }) {
         elevation: focused ? 4 : 2,
       }}>
         <Text style={{
-          fontSize: 20,
+          fontSize: 24,
           fontWeight: '900',
           color: focused ? '#FFFFFF' : '#2D6A4F',
           fontFamily: 'System',
@@ -234,9 +234,9 @@ export default function App() {
                   {userProfileImage ? (
                     // Show profile image
                     <View style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: 16,
+                      width: 38,
+                      height: 38,
+                      borderRadius: 19,
                       borderWidth: 2,
                       borderColor: iconBorderColor,
                       overflow: 'hidden',
@@ -244,8 +244,8 @@ export default function App() {
                       <Image
                         source={{ uri: userProfileImage }}
                         style={{
-                          width: 28,
-                          height: 28,
+                          width: 34,
+                          height: 34,
                           borderRadius: 14,
                         }}
                       />
@@ -253,9 +253,9 @@ export default function App() {
                   ) : user?.name ? (
                     // Show first letter of name
                     <View style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: 16,
+                      width: 38,
+                      height: 38,
+                      borderRadius: 19,
                       backgroundColor: iconBackgroundColor,
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -263,7 +263,7 @@ export default function App() {
                       borderColor: iconBorderColor,
                     }}>
                       <Text style={{
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: 'bold',
                         color: focused ? '#FFFFFF' : '#6B7280',
                       }}>
@@ -273,16 +273,16 @@ export default function App() {
                   ) : (
                     // Default person icon
                     <View style={{
-                      width: 32,
-                      height: 32,
+                      width: 38,
+                      height: 38,
                       alignItems: 'center',
                       justifyContent: 'center',
                     }}>
                       {/* Head */}
                       <View style={{
-                        width: 12,
-                        height: 12,
-                        borderRadius: 6,
+                        width: 14,
+                        height: 14,
+                        borderRadius: 7,
                         backgroundColor: iconBackgroundColor,
                         marginBottom: 2,
                         borderWidth: 1.5,
@@ -290,10 +290,10 @@ export default function App() {
                       }} />
                       {/* Shoulders/Body */}
                       <View style={{
-                        width: 20,
-                        height: 12,
-                        borderTopLeftRadius: 10,
-                        borderTopRightRadius: 10,
+                        width: 24,
+                        height: 14,
+                        borderTopLeftRadius: 12,
+                        borderTopRightRadius: 12,
                         backgroundColor: iconBackgroundColor,
                         borderWidth: 1.5,
                         borderColor: iconBorderColor,
@@ -317,15 +317,15 @@ export default function App() {
                   justifyContent: 'center',
                 }}>
                   <View style={{
-                    width: 32,
-                    height: 32,
+                    width: 38,
+                    height: 38,
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}>
                     {/* Shopping cart body */}
                     <View style={{
-                      width: 20,
-                      height: 12,
+                      width: 24,
+                      height: 14,
                       borderWidth: 1.5,
                       borderColor: iconBorderColor,
                       borderRadius: 2,
@@ -335,10 +335,10 @@ export default function App() {
                       {/* Cart handle */}
                       <View style={{
                         position: 'absolute',
-                        left: -6,
+                        left: -7,
                         top: -2,
-                        width: 6,
-                        height: 8,
+                        width: 7,
+                        height: 10,
                         borderWidth: 1.5,
                         borderColor: iconBorderColor,
                         borderRightWidth: 0,
@@ -369,20 +369,20 @@ export default function App() {
                     {/* Cart wheels */}
                     <View style={{
                       position: 'absolute',
-                      bottom: 6,
-                      left: 8,
-                      width: 4,
-                      height: 4,
-                      borderRadius: 2,
+                      bottom: 7,
+                      left: 10,
+                      width: 5,
+                      height: 5,
+                      borderRadius: 2.5,
                       backgroundColor: iconBorderColor,
                     }} />
                     <View style={{
                       position: 'absolute',
-                      bottom: 6,
-                      right: 8,
-                      width: 4,
-                      height: 4,
-                      borderRadius: 2,
+                      bottom: 7,
+                      right: 10,
+                      width: 5,
+                      height: 5,
+                      borderRadius: 2.5,
                       backgroundColor: iconBorderColor,
                     }} />
                   </View>
@@ -398,15 +398,15 @@ export default function App() {
                   justifyContent: 'center',
                 }}>
                   <View style={{
-                    width: 32,
-                    height: 32,
+                    width: 38,
+                    height: 38,
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}>
                     {/* Cooking pan */}
                     <View style={{
-                      width: 18,
-                      height: 10,
+                      width: 22,
+                      height: 12,
                       borderWidth: 1.5,
                       borderColor: iconBorderColor,
                       borderRadius: 9,
@@ -416,10 +416,10 @@ export default function App() {
                       {/* Pan handle */}
                       <View style={{
                         position: 'absolute',
-                        right: -8,
-                        top: 2,
-                        width: 8,
-                        height: 2,
+                        right: -10,
+                        top: 3,
+                        width: 10,
+                        height: 3,
                         borderRadius: 1,
                         backgroundColor: iconBorderColor,
                       }} />
