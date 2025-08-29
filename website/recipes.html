@@ -2,9 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mireva Recipes - Discover Amazing Recipes</title>
-    <meta name="description" content="Discover thousands of amazing recipes with Mireva. Search by ingredients, cuisine, or dietary preferences.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="format-detection" content="telephone=no">
+    <title>Mireva Recipes - AI-Powered Recipe Discovery</title>
+    <meta name="description" content="Discover thousands of recipes or create custom ones with AI. Search by ingredients, cuisine, or let AI generate recipes based on what you have.">
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -45,486 +48,136 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(29, 78, 61, 0.25) 0%, transparent 60%),
-                radial-gradient(circle at 80% 20%, rgba(29, 78, 61, 0.2) 0%, transparent 60%),
-                radial-gradient(circle at 40% 40%, rgba(29, 78, 61, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 60% 70%, rgba(45, 90, 69, 0.18) 0%, transparent 55%),
-                radial-gradient(circle at 30% 30%, rgba(52, 108, 83, 0.12) 0%, transparent 45%),
-                linear-gradient(135deg, #f8fffe 0%, #f2faf6 25%, #ecf5f0 50%, #e6f0ea 75%, #e0ebe4 100%);
+            background: linear-gradient(135deg, #f8fffe 0%, #f2faf6 25%, #ecf5f0 50%, #e6f0ea 75%, #e0ebe4 100%);
             color: var(--text-primary);
             line-height: 1.6;
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
         }
-
-        /* Enhanced Background Elements */
-        .background-elements {
+        
+        /* Animated Bubbles */
+        .bubble {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: floatUp 15s infinite linear;
             pointer-events: none;
             z-index: 1;
-            overflow: hidden;
         }
         
-        /* Floating geometric shapes - More Visible */
-        .floating-shape {
-            position: absolute;
-            opacity: 0.4;
-            animation: float 25s ease-in-out infinite;
-            filter: blur(0.2px);
-            box-shadow: 0 4px 20px rgba(29, 78, 61, 0.15);
+        @keyframes floatUp {
+            0% {
+                transform: translateY(100vh) translateX(0) scale(0.8);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.3;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px) scale(1.2);
+                opacity: 0;
+            }
         }
         
-        .shape-circle {
-            border-radius: 50%;
-            background: linear-gradient(45deg, rgba(29, 78, 61, 0.35), rgba(29, 78, 61, 0.15));
-            border: 1px solid rgba(29, 78, 61, 0.1);
-        }
-        
-        .shape-diamond {
-            transform: rotate(45deg);
-            background: linear-gradient(135deg, rgba(29, 78, 61, 0.3), rgba(29, 78, 61, 0.12));
-            border: 1px solid rgba(29, 78, 61, 0.08);
-        }
-        
-        .shape-oval {
-            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-            background: linear-gradient(90deg, rgba(29, 78, 61, 0.28), rgba(29, 78, 61, 0.1));
-            border: 1px solid rgba(29, 78, 61, 0.06);
-        }
-        
-        /* Enhanced grid overlay */
-        .background-elements::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                linear-gradient(rgba(29, 78, 61, 0.08) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(29, 78, 61, 0.08) 1px, transparent 1px);
-            background-size: 60px 60px;
-            opacity: 0.6;
-            animation: gridMove 30s linear infinite;
-        }
-        
-        /* Animated dot pattern overlay */
-        .background-elements::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                radial-gradient(circle at center, rgba(29, 78, 61, 0.2) 2px, transparent 2px);
-            background-size: 100px 100px;
-            opacity: 0.3;
-            animation: dotPulse 15s ease-in-out infinite;
-        }
-
-        /* Individual floating shapes */
-        .shape-1 {
-            width: 120px;
-            height: 120px;
-            top: 10%;
-            left: 5%;
-            animation-delay: 0s;
-        }
-
-        .shape-2 {
-            width: 80px;
-            height: 80px;
-            top: 20%;
-            right: 15%;
-            animation-delay: -8s;
-        }
-
-        .shape-3 {
-            width: 150px;
-            height: 80px;
-            top: 60%;
-            left: 80%;
-            animation-delay: -15s;
-        }
-
-        .shape-4 {
-            width: 60px;
-            height: 60px;
-            top: 40%;
-            left: 20%;
-            animation-delay: -5s;
-        }
-
-        .shape-5 {
-            width: 100px;
-            height: 100px;
-            top: 75%;
-            right: 25%;
-            animation-delay: -12s;
-        }
-
-        .shape-6 {
-            width: 90px;
-            height: 90px;
-            top: 30%;
-            left: 60%;
-            animation-delay: -3s;
-        }
-
-        .shape-7 {
-            width: 70px;
+        .bubble:nth-child(1) {
+            width: 40px;
             height: 40px;
-            top: 80%;
-            left: 40%;
-            animation-delay: -10s;
-        }
-
-        /* Leaf Pattern Elements - Enhanced Visibility */
-        .leaf-pattern {
-            position: absolute;
-            opacity: 0.25;
-            animation: leafFloat 30s ease-in-out infinite;
-            filter: blur(0.1px);
-            drop-shadow: 0 2px 8px rgba(29, 78, 61, 0.2);
-        }
-
-        .leaf-svg {
-            width: 100%;
-            height: 100%;
-            fill: currentColor;
-        }
-
-        .leaf-1 {
-            width: 60px;
-            height: 80px;
-            color: rgba(29, 78, 61, 0.4);
-            top: 15%;
-            left: 25%;
+            left: 10%;
+            animation-duration: 20s;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.4), rgba(99, 102, 241, 0.1));
             animation-delay: 0s;
-            transform: rotate(25deg);
         }
-
-        .leaf-2 {
-            width: 45px;
+        
+        .bubble:nth-child(2) {
+            width: 60px;
             height: 60px;
-            color: rgba(29, 78, 61, 0.35);
-            top: 35%;
-            right: 30%;
-            animation-delay: -10s;
-            transform: rotate(-15deg);
+            left: 20%;
+            animation-duration: 25s;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.4), rgba(139, 92, 246, 0.1));
+            animation-delay: 2s;
         }
-
-        .leaf-3 {
-            width: 70px;
-            height: 90px;
-            color: rgba(29, 78, 61, 0.32);
-            top: 55%;
-            left: 15%;
-            animation-delay: -20s;
-            transform: rotate(45deg);
-        }
-
-        .leaf-4 {
-            width: 40px;
-            height: 55px;
-            color: rgba(29, 78, 61, 0.38);
-            top: 70%;
-            right: 15%;
-            animation-delay: -5s;
-            transform: rotate(-30deg);
-        }
-
-        .leaf-5 {
-            width: 55px;
-            height: 75px;
-            color: rgba(29, 78, 61, 0.3);
-            top: 25%;
-            left: 70%;
-            animation-delay: -15s;
-            transform: rotate(60deg);
-        }
-
-        .leaf-6 {
-            width: 35px;
-            height: 50px;
-            color: rgba(29, 78, 61, 0.36);
-            top: 45%;
-            right: 45%;
-            animation-delay: -8s;
-            transform: rotate(-45deg);
-        }
-
-        .leaf-7 {
-            width: 50px;
-            height: 70px;
-            color: rgba(29, 78, 61, 0.33);
-            top: 85%;
-            left: 60%;
-            animation-delay: -12s;
-            transform: rotate(15deg);
-        }
-
-        .leaf-8 {
-            width: 65px;
-            height: 85px;
-            color: rgba(29, 78, 61, 0.29);
-            top: 10%;
-            right: 20%;
-            animation-delay: -18s;
-            transform: rotate(-60deg);
-        }
-
-        /* Additional Leaf Patterns for More Coverage */
-        .leaf-9 {
+        
+        .bubble:nth-child(3) {
             width: 45px;
-            height: 65px;
-            color: rgba(29, 78, 61, 0.35);
-            top: 5%;
-            left: 45%;
-            animation-delay: -22s;
-            transform: rotate(35deg);
+            height: 45px;
+            left: 35%;
+            animation-duration: 18s;
+            background: radial-gradient(circle, rgba(236, 72, 153, 0.4), rgba(236, 72, 153, 0.1));
+            animation-delay: 4s;
         }
-
-        .leaf-10 {
+        
+        .bubble:nth-child(4) {
+            width: 50px;
+            height: 50px;
+            left: 50%;
+            animation-duration: 22s;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.4), rgba(6, 182, 212, 0.1));
+            animation-delay: 1s;
+        }
+        
+        .bubble:nth-child(5) {
+            width: 35px;
+            height: 35px;
+            left: 65%;
+            animation-duration: 19s;
+            background: radial-gradient(circle, rgba(5, 150, 105, 0.4), rgba(5, 150, 105, 0.1));
+            animation-delay: 3s;
+        }
+        
+        .bubble:nth-child(6) {
             width: 55px;
-            height: 70px;
-            color: rgba(29, 78, 61, 0.32);
-            top: 40%;
-            left: 85%;
-            animation-delay: -25s;
-            transform: rotate(-25deg);
+            height: 55px;
+            left: 75%;
+            animation-duration: 23s;
+            background: radial-gradient(circle, rgba(251, 146, 60, 0.4), rgba(251, 146, 60, 0.1));
+            animation-delay: 5s;
         }
-
-        .leaf-11 {
-            width: 38px;
-            height: 52px;
-            color: rgba(29, 78, 61, 0.38);
-            top: 65%;
-            left: 5%;
-            animation-delay: -28s;
-            transform: rotate(55deg);
-        }
-
-        .leaf-12 {
-            width: 62px;
-            height: 78px;
-            color: rgba(29, 78, 61, 0.3);
-            top: 20%;
-            left: 60%;
-            animation-delay: -30s;
-            transform: rotate(-40deg);
-        }
-
-        .leaf-13 {
+        
+        .bubble:nth-child(7) {
             width: 42px;
-            height: 58px;
-            color: rgba(29, 78, 61, 0.36);
-            top: 50%;
-            right: 10%;
-            animation-delay: -32s;
-            transform: rotate(20deg);
+            height: 42px;
+            left: 85%;
+            animation-duration: 21s;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.4), rgba(59, 130, 246, 0.1));
+            animation-delay: 1.5s;
         }
-
-        .leaf-14 {
-            width: 58px;
-            height: 75px;
-            color: rgba(29, 78, 61, 0.28);
-            top: 75%;
-            left: 35%;
-            animation-delay: -35s;
-            transform: rotate(-55deg);
-        }
-
-        .leaf-15 {
+        
+        .bubble:nth-child(8) {
             width: 48px;
-            height: 64px;
-            color: rgba(29, 78, 61, 0.33);
-            top: 90%;
-            right: 40%;
-            animation-delay: -38s;
-            transform: rotate(40deg);
-        }
-
-        .leaf-16 {
-            width: 52px;
-            height: 68px;
-            color: rgba(29, 78, 61, 0.32);
-            top: 30%;
-            left: 35%;
-            animation-delay: -40s;
-            transform: rotate(-20deg);
-        }
-
-        .leaf-17 {
-            width: 46px;
-            height: 62px;
-            color: rgba(29, 78, 61, 0.35);
-            top: 80%;
-            left: 80%;
-            animation-delay: -42s;
-            transform: rotate(65deg);
-        }
-
-        .leaf-18 {
-            width: 40px;
-            height: 56px;
-            color: rgba(29, 78, 61, 0.29);
-            top: 60%;
-            right: 25%;
-            animation-delay: -45s;
-            transform: rotate(-35deg);
-        }
-
-        @keyframes float {
-            0%, 100% { 
-                transform: translateY(0px) translateX(0px) rotate(0deg) scale(1);
-                opacity: 0.4;
-            }
-            25% { 
-                transform: translateY(-25px) translateX(15px) rotate(90deg) scale(1.1);
-                opacity: 0.6;
-            }
-            50% { 
-                transform: translateY(-15px) translateX(-10px) rotate(180deg) scale(0.9);
-                opacity: 0.3;
-            }
-            75% { 
-                transform: translateY(-35px) translateX(20px) rotate(270deg) scale(1.05);
-                opacity: 0.5;
-            }
-        }
-        
-        @keyframes gridMove {
-            0% { 
-                transform: translate(0, 0);
-                opacity: 0.6;
-            }
-            25% { 
-                transform: translate(20px, 20px);
-                opacity: 0.8;
-            }
-            50% { 
-                transform: translate(40px, 40px);
-                opacity: 0.4;
-            }
-            75% { 
-                transform: translate(60px, 60px);
-                opacity: 0.7;
-            }
-            100% { 
-                transform: translate(80px, 80px);
-                opacity: 0.6;
-            }
-        }
-
-        @keyframes leafFloat {
-            0%, 100% { 
-                transform: translateY(0px) translateX(0px) rotate(0deg) scale(1);
-                opacity: 0.25;
-            }
-            25% { 
-                transform: translateY(-20px) translateX(12px) rotate(8deg) scale(1.05);
-                opacity: 0.4;
-            }
-            50% { 
-                transform: translateY(-12px) translateX(-6px) rotate(-5deg) scale(0.95);
-                opacity: 0.15;
-            }
-            75% { 
-                transform: translateY(-28px) translateX(18px) rotate(12deg) scale(1.1);
-                opacity: 0.35;
-            }
-        }
-
-        @keyframes dotPulse {
-            0%, 100% { 
-                transform: scale(1);
-                opacity: 0.3;
-            }
-            50% { 
-                transform: scale(1.2);
-                opacity: 0.6;
-            }
-        }
-
-        /* Ensure content is above background */
-        .header, main {
-            position: relative;
-            z-index: 10;
-        }
-        
-        /* Responsive background adjustments */
-        @media (max-width: 768px) {
-            .background-elements::before {
-                background-size: 40px 40px;
-                opacity: 0.2;
-            }
-            
-            .floating-shape {
-                opacity: 0.08;
-            }
-            
-            .shape-1, .shape-5 { display: none; }
-            
-            .shape-2, .shape-4, .shape-6 {
-                width: 50px;
-                height: 50px;
-            }
-            
-            .shape-3, .shape-7 {
-                width: 80px;
-                height: 40px;
-            }
-            
-            .leaf-pattern {
-                opacity: 0.05;
-            }
-            
-            .leaf-1, .leaf-3, .leaf-5, .leaf-8, .leaf-9, .leaf-11, .leaf-13, .leaf-15, .leaf-17 { display: none; }
-            
-            .leaf-2, .leaf-4, .leaf-6, .leaf-7, .leaf-10, .leaf-12, .leaf-14, .leaf-16, .leaf-18 {
-                width: 28px;
-                height: 38px;
-            }
-        }
-        
-        @media (prefers-reduced-motion: reduce) {
-            .floating-shape, .background-elements::before, .background-elements::after, .leaf-pattern {
-                animation: none;
-            }
+            height: 48px;
+            left: 90%;
+            animation-duration: 24s;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.4), rgba(16, 185, 129, 0.1));
+            animation-delay: 3.5s;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 1rem;
+            position: relative;
+            z-index: 2;
         }
 
-        /* Dark Green Professional Header */
+        /* Header */
         .header {
             background: linear-gradient(135deg, var(--mireva-green-darkest) 0%, var(--mireva-green-darker) 100%);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             position: sticky;
             top: 0;
             z-index: 100;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden;
             box-shadow: 0 2px 8px rgba(6, 78, 59, 0.3);
         }
 
         .header-content {
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
             padding: 1rem 0;
-            position: relative;
             min-height: 80px;
         }
 
@@ -532,569 +185,1073 @@
             display: flex;
             align-items: center;
             gap: 1rem;
-            padding: 0.75rem 0;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
             text-decoration: none;
-            color: inherit;
-            cursor: pointer;
-        }
-
-        .logo-section::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: calc(100% + 2rem);
-            height: calc(100% + 1rem);
-            background: linear-gradient(135deg, 
-                rgba(255, 255, 255, 0.1) 0%, 
-                rgba(255, 255, 255, 0.05) 50%, 
-                rgba(255, 255, 255, 0.02) 100%
-            );
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            opacity: 0;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: -1;
-        }
-
-        .logo-section:hover::before {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1.02);
+            color: white;
         }
 
         .logo-container {
-            position: relative;
+            width: 54px;
+            height: 54px;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 54px;
-            height: 54px;
+            background: rgba(255, 255, 255, 0.15);
             border-radius: 14px;
-            background: linear-gradient(135deg, 
-                rgba(255, 255, 255, 0.2) 0%, 
-                rgba(255, 255, 255, 0.15) 50%, 
-                rgba(255, 255, 255, 0.1) 100%
-            );
-            box-shadow: 
-                0 4px 12px rgba(0, 0, 0, 0.1),
-                0 2px 4px rgba(0, 0, 0, 0.05),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
-        }
-
-        .logo-container::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            background: linear-gradient(135deg, 
-                rgba(255, 255, 255, 0.1) 0%, 
-                transparent 50%, 
-                rgba(0, 0, 0, 0.02) 100%
-            );
-            pointer-events: none;
-        }
-
-        .logo-container:hover {
-            transform: translateY(-1px);
-            box-shadow: 
-                0 8px 20px rgba(0, 0, 0, 0.15),
-                0 4px 8px rgba(0, 0, 0, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.4);
-            background: linear-gradient(135deg, 
-                rgba(255, 255, 255, 0.25) 0%, 
-                rgba(255, 255, 255, 0.2) 50%, 
-                rgba(255, 255, 255, 0.15) 100%
-            );
         }
 
         .logo {
             width: 32px;
             height: 32px;
-            object-fit: contain;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 1;
-        }
-
-        .logo-container:hover .logo {
-            transform: scale(1.05);
-        }
-
-        .brand-content {
-            display: flex;
-            flex-direction: column;
-            margin-left: 0.5rem;
         }
 
         .brand-text {
             font-weight: 700;
             font-size: 1.875rem;
-            color: var(--white);
-            letter-spacing: -0.025em;
-            line-height: 1.2;
-            margin-bottom: 0;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .logo-section:hover .brand-text {
-            color: var(--white);
-            transform: translateX(2px);
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            color: white;
         }
 
         .subtitle {
-            font-weight: 500;
             font-size: 0.8125rem;
             color: rgba(255, 255, 255, 0.9);
             letter-spacing: 0.075em;
             text-transform: uppercase;
-            margin-top: -2px;
-            opacity: 0.9;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            margin-top: -4px;
         }
 
-        .logo-section:hover .subtitle {
-            color: var(--white);
-            opacity: 1;
-            transform: translateX(2px);
-        }
-
-        /* Header bubbles removed for cleaner design */
-
-        /* Header decorations removed for cleaner design */
-
-        /* Hero Section */
-        .hero {
-            text-align: center;
-            padding: 3rem 0;
-        }
-
-        .hero h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 1rem;
-        }
-
-        .hero p {
-            font-size: 1.25rem;
-            color: var(--text-secondary);
-            margin-bottom: 2rem;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* Search Section */
-        .search-section {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: var(--border-radius);
-            padding: 2rem;
-            margin-bottom: 3rem;
-            box-shadow: 
-                0 8px 32px rgba(29, 78, 61, 0.08),
-                0 4px 16px rgba(0, 0, 0, 0.04),
-                inset 0 1px 0 rgba(255, 255, 255, 0.4);
-        }
-
-        .search-container {
-            position: relative;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 1rem 3rem 1rem 1rem;
-            font-size: 1.125rem;
-            border: 2px solid var(--border-color);
-            border-radius: var(--border-radius);
-            outline: none;
-            transition: all 0.3s ease;
-            background: var(--white);
-        }
-
-        .search-input:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgb(99 102 241 / 0.1);
-        }
-
-        .search-icon {
-            position: absolute;
-            right: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-light);
-            font-size: 1.25rem;
-        }
-
-        .search-filters {
+        /* Mode Toggle */
+        .mode-toggle {
             display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-            flex-wrap: wrap;
-            justify-content: center;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50px;
+            padding: 5px;
+            gap: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .mode-toggle::before {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            height: calc(100% - 10px);
+            width: calc(50% - 5px);
+            background: linear-gradient(135deg, var(--mireva-green-light) 0%, var(--mireva-green) 100%);
+            border-radius: 50px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1;
+        }
+        
+        .mode-toggle.ai-active::before {
+            transform: translateX(100%);
+            background: linear-gradient(135deg, var(--mireva-purple) 0%, var(--mireva-pink) 100%);
         }
 
-        .filter-tag {
-            padding: 0.5rem 1rem;
-            background: linear-gradient(135deg, var(--mireva-green-light), var(--mireva-green));
-            border: 1px solid var(--mireva-green);
-            border-radius: 25px;
-            font-size: 0.875rem;
-            color: var(--white);
+        .mode-btn {
+            padding: 12px 24px;
+            border: none;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.8);
+            border-radius: 50px;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-weight: 500;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-            box-shadow: 0 2px 4px rgba(6, 78, 59, 0.2);
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            z-index: 2;
+            font-size: 0.95rem;
         }
 
-        .filter-tag:hover, .filter-tag.active {
-            background: linear-gradient(135deg, var(--mireva-green-darker), var(--mireva-green-darkest));
-            color: var(--white);
-            border-color: var(--mireva-green-darkest);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(6, 78, 59, 0.3);
+        .mode-btn.active {
+            color: white;
             text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
         }
 
-        /* Stats */
-        .stats {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+        .mode-btn:hover:not(.active) {
+            color: white;
+        }
+        
+        .mode-btn i {
+            font-size: 0.9rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem 0;
+        }
+
+        /* Search Mode */
+        .search-mode {
+            display: block;
+        }
+
+        .search-section {
+            background: white;
             border-radius: var(--border-radius);
-            padding: 1.5rem;
+            padding: 2rem;
             margin-bottom: 2rem;
-            box-shadow: 
-                0 4px 20px rgba(29, 78, 61, 0.06),
-                0 2px 8px rgba(0, 0, 0, 0.03),
-                inset 0 1px 0 rgba(255, 255, 255, 0.5);
-            text-align: center;
+            box-shadow: var(--shadow-md);
         }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        .search-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .search-container {
+            display: flex;
             gap: 1rem;
+            margin-bottom: 1.5rem;
         }
 
-        .stat-item {
-            padding: 1rem;
+        .search-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
         }
 
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--primary-color);
+        .search-input:focus {
+            outline: none;
+            border-color: var(--mireva-green);
         }
 
-        .stat-label {
+        .search-btn {
+            padding: 0.75rem 2rem;
+            background: var(--mireva-green);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .search-btn:hover {
+            background: var(--mireva-green-dark);
+            transform: translateY(-1px);
+        }
+
+        /* Filter Tags */
+        .filter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .tag {
+            padding: 0.5rem 1rem;
+            background: var(--secondary-color);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
             font-size: 0.875rem;
-            color: var(--text-secondary);
-            margin-top: 0.25rem;
+            cursor: pointer;
+            transition: all 0.3s;
         }
 
-        /* Recipes Grid */
+        .tag:hover, .tag.active {
+            background: var(--mireva-green);
+            color: white;
+            border-color: var(--mireva-green);
+        }
+
+        /* AI Mode */
+        .ai-mode {
+            display: none;
+            padding-bottom: 100px; /* Extra space for dropdown overflow */
+        }
+
+        .ai-section {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 245, 255, 0.98) 100%);
+            border-radius: var(--border-radius);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            position: relative;
+            overflow: visible;
+            padding-bottom: 3rem;
+        }
+        
+        .ai-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--mireva-purple) 0%, var(--mireva-pink) 50%, var(--mireva-blue) 100%);
+        }
+
+        .ai-title {
+            font-size: 1.875rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--mireva-purple) 0%, var(--mireva-pink) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .ai-title i {
+            background: linear-gradient(135deg, var(--mireva-purple) 0%, var(--mireva-pink) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .ai-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .ingredients-input {
+            width: 100%;
+            min-height: 120px;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            resize: vertical;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .ingredients-input:focus {
+            outline: none;
+            border-color: var(--mireva-purple);
+        }
+
+        /* Ingredient Suggestions */
+        .ingredient-suggestions {
+            margin: 1.5rem 0 2rem 0;
+        }
+        
+        .suggestions-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #94a3b8;
+            margin-bottom: 0.75rem;
+        }
+        
+        .suggestion-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1.5px solid rgba(226, 232, 240, 0.8);
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .chip:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+            border-color: rgba(139, 92, 246, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
+        }
+        
+        .chip:active {
+            transform: translateY(0);
+        }
+        
+        .chip.selected {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(236, 72, 153, 0.15) 100%);
+            border-color: rgba(139, 92, 246, 0.5);
+            color: var(--mireva-purple);
+            font-weight: 600;
+        }
+        
+        .chip.selected::after {
+            content: ' ✓';
+            color: var(--mireva-purple);
+            font-weight: 700;
+        }
+
+        .ai-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+            margin: 2rem 0;
+            position: relative;
+            z-index: 10;
+        }
+
+        .ai-option {
+            background: transparent;
+            padding: 0;
+            position: relative;
+            overflow: visible;
+        }
+
+        .ai-option label {
+            font-weight: 500;
+            color: #94a3b8;
+            font-size: 0.625rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        /* Hide native select */
+        .ai-option select {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Custom Modern Dropdown */
+        .modern-dropdown {
+            position: relative;
+            width: 100%;
+        }
+
+        .dropdown-selected {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1.5px solid rgba(226, 232, 240, 0.8);
+            border-radius: 16px;
+            padding: 1rem 1.25rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #1e293b;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dropdown-selected::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, 
+                rgba(139, 92, 246, 0.03) 0%, 
+                rgba(236, 72, 153, 0.03) 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .dropdown-selected:hover {
+            border-color: rgba(139, 92, 246, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.15),
+                        0 8px 10px -6px rgba(139, 92, 246, 0.1);
+        }
+
+        .dropdown-selected:hover::before {
+            opacity: 1;
+        }
+
+        .dropdown-selected.active {
+            border-color: rgba(139, 92, 246, 0.5);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.08),
+                        0 10px 25px -5px rgba(139, 92, 246, 0.15);
+        }
+
+        .dropdown-arrow {
+            width: 20px;
+            height: 20px;
+            position: relative;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .dropdown-arrow::before,
+        .dropdown-arrow::after {
+            content: '';
+            position: absolute;
+            background: #94a3b8;
+            transition: all 0.3s;
+        }
+
+        .dropdown-arrow::before {
+            width: 10px;
+            height: 2px;
+            top: 9px;
+            right: 0;
+            transform: rotate(45deg);
+            transform-origin: right center;
+        }
+
+        .dropdown-arrow::after {
+            width: 10px;
+            height: 2px;
+            top: 9px;
+            left: 0;
+            transform: rotate(-45deg);
+            transform-origin: left center;
+        }
+
+        .dropdown-selected:hover .dropdown-arrow::before,
+        .dropdown-selected:hover .dropdown-arrow::after {
+            background: var(--mireva-purple);
+        }
+
+        .dropdown-selected.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        /* Dropdown Options Container */
+        .dropdown-options {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(226, 232, 240, 0.5);
+            border-radius: 16px;
+            padding: 0.5rem;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px) scale(0.95);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            max-height: 280px;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+                        0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* For last row items - make dropdown open upward */
+        .ai-option:nth-child(5) .dropdown-options {
+            top: auto;
+            bottom: calc(100% + 8px);
+            transform: translateY(10px) scale(0.95);
+        }
+        
+        .ai-option:nth-child(5) .dropdown-options.active {
+            transform: translateY(0) scale(1);
+        }
+
+        .dropdown-options.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .dropdown-option {
+            padding: 0.875rem 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.925rem;
+            color: #475569;
+            position: relative;
+            margin-bottom: 0.25rem;
+        }
+
+        .dropdown-option:last-child {
+            margin-bottom: 0;
+        }
+
+        .dropdown-option:hover {
+            background: linear-gradient(135deg, 
+                rgba(139, 92, 246, 0.08) 0%, 
+                rgba(236, 72, 153, 0.08) 100%);
+            color: var(--mireva-purple);
+            padding-left: 1.25rem;
+        }
+
+        .dropdown-option.selected {
+            background: linear-gradient(135deg, 
+                rgba(139, 92, 246, 0.12) 0%, 
+                rgba(236, 72, 153, 0.12) 100%);
+            color: var(--mireva-purple);
+            font-weight: 600;
+            padding-left: 2.5rem;
+        }
+
+        .dropdown-option.selected::before {
+            content: '✓';
+            position: absolute;
+            left: 1rem;
+            font-weight: 700;
+            color: var(--mireva-purple);
+        }
+
+        /* Scrollbar Styling */
+        .dropdown-options::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .dropdown-options::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.02);
+            border-radius: 2px;
+        }
+
+        .dropdown-options::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, 
+                rgba(139, 92, 246, 0.3) 0%, 
+                rgba(236, 72, 153, 0.3) 100%);
+            border-radius: 2px;
+        }
+
+        .dropdown-options::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, 
+                rgba(139, 92, 246, 0.5) 0%, 
+                rgba(236, 72, 153, 0.5) 100%);
+        }
+
+        .generate-btn {
+            padding: 1rem 2.5rem;
+            background: linear-gradient(135deg, var(--mireva-purple) 0%, var(--mireva-pink) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+            background: linear-gradient(135deg, var(--mireva-pink) 0%, var(--mireva-purple) 100%);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--mireva-purple);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Recipe Cards */
         .recipes-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 1.5rem;
-            margin-bottom: 3rem;
+            margin-top: 2rem;
         }
 
         .recipe-card {
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: white;
             border-radius: var(--border-radius);
             overflow: hidden;
-            box-shadow: 
-                0 4px 16px rgba(29, 78, 61, 0.05),
-                0 2px 8px rgba(0, 0, 0, 0.03),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s;
+            cursor: pointer;
         }
 
         .recipe-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 
-                0 12px 40px rgba(29, 78, 61, 0.12),
-                0 6px 20px rgba(0, 0, 0, 0.08),
-                inset 0 1px 0 rgba(255, 255, 255, 0.4);
-            border-color: rgba(29, 78, 61, 0.1);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
         }
 
-        .recipe-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .recipe-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-            line-height: 1.4;
-        }
-
-        .recipe-meta {
-            display: flex;
-            gap: 1rem;
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            margin-bottom: 1rem;
-        }
-
-        .meta-item {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
 
         .recipe-content {
             padding: 1.5rem;
         }
 
-        .ingredients-section {
-            margin-bottom: 1.5rem;
-        }
-
-        .section-title {
-            font-size: 0.875rem;
+        .recipe-title {
+            font-size: 1.125rem;
             font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .ingredients-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        .ingredient-tag {
-            background: var(--secondary-color);
-            color: var(--text-primary);
-            padding: 0.25rem 0.75rem;
-            border-radius: 50px;
-            font-size: 0.75rem;
-            border: 1px solid var(--border-color);
-        }
-
-        .steps-section {
-            margin-bottom: 1rem;
-        }
-
-        .step-item {
-            background: var(--secondary-color);
-            padding: 0.75rem;
-            border-radius: 8px;
             margin-bottom: 0.5rem;
-            font-size: 0.875rem;
-            line-height: 1.5;
-            border-left: 3px solid var(--primary-color);
+            color: var(--text-primary);
+            line-height: 1.3;
         }
-        
-        .steps-expand-toggle {
+
+        .recipe-meta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .recipe-meta span {
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            padding: 0.75rem;
-            margin: 0.5rem 0;
-            background: linear-gradient(135deg, rgba(29, 78, 61, 0.05) 0%, rgba(29, 78, 61, 0.08) 100%);
-            border: 1px solid rgba(29, 78, 61, 0.15);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            font-size: 0.875rem;
-            color: var(--primary-color);
-            font-weight: 500;
-            user-select: none;
-            -webkit-user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        .steps-expand-toggle:hover {
-            background: linear-gradient(135deg, rgba(29, 78, 61, 0.08) 0%, rgba(29, 78, 61, 0.12) 100%);
-            border-color: rgba(29, 78, 61, 0.25);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(29, 78, 61, 0.15);
-        }
-        
-        .expand-icon {
-            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            font-size: 0.75rem;
-        }
-        
-        .steps-expand-toggle.expanded .expand-icon {
-            transform: rotate(180deg);
-        }
-        
-        .steps-expand-toggle.expanded .expand-text::before {
-            content: "Hide ";
-        }
-        
-        .steps-expand-toggle.expanded .expand-text {
-            opacity: 0.8;
-        }
-        
-        .steps-full {
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            max-height: 0;
-            opacity: 0;
-        }
-        
-        .steps-full.expanded {
-            max-height: 1000px;
-            opacity: 1;
-            margin-top: 0.5rem;
-        }
-        
-        .steps-full .step-item {
-            animation: slideInUp 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        
-        .steps-full.expanded .step-item {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
-        .steps-full.expanded .step-item:nth-child(1) { animation-delay: 0.1s; }
-        .steps-full.expanded .step-item:nth-child(2) { animation-delay: 0.15s; }
-        .steps-full.expanded .step-item:nth-child(3) { animation-delay: 0.2s; }
-        .steps-full.expanded .step-item:nth-child(4) { animation-delay: 0.25s; }
-        .steps-full.expanded .step-item:nth-child(5) { animation-delay: 0.3s; }
-        
-        @keyframes slideInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            gap: 0.25rem;
         }
 
         .recipe-tags {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.25rem;
+            gap: 0.5rem;
         }
 
         .recipe-tag {
-            background: rgba(99, 102, 241, 0.1);
-            color: var(--primary-color);
             padding: 0.25rem 0.5rem;
+            background: var(--secondary-color);
             border-radius: 4px;
             font-size: 0.75rem;
-            font-weight: 500;
-        }
-
-        /* Loading States */
-        .loading {
-            text-align: center;
-            padding: 3rem;
             color: var(--text-secondary);
         }
 
-        .loading-spinner {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--border-color);
+        .ai-generated-badge {
+            background: linear-gradient(135deg, var(--mireva-purple), var(--mireva-blue));
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        /* Recipe Modal */
+        .recipe-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 200;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .recipe-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--border-radius);
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            padding: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .close-modal {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: var(--secondary-color);
             border-radius: 50%;
-            border-top-color: var(--primary-color);
-            animation: spin 1s ease-in-out infinite;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .close-modal:hover {
+            background: var(--border-color);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .ingredients-list, .steps-list {
+            margin: 1.5rem 0;
+        }
+
+        .ingredients-list h3, .steps-list h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .ingredients-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .ingredients-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ingredients-list li:before {
+            content: "✓";
+            color: var(--mireva-green);
+            font-weight: bold;
+        }
+
+        .steps-list ol {
+            padding-left: 1.5rem;
+        }
+
+        .steps-list li {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        /* API Key Modal */
+        .api-key-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 300;
+            padding: 2rem;
+        }
+
+        .api-key-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .api-key-content {
+            background: white;
+            border-radius: var(--border-radius);
+            max-width: 500px;
+            width: 100%;
+            padding: 2rem;
+        }
+
+        .api-key-title {
+            font-size: 1.5rem;
+            font-weight: 600;
             margin-bottom: 1rem;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .api-key-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            margin: 1rem 0;
         }
 
-        .error-state {
-            text-align: center;
-            padding: 3rem;
-            color: #ef4444;
+        .api-key-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
+        .api-key-save, .api-key-cancel {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .api-key-save {
+            background: var(--mireva-green);
+            color: white;
+        }
+
+        .api-key-save:hover {
+            background: var(--mireva-green-dark);
+        }
+
+        .api-key-cancel {
+            background: var(--secondary-color);
+            color: var(--text-primary);
+        }
+
+        .api-key-cancel:hover {
+            background: var(--border-color);
+        }
+
+        .api-key-info {
+            background: var(--secondary-color);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
             color: var(--text-secondary);
         }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .header-content {
-                padding: 0.75rem 0;
-                min-height: 70px;
+        /* Custom Dropdown Styles */
+        .custom-dropdown {
+            position: relative;
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+        
+        .dropdown-trigger {
+            padding: 1rem 1.25rem;
+            border: 2px solid transparent;
+            background: linear-gradient(white, white) padding-box,
+                       linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(236, 72, 153, 0.3)) border-box;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            outline: none;
+            text-align: left;
+            font-family: inherit;
+        }
+        
+        .dropdown-trigger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(139, 92, 246, 0.15);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(246, 239, 255, 1) 100%) padding-box,
+                       linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(236, 72, 153, 0.4)) border-box;
+        }
+        
+        .dropdown-trigger.active {
+            border-color: var(--mireva-purple);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.2);
+            background: white;
+        }
+        
+        .dropdown-arrow {
+            width: 20px;
+            height: 20px;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(135deg, var(--mireva-purple), var(--mireva-pink));
+            -webkit-mask-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            mask-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            -webkit-mask-size: contain;
+            mask-size: contain;
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+        }
+        
+        .dropdown-trigger.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 10px 40px rgba(139, 92, 246, 0.15);
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px) scale(0.95);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+        
+        .dropdown-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+        
+        /* Tree Leaf Animation */
+        @keyframes leafGrow {
+            0% {
+                transform: translateX(-10px) scale(0.8);
+                opacity: 0;
             }
-            
-            .logo-container {
-                width: 48px;
-                height: 48px;
-                border-radius: 12px;
+            50% {
+                transform: translateX(5px) scale(1.05);
             }
-            
-            .logo {
-                width: 28px;
-                height: 28px;
-            }
-            
-            .brand-text {
-                font-size: 1.625rem;
-            }
-            
-            .subtitle {
-                font-size: 0.75rem;
-                letter-spacing: 0.05em;
-            }
-            
-            .header-decoration {
-                display: none;
-            }
-            
-            .hero h1 {
-                font-size: 2rem;
-            }
-            
-            .hero p {
-                font-size: 1rem;
-            }
-            
-            .recipes-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-            
-            .search-section {
-                padding: 1rem;
-                margin: 1rem 0;
+            100% {
+                transform: translateX(0) scale(1);
+                opacity: 1;
             }
         }
+        
+        .dropdown-option {
+            padding: 0.875rem 1.25rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            position: relative;
+            animation: leafGrow 0.3s ease-out backwards;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.05);
+        }
+        
+        .dropdown-option:last-child {
+            border-bottom: none;
+        }
+        
+        .dropdown-menu.active .dropdown-option:nth-child(1) { animation-delay: 0.05s; }
+        .dropdown-menu.active .dropdown-option:nth-child(2) { animation-delay: 0.1s; }
+        .dropdown-menu.active .dropdown-option:nth-child(3) { animation-delay: 0.15s; }
+        .dropdown-menu.active .dropdown-option:nth-child(4) { animation-delay: 0.2s; }
+        .dropdown-menu.active .dropdown-option:nth-child(5) { animation-delay: 0.25s; }
+        .dropdown-menu.active .dropdown-option:nth-child(6) { animation-delay: 0.3s; }
+        .dropdown-menu.active .dropdown-option:nth-child(7) { animation-delay: 0.35s; }
+        .dropdown-menu.active .dropdown-option:nth-child(8) { animation-delay: 0.4s; }
+        .dropdown-menu.active .dropdown-option:nth-child(9) { animation-delay: 0.45s; }
+        .dropdown-menu.active .dropdown-option:nth-child(10) { animation-delay: 0.5s; }
+        
+        .dropdown-option::before {
+            content: '🍃';
+            position: absolute;
+            left: -20px;
+            opacity: 0;
+            transition: all 0.3s;
+            transform: scale(0) rotate(-45deg);
+        }
+        
+        .dropdown-option:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+            padding-left: 2rem;
+            color: var(--mireva-purple);
+        }
+        
+        .dropdown-option:hover::before {
+            opacity: 0.5;
+            left: 8px;
+            transform: scale(1) rotate(0deg);
+        }
+        
+        .dropdown-option.selected {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(236, 72, 153, 0.15) 100%);
+            color: var(--mireva-purple);
+            font-weight: 600;
+        }
+        
+        .dropdown-option.selected::after {
+            content: '✓';
+            margin-left: auto;
+            color: var(--mireva-purple);
+            font-weight: 700;
+        }
+        
+        /* Scrollbar Styling */
+        .dropdown-menu::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .dropdown-menu::-webkit-scrollbar-track {
+            background: rgba(139, 92, 246, 0.05);
+        }
+        
+        .dropdown-menu::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--mireva-purple), var(--mireva-pink));
+            border-radius: 3px;
+        }
 
-        @media (max-width: 480px) {
+        /* Responsive - Mobile Optimizations */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 0.75rem;
+            }
+            
+            .header {
+                position: sticky;
+                top: 0;
+                z-index: 200;
+            }
+            
             .header-content {
-                padding: 0.5rem 0;
-                min-height: 65px;
+                flex-direction: row;
+                justify-content: space-between;
+                padding: 0.75rem 0;
+                min-height: 60px;
             }
             
             .logo-section {
-                gap: 0.75rem;
+                gap: 0.5rem;
             }
             
             .logo-container {
@@ -1113,594 +1270,1542 @@
             
             .subtitle {
                 font-size: 0.7rem;
+                display: none;
+            }
+            
+            .mode-toggle {
+                padding: 4px;
+                gap: 0;
+            }
+            
+            .mode-btn {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .mode-btn i {
+                font-size: 0.8rem;
+            }
+
+            .search-container {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            .search-section {
+                padding: 1.25rem;
+                margin-bottom: 1rem;
+            }
+            
+            .search-title {
+                font-size: 1.25rem;
+            }
+
+            .recipes-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                padding: 0;
+            }
+            
+            /* Mobile Recipe Cards */
+            .recipe-card {
+                border-radius: 16px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                transition: transform 0.2s;
+                -webkit-tap-highlight-color: transparent;
+            }
+            
+            .recipe-card:active {
+                transform: scale(0.98);
+            }
+            
+            .recipe-content {
+                padding: 1.25rem;
+            }
+            
+            .recipe-title {
+                font-size: 1.05rem;
+                line-height: 1.4;
+                margin-bottom: 0.75rem;
+            }
+            
+            .recipe-meta {
+                font-size: 0.8rem;
+                gap: 0.75rem;
+            }
+            
+            .recipe-tags {
+                margin-top: 0.75rem;
+            }
+            
+            .recipe-tag {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.7rem;
+                border-radius: 6px;
+            }
+            
+            /* AI Mode Mobile */
+            .ai-section {
+                padding: 1.5rem;
+                margin-bottom: 1rem;
+                border-radius: 16px;
+            }
+            
+            .ai-title {
+                font-size: 1.5rem;
+                gap: 0.5rem;
+            }
+            
+            .ai-subtitle {
+                font-size: 0.875rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .ingredients-input {
+                min-height: 100px;
+                font-size: 0.95rem;
+                padding: 0.875rem;
+                border-radius: 12px;
+                -webkit-appearance: none;
+            }
+            
+            /* Mobile Ingredient Suggestions */
+            .ingredient-suggestions {
+                margin: 1rem 0 1.5rem 0;
+            }
+            
+            .suggestions-label {
+                font-size: 0.65rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .suggestion-chips {
+                gap: 0.4rem;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                padding-bottom: 0.5rem;
+            }
+            
+            .suggestion-chips::-webkit-scrollbar {
+                display: none;
+            }
+            
+            .chip {
+                padding: 0.45rem 0.75rem;
+                font-size: 0.8rem;
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+
+            .ai-options {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                margin: 1.5rem 0;
+            }
+            
+            .ai-option {
+                margin-bottom: 0;
+            }
+            
+            .ai-option label {
+                font-size: 0.65rem;
+                letter-spacing: 1.2px;
+                margin-bottom: 0.5rem;
+            }
+            
+            /* Mobile Dropdown Styles */
+            .dropdown-selected {
+                padding: 1rem 1rem;
+                font-size: 0.95rem;
+                border-radius: 12px;
+                -webkit-tap-highlight-color: transparent;
+                min-height: 48px; /* Better touch target */
+            }
+            
+            .dropdown-arrow {
+                width: 16px;
+                height: 16px;
+            }
+            
+            .dropdown-arrow::before,
+            .dropdown-arrow::after {
+                width: 8px;
+            }
+            
+            .dropdown-options {
+                max-height: 50vh; /* Half viewport height on mobile */
+                border-radius: 12px;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            }
+            
+            .dropdown-option {
+                padding: 1rem 1.25rem;
+                font-size: 0.95rem;
+                min-height: 44px; /* iOS touch target */
+                display: flex;
+                align-items: center;
+            }
+            
+            /* Don't open upward on mobile */
+            .ai-option:nth-child(5) .dropdown-options {
+                top: calc(100% + 8px);
+                bottom: auto;
+                transform: translateY(-10px) scale(0.95);
+            }
+            
+            .generate-btn {
+                width: 100%;
+                padding: 1rem 2rem;
+                font-size: 1rem;
+                border-radius: 12px;
+                margin-top: 1.5rem;
+            }
+            
+            /* Filter tags mobile */
+            .filter-tags {
+                gap: 0.4rem;
+                margin-bottom: 1.5rem;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                padding-bottom: 0.5rem;
+            }
+            
+            .filter-tags::-webkit-scrollbar {
+                display: none;
+            }
+            
+            .tag {
+                padding: 0.5rem 0.875rem;
+                font-size: 0.8rem;
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+            
+            /* Modal Mobile */
+            .recipe-modal {
+                padding: 1rem;
+            }
+            
+            .modal-content {
+                max-height: 95vh;
+                border-radius: 20px 20px 0 0;
+                margin-top: auto;
+            }
+            
+            .modal-header {
+                padding: 1.25rem;
+                position: sticky;
+                top: 0;
+                background: white;
+                z-index: 10;
+                border-radius: 20px 20px 0 0;
+            }
+            
+            .modal-title {
+                font-size: 1.25rem;
+                padding-right: 2rem;
+            }
+            
+            .close-modal {
+                position: absolute;
+                right: 1rem;
+                top: 1rem;
+            }
+            
+            .modal-body {
+                padding: 0 1.25rem 2rem;
+            }
+            
+            .ingredients-list h3, .steps-list h3 {
+                font-size: 1.1rem;
+                margin-bottom: 0.75rem;
+            }
+            
+            .ingredients-list li {
+                font-size: 0.9rem;
+                padding: 0.75rem 0;
+            }
+            
+            .steps-list li {
+                font-size: 0.9rem;
+                margin-bottom: 1rem;
+                line-height: 1.5;
+            }
+            
+            /* API Key Modal Mobile */
+            .api-key-content {
+                margin: 1rem;
+                padding: 1.5rem;
+                border-radius: 16px;
+            }
+            
+            .api-key-title {
+                font-size: 1.25rem;
+            }
+            
+            .api-key-info {
+                font-size: 0.8rem;
+                padding: 0.875rem;
+            }
+            
+            .api-key-input {
+                font-size: 0.9rem;
+                padding: 0.875rem;
+            }
+            
+            .api-key-actions {
+                flex-direction: column-reverse;
+                gap: 0.75rem;
+            }
+            
+            .api-key-save, .api-key-cancel {
+                width: 100%;
+                padding: 0.875rem;
+            }
+            
+            /* Loading state */
+            .loading {
+                padding: 3rem 1rem;
+            }
+            
+            .spinner {
+                width: 36px;
+                height: 36px;
+            }
+            
+            /* Empty state */
+            .empty-state {
+                padding: 3rem 1rem;
+            }
+            
+            .empty-state i {
+                font-size: 3rem;
+            }
+            
+            .empty-state h3 {
+                font-size: 1.25rem;
             }
         }
-
-        /* Fade in animation */
-        .fade-in {
-            animation: fadeIn 0.5s ease-in;
+        
+        /* iOS Specific Fixes */
+        @supports (-webkit-touch-callout: none) {
+            /* iOS only styles */
+            .dropdown-selected {
+                -webkit-user-select: none;
+            }
+            
+            .dropdown-options {
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .mode-toggle {
+                -webkit-backdrop-filter: blur(10px);
+            }
+            
+            input, textarea, select {
+                font-size: 16px; /* Prevent zoom on focus */
+            }
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        
+        /* iPhone X and newer - Safe areas */
+        @supports (padding: max(0px)) {
+            .header {
+                padding-top: max(0rem, env(safe-area-inset-top));
+            }
+            
+            .main-content {
+                padding-bottom: max(2rem, env(safe-area-inset-bottom));
+            }
+        }
+        
+        /* Small phones */
+        @media (max-width: 375px) {
+            .brand-text {
+                font-size: 1.25rem;
+            }
+            
+            .mode-btn {
+                padding: 8px 10px;
+                font-size: 0.8rem;
+            }
+            
+            .mode-btn span {
+                display: none;
+            }
+            
+            .search-title {
+                font-size: 1.1rem;
+            }
+            
+            .ai-title {
+                font-size: 1.25rem;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Enhanced Background Elements -->
-    <div class="background-elements">
-        <!-- Floating geometric shapes -->
-        <div class="floating-shape shape-circle shape-1"></div>
-        <div class="floating-shape shape-diamond shape-2"></div>
-        <div class="floating-shape shape-oval shape-3"></div>
-        <div class="floating-shape shape-circle shape-4"></div>
-        <div class="floating-shape shape-diamond shape-5"></div>
-        <div class="floating-shape shape-oval shape-6"></div>
-        <div class="floating-shape shape-circle shape-7"></div>
-        
-        <!-- Leaf patterns -->
-        <div class="leaf-pattern leaf-1">
-            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50,5 Q20,20 15,50 Q20,80 35,95 Q50,110 65,95 Q80,80 85,50 Q80,20 50,5 Z M50,15 Q40,25 35,40 Q40,55 50,65 Q60,55 65,40 Q60,25 50,15 Z"/>
-                <path d="M50,10 L55,45 M45,25 Q50,30 55,25 M45,45 Q50,50 55,45 M45,65 Q50,70 55,65"/>
-            </svg>
-        </div>
-        
-        <div class="leaf-pattern leaf-2">
-            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50,8 Q25,18 18,45 Q22,75 40,92 Q50,105 60,92 Q78,75 82,45 Q75,18 50,8 Z M50,18 Q35,28 30,45 Q35,62 50,75 Q65,62 70,45 Q65,28 50,18 Z"/>
-                <path d="M50,12 L52,50 M42,30 Q47,35 52,30 M42,50 Q47,55 52,50"/>
-            </svg>
-        </div>
-        
-        <div class="leaf-pattern leaf-3">
-            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50,3 Q18,15 12,48 Q18,78 38,98 Q50,115 62,98 Q82,78 88,48 Q82,15 50,3 Z M50,13 Q30,25 25,48 Q30,71 50,88 Q70,71 75,48 Q70,25 50,13 Z"/>
-                <path d="M50,8 L54,55 M40,25 Q45,30 50,25 M58,35 Q53,40 48,35 M40,55 Q45,60 50,55"/>
-            </svg>
-        </div>
-        
-        <div class="leaf-pattern leaf-4">
-            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50,10 Q30,22 25,45 Q28,68 42,85 Q50,95 58,85 Q72,68 75,45 Q70,22 50,10 Z M50,20 Q38,32 35,45 Q38,58 50,70 Q62,58 65,45 Q62,32 50,20 Z"/>
-                <path d="M50,15 L51,60 M43,35 Q48,40 53,35"/>
-            </svg>
-        </div>
-        
-        <div class="leaf-pattern leaf-5">
-            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50,6 Q22,16 16,46 Q20,76 36,94 Q50,108 64,94 Q80,76 84,46 Q78,16 50,6 Z M50,16 Q32,26 28,46 Q32,66 50,82 Q68,66 72,46 Q68,26 50,16 Z"/>
-                <path d="M50,11 L53,52 M41,28 Q46,33 51,28 M44,48 Q49,53 54,48 M41,68 Q46,73 51,68"/>
-            </svg>
-        </div>
-        
-        <div class="leaf-pattern leaf-6">
-            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50,12 Q32,20 28,42 Q30,64 44,78 Q50,88 56,78 Q70,64 72,42 Q68,20 50,12 Z M50,22 Q40,30 38,42 Q40,54 50,65 Q60,54 62,42 Q60,30 50,22 Z"/>
-                <path d="M50,17 L51,55 M45,32 Q50,37 55,32"/>
-            </svg>
-        </div>
-        
-        <div class="leaf-pattern leaf-7">
-            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50,9 Q26,19 20,47 Q24,75 40,91 Q50,102 60,91 Q76,75 80,47 Q74,19 50,9 Z M50,19 Q34,29 30,47 Q34,65 50,78 Q66,65 70,47 Q66,29 50,19 Z"/>
-                <path d="M50,14 L52,53 M42,32 Q47,37 52,32 M45,52 Q50,57 55,52"/>
-            </svg>
-        </div>
-        
-        <div class="leaf-pattern leaf-8">
-            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50,4 Q20,14 14,44 Q18,74 34,94 Q50,110 66,94 Q82,74 86,44 Q80,14 50,4 Z M50,14 Q28,24 24,44 Q28,64 50,84 Q72,64 76,44 Q72,24 50,14 Z"/>
-                <path d="M50,9 L54,58 M38,26 Q43,31 48,26 M55,38 Q50,43 45,38 M38,58 Q43,63 48,58 M58,58 Q53,63 48,58"/>
-            </svg>
-        </div>
-        
-        <!-- Additional Leaf Patterns with Diverse Designs -->
-        <div class="leaf-pattern leaf-9">
-            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50,7 Q28,17 22,42 Q26,67 42,87 Q50,98 58,87 Q74,67 78,42 Q72,17 50,7 Z M50,17 Q36,27 32,42 Q36,57 50,72 Q64,57 68,42 Q64,27 50,17 Z"/>
-                <path d="M50,12 L52,55 M43,28 Q48,33 53,28 M46,48 Q51,53 56,48"/>
-            </svg>
-        </div>
-        
-        <div class="leaf-pattern leaf-10">
-            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50,5 Q24,15 18,45 Q22,75 38,95 Q50,108 62,95 Q78,75 82,45 Q76,15 50,5 Z M50,15 Q32,25 28,45 Q32,65 50,85 Q68,65 72,45 Q68,25 50,15 Z"/>
-                <path d="M50,10 L53,58 M40,30 Q45,35 50,30 M42,55 Q47,60 52,55 M58,35 Q53,40 48,35"/>
-            </svg>
-        </div>
-        
-        <div class="leaf-pattern leaf-11">
-            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50,8 Q30,18 26,40 Q28,62 44,78 Q50,86 56,78 Q72,62 74,40 Q70,18 50,8 Z M50,18 Q38,28 36,40 Q38,52 50,64 Q62,52 64,40 Q62,28 50,18 Z"/>
-                <path d="M50,13 L51,50 M44,25 Q49,30 54,25 M45,45 Q50,50 55,45"/>
-            </svg>
-        </div>
-        
-        <div class="leaf-pattern leaf-12">
-            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50,6 Q22,16 16,46 Q20,76 36,96 Q50,110 64,96 Q80,76 84,46 Q78,16 50,6 Z M50,16 Q30,26 26,46 Q30,66 50,86 Q70,66 74,46 Q70,26 50,16 Z"/>
-                <path d="M50,11 L54,62 M38,28 Q43,33 48,28 M56,40 Q51,45 46,40 M38,60 Q43,65 48,60"/>
-            </svg>
-        </div>
-        
-        <div class="leaf-pattern leaf-13">
-            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50,9 Q32,19 28,41 Q30,63 46,79 Q50,87 54,79 Q70,63 72,41 Q68,19 50,9 Z M50,19 Q40,29 38,41 Q40,53 50,65 Q60,53 62,41 Q60,29 50,19 Z"/>
-                <path d="M50,14 L51,55 M45,32 Q50,37 55,32"/>
-            </svg>
-        </div>
-        
-        <div class="leaf-pattern leaf-14">
-            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50,4 Q26,14 20,44 Q24,74 40,94 Q50,106 60,94 Q76,74 80,44 Q74,14 50,4 Z M50,14 Q34,24 30,44 Q34,64 50,84 Q66,64 70,44 Q66,24 50,14 Z"/>
-                <path d="M50,9 L53,60 M41,26 Q46,31 51,26 M43,46 Q48,51 53,46 M41,66 Q46,71 51,66"/>
-            </svg>
-        </div>
-        
-        <div class="leaf-pattern leaf-15">
-            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50,7 Q34,17 30,39 Q32,61 48,77 Q50,85 52,77 Q68,61 70,39 Q66,17 50,7 Z M50,17 Q42,27 40,39 Q42,51 50,63 Q58,51 60,39 Q58,27 50,17 Z"/>
-                <path d="M50,12 L51,52 M46,30 Q51,35 56,30 M47,50 Q52,55 57,50"/>
-            </svg>
-        </div>
-        
-        <div class="leaf-pattern leaf-16">
-            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50,6 Q28,16 24,43 Q26,70 42,90 Q50,100 58,90 Q74,70 76,43 Q72,16 50,6 Z M50,16 Q36,26 34,43 Q36,60 50,80 Q64,60 66,43 Q64,26 50,16 Z"/>
-                <path d="M50,11 L52,56 M42,29 Q47,34 52,29 M44,49 Q49,54 54,49"/>
-            </svg>
-        </div>
-        
-        <div class="leaf-pattern leaf-17">
-            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50,8 Q30,18 26,42 Q28,66 44,82 Q50,90 56,82 Q72,66 74,42 Q70,18 50,8 Z M50,18 Q38,28 36,42 Q38,56 50,70 Q62,56 64,42 Q62,28 50,18 Z"/>
-                <path d="M50,13 L51,53 M44,31 Q49,36 54,31 M45,51 Q50,56 55,51"/>
-            </svg>
-        </div>
-        
-        <div class="leaf-pattern leaf-18">
-            <svg class="leaf-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50,10 Q36,20 32,40 Q34,60 48,76 Q50,84 52,76 Q66,60 68,40 Q64,20 50,10 Z M50,20 Q44,30 42,40 Q44,50 50,62 Q56,50 58,40 Q56,30 50,20 Z"/>
-                <path d="M50,15 L51,48 M47,28 Q52,33 57,28 M48,48 Q53,53 58,48"/>
-            </svg>
-        </div>
-    </div>
-
+    <!-- Animated Background Bubbles -->
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <!-- Header -->
     <header class="header">
         <div class="container">
             <div class="header-content">
                 <a href="/" class="logo-section">
                     <div class="logo-container">
-                        <img src="mireva-logo.png" alt="Mireva Logo" class="logo">
+                        <img src="/mireva-logo.png" alt="Mireva" class="logo">
                     </div>
-                    <div class="brand-content">
+                    <div>
                         <div class="brand-text">Mireva</div>
-                        <div class="subtitle">Recipe Collection</div>
+                        <div class="subtitle">Smart Recipes</div>
                     </div>
                 </a>
+                
+                <div class="mode-toggle">
+                    <button class="mode-btn active" data-mode="search">
+                        <i class="fas fa-search"></i> <span>Search</span>
+                    </button>
+                    <button class="mode-btn" data-mode="ai">
+                        <i class="fas fa-sparkles"></i> <span>AI Create</span>
+                    </button>
+                </div>
             </div>
         </div>
     </header>
 
-    <main class="container">
-        <section class="hero">
-            <h1>Discover Amazing Recipes</h1>
-            <p>Explore thousands of carefully curated recipes from renowned culinary sources. Find your next favorite dish with our intelligent search and filtering system.</p>
-        </section>
+    <!-- Main Content -->
+    <main class="main-content container">
+        <!-- Search Mode -->
+        <div class="search-mode mode-content">
+            <div class="search-section">
+                <h2 class="search-title">Browse Our Recipe Collection</h2>
+                <p style="color: var(--text-secondary); margin-top: -0.5rem; margin-bottom: 1rem;">962 recipes from around the world</p>
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search for recipes, ingredients, or cuisines..." id="searchInput" onkeypress="if(event.key==='Enter') searchRecipes()">
+                    <button class="search-btn" onclick="searchRecipes()">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                    <button class="search-btn" onclick="clearSearch()" style="background: var(--secondary-color); color: var(--text-primary); margin-left: 0.5rem;">
+                        <i class="fas fa-times"></i> Clear
+                    </button>
+                </div>
+                
+                <div class="filter-tags" id="filterTags">
+                    <span class="tag active" data-filter="">All Recipes</span>
+                    <span class="tag" data-filter="Persian">Persian</span>
+                    <span class="tag" data-filter="French">French</span>
+                    <span class="tag" data-filter="Italian">Italian</span>
+                    <span class="tag" data-filter="Mexican">Mexican</span>
+                    <span class="tag" data-filter="Chinese">Chinese</span>
+                    <span class="tag" data-filter="Indian">Indian</span>
+                    <span class="tag" data-filter="Vegetarian">Vegetarian</span>
+                    <span class="tag" data-filter="Vegan">Vegan</span>
+                    <span class="tag" data-filter="Gluten-Free">Gluten-Free</span>
+                    <span class="tag" data-filter="Quick">Quick & Easy</span>
+                </div>
+            </div>
 
-        <section class="search-section">
-            <div class="search-container">
-                <input 
-                    type="text" 
-                    id="searchInput" 
-                    class="search-input" 
-                    placeholder="Search recipes, ingredients, or cuisines..."
-                    autocomplete="off"
-                >
-                <i class="fas fa-search search-icon"></i>
+            <div class="loading" id="searchLoading">
+                <div class="spinner"></div>
+                <p>Searching recipes...</p>
             </div>
-            
-            <div class="search-filters">
-                <div class="filter-tag" data-filter="">All Recipes</div>
-                <div class="filter-tag" data-filter="quick">Quick & Easy</div>
-                <div class="filter-tag" data-filter="healthy">Healthy</div>
-                <div class="filter-tag" data-filter="persian">Persian</div>
-                <div class="filter-tag" data-filter="italian">Italian</div>
-                <div class="filter-tag" data-filter="chinese">Chinese</div>
-                <div class="filter-tag" data-filter="indian">Indian</div>
-                <div class="filter-tag" data-filter="mexican">Mexican</div>
-                <div class="filter-tag" data-filter="french">French</div>
-                <div class="filter-tag" data-filter="japanese">Japanese</div>
-                <div class="filter-tag" data-filter="thai">Thai</div>
-                <div class="filter-tag" data-filter="vegetarian">Vegetarian</div>
-                <div class="filter-tag" data-filter="dessert">Desserts</div>
-            </div>
-        </section>
 
-        <section id="stats" class="stats">
-            <div class="loading">
-                <div class="loading-spinner"></div>
-                <p>Loading recipe database...</p>
-            </div>
-        </section>
+            <div class="recipes-grid" id="searchResults"></div>
 
-        <section id="recipesContainer" class="recipes-grid">
-            <div class="loading">
-                <div class="loading-spinner"></div>
-                <p>Loading delicious recipes...</p>
+            <div class="empty-state" id="searchEmpty" style="display: none;">
+                <i class="fas fa-search"></i>
+                <h3>No recipes found</h3>
+                <p>Try different keywords or browse by category using the tags above</p>
+                <div class="recipes-grid" id="suggestedRecipes" style="margin-top: 2rem;"></div>
             </div>
-        </section>
+        </div>
+
+        <!-- AI Mode -->
+        <div class="ai-mode mode-content">
+            <div class="ai-section">
+                <h2 class="ai-title">
+                    <i class="fas fa-wand-magic-sparkles"></i>
+                    AI Recipe Generator
+                </h2>
+                <p class="ai-subtitle">Enter your ingredients and let AI create custom recipes for you</p>
+                <div style="margin: 1rem 0;">
+                    <button onclick="document.getElementById('apiKeyModal').classList.add('active')" style="background: none; border: 1px solid var(--mireva-green); color: var(--mireva-green); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">
+                        <i class="fas fa-key"></i> Set API Key
+                    </button>
+                    <span id="apiKeyStatus" style="margin-left: 1rem; color: var(--text-secondary); font-size: 0.9rem;"></span>
+                </div>
+                
+                <textarea 
+                    class="ingredients-input" 
+                    id="ingredientsInput"
+                    placeholder="Enter ingredients you have, separated by commas&#10;Example: chicken, rice, tomatoes, onions, garlic"></textarea>
+                
+                <div class="ingredient-suggestions">
+                    <p class="suggestions-label">Popular ingredients:</p>
+                    <div class="suggestion-chips">
+                        <span class="chip" data-ingredient="chicken">Chicken</span>
+                        <span class="chip" data-ingredient="rice">Rice</span>
+                        <span class="chip" data-ingredient="pasta">Pasta</span>
+                        <span class="chip" data-ingredient="tomatoes">Tomatoes</span>
+                        <span class="chip" data-ingredient="cheese">Cheese</span>
+                        <span class="chip" data-ingredient="eggs">Eggs</span>
+                        <span class="chip" data-ingredient="beef">Beef</span>
+                        <span class="chip" data-ingredient="salmon">Salmon</span>
+                        <span class="chip" data-ingredient="potatoes">Potatoes</span>
+                        <span class="chip" data-ingredient="onions">Onions</span>
+                        <span class="chip" data-ingredient="garlic">Garlic</span>
+                        <span class="chip" data-ingredient="chocolate">Chocolate</span>
+                        <span class="chip" data-ingredient="milk">Milk</span>
+                        <span class="chip" data-ingredient="butter">Butter</span>
+                        <span class="chip" data-ingredient="flour">Flour</span>
+                        <span class="chip" data-ingredient="sugar">Sugar</span>
+                        <span class="chip" data-ingredient="mushrooms">Mushrooms</span>
+                        <span class="chip" data-ingredient="spinach">Spinach</span>
+                        <span class="chip" data-ingredient="bread">Bread</span>
+                        <span class="chip" data-ingredient="lemon">Lemon</span>
+                    </div>
+                </div>
+                
+                <div class="ai-options">
+                    <div class="ai-option">
+                        <label>CUISINE TYPE</label>
+                        <select id="cuisineSelect">
+                            <option value="">Any Cuisine</option>
+                            <option value="Italian">Italian</option>
+                            <option value="Mexican">Mexican</option>
+                            <option value="Chinese">Chinese</option>
+                            <option value="Indian">Indian</option>
+                            <option value="Persian">Persian</option>
+                            <option value="Thai">Thai</option>
+                            <option value="Japanese">Japanese</option>
+                            <option value="Mediterranean">Mediterranean</option>
+                            <option value="French">French</option>
+                        </select>
+                        <div class="modern-dropdown" data-select="cuisineSelect">
+                            <div class="dropdown-selected">
+                                <span>Any Cuisine</span>
+                                <div class="dropdown-arrow"></div>
+                            </div>
+                            <div class="dropdown-options">
+                                <div class="dropdown-option selected" data-value="">Any Cuisine</div>
+                                <div class="dropdown-option" data-value="Italian">Italian</div>
+                                <div class="dropdown-option" data-value="Mexican">Mexican</div>
+                                <div class="dropdown-option" data-value="Chinese">Chinese</div>
+                                <div class="dropdown-option" data-value="Indian">Indian</div>
+                                <div class="dropdown-option" data-value="Persian">Persian</div>
+                                <div class="dropdown-option" data-value="Thai">Thai</div>
+                                <div class="dropdown-option" data-value="Japanese">Japanese</div>
+                                <div class="dropdown-option" data-value="Mediterranean">Mediterranean</div>
+                                <div class="dropdown-option" data-value="French">French</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="ai-option">
+                        <label>DIETARY PREFERENCE</label>
+                        <select id="dietSelect">
+                            <option value="">No Preference</option>
+                            <option value="vegetarian">Vegetarian</option>
+                            <option value="vegan">Vegan</option>
+                            <option value="gluten-free">Gluten-Free</option>
+                            <option value="dairy-free">Dairy-Free</option>
+                            <option value="keto">Keto</option>
+                            <option value="paleo">Paleo</option>
+                        </select>
+                        <div class="modern-dropdown" data-select="dietSelect">
+                            <div class="dropdown-selected">
+                                <span>No Preference</span>
+                                <div class="dropdown-arrow"></div>
+                            </div>
+                            <div class="dropdown-options">
+                                <div class="dropdown-option selected" data-value="">No Preference</div>
+                                <div class="dropdown-option" data-value="vegetarian">Vegetarian</div>
+                                <div class="dropdown-option" data-value="vegan">Vegan</div>
+                                <div class="dropdown-option" data-value="gluten-free">Gluten-Free</div>
+                                <div class="dropdown-option" data-value="dairy-free">Dairy-Free</div>
+                                <div class="dropdown-option" data-value="keto">Keto</div>
+                                <div class="dropdown-option" data-value="paleo">Paleo</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="ai-option">
+                        <label>COOKING TIME</label>
+                        <select id="timeSelect">
+                            <option value="">Any Time</option>
+                            <option value="15">Under 15 mins</option>
+                            <option value="30">Under 30 mins</option>
+                            <option value="60">Under 1 hour</option>
+                            <option value="120">Under 2 hours</option>
+                        </select>
+                        <div class="modern-dropdown" data-select="timeSelect">
+                            <div class="dropdown-selected">
+                                <span>Any Time</span>
+                                <div class="dropdown-arrow"></div>
+                            </div>
+                            <div class="dropdown-options">
+                                <div class="dropdown-option selected" data-value="">Any Time</div>
+                                <div class="dropdown-option" data-value="15">Under 15 mins</div>
+                                <div class="dropdown-option" data-value="30">Under 30 mins</div>
+                                <div class="dropdown-option" data-value="60">Under 1 hour</div>
+                                <div class="dropdown-option" data-value="120">Under 2 hours</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="ai-option">
+                        <label>NUMBER OF RECIPES</label>
+                        <select id="countSelect">
+                            <option value="3">3 Recipes</option>
+                            <option value="5">5 Recipes</option>
+                            <option value="10">10 Recipes</option>
+                        </select>
+                        <div class="modern-dropdown" data-select="countSelect">
+                            <div class="dropdown-selected">
+                                <span>3 Recipes</span>
+                                <div class="dropdown-arrow"></div>
+                            </div>
+                            <div class="dropdown-options">
+                                <div class="dropdown-option selected" data-value="3">3 Recipes</div>
+                                <div class="dropdown-option" data-value="5">5 Recipes</div>
+                                <div class="dropdown-option" data-value="10">10 Recipes</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="ai-option">
+                        <label>RECIPE VIBE</label>
+                        <select id="vibeSelect">
+                            <option value="">No Preference</option>
+                            <option value="comfort">Comfort Food</option>
+                            <option value="romantic">Romantic Dinner</option>
+                            <option value="party">Party & Fun</option>
+                            <option value="bachelor">Bachelor Style</option>
+                            <option value="family">Family Friendly</option>
+                            <option value="fancy">Fancy & Elegant</option>
+                            <option value="adventurous">Adventurous & Unique</option>
+                            <option value="nostalgic">Nostalgic & Traditional</option>
+                            <option value="healthy">Fresh & Healthy</option>
+                            <option value="midnight">Midnight Snack</option>
+                        </select>
+                        <div class="modern-dropdown" data-select="vibeSelect">
+                            <div class="dropdown-selected">
+                                <span>No Preference</span>
+                                <div class="dropdown-arrow"></div>
+                            </div>
+                            <div class="dropdown-options">
+                                <div class="dropdown-option selected" data-value="">No Preference</div>
+                                <div class="dropdown-option" data-value="comfort">Comfort Food</div>
+                                <div class="dropdown-option" data-value="romantic">Romantic Dinner</div>
+                                <div class="dropdown-option" data-value="party">Party & Fun</div>
+                                <div class="dropdown-option" data-value="bachelor">Bachelor Style</div>
+                                <div class="dropdown-option" data-value="family">Family Friendly</div>
+                                <div class="dropdown-option" data-value="fancy">Fancy & Elegant</div>
+                                <div class="dropdown-option" data-value="adventurous">Adventurous & Unique</div>
+                                <div class="dropdown-option" data-value="nostalgic">Nostalgic & Traditional</div>
+                                <div class="dropdown-option" data-value="healthy">Fresh & Healthy</div>
+                                <div class="dropdown-option" data-value="midnight">Midnight Snack</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="generate-btn" id="generateBtn" onclick="generateRecipes()">
+                    <i class="fas fa-sparkles"></i> Generate Recipes
+                </button>
+            </div>
+
+            <div class="loading" id="aiLoading">
+                <div class="spinner"></div>
+                <p>AI is creating your recipes...</p>
+            </div>
+
+            <div class="recipes-grid" id="aiResults"></div>
+
+            <div class="empty-state" id="aiEmpty">
+                <i class="fas fa-robot"></i>
+                <h3>Ready to create recipes</h3>
+                <p>Enter your ingredients and preferences above</p>
+            </div>
+        </div>
     </main>
 
+    <!-- Recipe Modal -->
+    <div class="recipe-modal" id="recipeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Recipe Title</h2>
+                <button class="close-modal" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Recipe details will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- API Key Modal -->
+    <div class="api-key-modal" id="apiKeyModal">
+        <div class="api-key-content">
+            <h3 class="api-key-title">OpenAI API Key Required</h3>
+            <div class="api-key-info">
+                <i class="fas fa-lock" style="color: var(--mireva-green);"></i>
+                <strong>Privacy First:</strong> Your API key is stored locally in your browser and never sent to our servers.
+            </div>
+            <div class="api-key-info" style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%); border: 1px solid rgba(139, 92, 246, 0.2);">
+                <i class="fas fa-sparkles" style="color: var(--mireva-purple);"></i>
+                <strong>How to get an API key:</strong><br>
+                1. Go to <a href="https://platform.openai.com/api-keys" target="_blank" style="color: var(--mireva-purple); text-decoration: underline;">OpenAI API Keys</a><br>
+                2. Sign in or create an account<br>
+                3. Click "Create new secret key"<br>
+                4. Copy and paste it below
+            </div>
+            <input 
+                type="password" 
+                class="api-key-input" 
+                id="apiKeyInput" 
+                placeholder="sk-..."
+                value="">
+            <div class="api-key-actions">
+                <button class="api-key-cancel" onclick="closeApiKeyModal()">Cancel</button>
+                <button class="api-key-save" onclick="saveApiKey()">Save & Continue</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        class RecipeApp {
-            constructor() {
-                // Use relative URLs to always match current domain - prevents cross-domain issues
-                this.apiBase = window.location.protocol + '//' + window.location.host;
-                this.currentQuery = '';
-                this.currentFilter = '';
-                this.recipes = [];
-                this.isLoading = false;
-                
-                this.init();
+        // Configuration
+        // Use the same domain as the current page to avoid CORS issues
+        const API_BASE = window.location.origin;
+        
+        // State
+        let currentMode = 'search';
+        let searchResults = [];
+        let aiResults = [];
+        let openAIKey = localStorage.getItem('openai_api_key') || '';
+
+        // Mode switching
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const mode = this.dataset.mode;
+                switchMode(mode);
+            });
+        });
+
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            // Update buttons and toggle container
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === mode);
+            });
+            
+            // Update toggle background
+            const toggle = document.querySelector('.mode-toggle');
+            if (mode === 'ai') {
+                toggle.classList.add('ai-active');
+                // Don't use custom dropdowns
+                // setTimeout(() => {
+                //     if (!document.querySelector('.custom-dropdown')) {
+                //         initializeCustomDropdowns();
+                //     }
+                // }, 100);
+            } else {
+                toggle.classList.remove('ai-active');
             }
             
-            formatDate(dateString) {
-                try {
-                    if (!dateString) return 'Recently';
-                    
-                    // Handle different date formats
-                    const date = new Date(dateString);
-                    
-                    // Check if date is valid
-                    if (isNaN(date.getTime())) {
-                        return 'Recently';
-                    }
-                    
-                    // Format the date
-                    return date.toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                    });
-                } catch (error) {
-                    console.warn('Date formatting error:', error);
-                    return 'Recently';
-                }
-            }
+            // Update content
+            document.querySelector('.search-mode').style.display = mode === 'search' ? 'block' : 'none';
+            document.querySelector('.ai-mode').style.display = mode === 'ai' ? 'block' : 'none';
+        }
 
-            init() {
-                this.loadStats();
-                this.loadRecipes();
-                this.setupEventListeners();
-            }
-
-            setupEventListeners() {
-                // Search input with debouncing
-                const searchInput = document.getElementById('searchInput');
-                let searchTimeout;
+        // Clear search and show all recipes
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            // Reset all tags
+            document.querySelectorAll('.tag').forEach(tag => {
+                tag.classList.remove('active');
+            });
+            // Make "All Recipes" active
+            document.querySelector('.tag[data-filter=""]').classList.add('active');
+            loadAllRecipes();
+        }
+        
+        // Search functionality
+        async function searchRecipes() {
+            const query = document.getElementById('searchInput').value || '';
+            const loading = document.getElementById('searchLoading');
+            const resultsGrid = document.getElementById('searchResults');
+            const emptyState = document.getElementById('searchEmpty');
+            
+            console.log('Searching for:', query);
+            
+            loading.classList.add('active');
+            resultsGrid.innerHTML = '';
+            emptyState.style.display = 'none';
+            
+            try {
+                const url = `${API_BASE}/api/recipes/search?q=${encodeURIComponent(query)}&limit=24`;
+                console.log('Fetching:', url);
                 
-                searchInput.addEventListener('input', (e) => {
-                    clearTimeout(searchTimeout);
-                    searchTimeout = setTimeout(() => {
-                        this.currentQuery = e.target.value;
-                        this.loadRecipes();
-                    }, 500);
-                });
-
-                // Filter tags
-                const filterTags = document.querySelectorAll('.filter-tag');
-                filterTags.forEach(tag => {
-                    tag.addEventListener('click', () => {
-                        // Remove active class from all tags
-                        filterTags.forEach(t => t.classList.remove('active'));
-                        // Add active class to clicked tag
-                        tag.classList.add('active');
-                        
-                        this.currentFilter = tag.dataset.filter;
-                        this.currentQuery = this.currentFilter;
-                        searchInput.value = this.currentFilter;
-                        this.loadRecipes();
-                    });
-                });
-
-                // Set default active filter
-                filterTags[0].classList.add('active');
-            }
-
-            async loadStats() {
-                try {
-                    // Primary API call
-                    let response = await fetch(`${this.apiBase}/api/recipes/stats?t=${Date.now()}`);
-                    
-                    // Fallback to alternative domain if primary fails
-                    if (!response.ok && this.apiBase.includes('www.')) {
-                        console.log('Trying fallback API endpoint...');
-                        response = await fetch(`https://mireva.life/api/recipes/stats?t=${Date.now()}`);
-                    }
-                    
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    }
-                    const data = await response.json();
-                    
-                    document.getElementById('stats').innerHTML = `
-                        <div class="stats-grid fade-in">
-                            <div class="stat-item">
-                                <div class="stat-number">${data.total_recipes.toLocaleString()}</div>
-                                <div class="stat-label">Total Recipes</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-number">Complete</div>
-                                <div class="stat-label">Collection</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-number">${this.formatDate(data.metadata.generation_date)}</div>
-                                <div class="stat-label">Last Updated</div>
-                            </div>
-                        </div>
-                    `;
-                } catch (error) {
-                    console.error('Error loading stats:', error);
-                    document.getElementById('stats').innerHTML = `
-                        <div class="error-state">
-                            <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
-                            <p>Unable to load statistics</p>
-                        </div>
-                    `;
-                }
-            }
-
-            async loadRecipes() {
-                if (this.isLoading) return;
+                const response = await fetch(url);
                 
-                this.isLoading = true;
-                const container = document.getElementById('recipesContainer');
-                
-                container.innerHTML = `
-                    <div class="loading" style="grid-column: 1 / -1;">
-                        <div class="loading-spinner"></div>
-                        <p>Finding perfect recipes...</p>
-                    </div>
-                `;
-
-                try {
-                    let url;
-                    if (this.currentQuery) {
-                        url = `${this.apiBase}/api/recipes/search?q=${encodeURIComponent(this.currentQuery)}&limit=50&t=${Date.now()}`;
-                    } else {
-                        url = `${this.apiBase}/api/recipes/search?limit=24&t=${Date.now()}`;
-                    }
-
-                    let response = await fetch(url);
-                    
-                    // Fallback to alternative domain if primary fails
-                    if (!response.ok && this.apiBase.includes('www.')) {
-                        console.log('Trying fallback API endpoint for recipes...');
-                        const fallbackUrl = url.replace('https://www.mireva.life', 'https://mireva.life');
-                        response = await fetch(fallbackUrl);
-                    }
-                    
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    }
-                    const recipes = await response.json();
-                    
-                    this.recipes = recipes;
-                    this.displayRecipes(recipes);
-                } catch (error) {
-                    console.error('Error loading recipes:', error);
-                    container.innerHTML = `
-                        <div class="error-state" style="grid-column: 1 / -1;">
-                            <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
-                            <p>Unable to load recipes. Please check if the API is running.</p>
-                            <p style="font-size: 0.875rem; margin-top: 0.5rem;">Error: ${error.message}</p>
-                        </div>
-                    `;
-                } finally {
-                    this.isLoading = false;
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-            }
-
-            displayRecipes(recipes) {
-                const container = document.getElementById('recipesContainer');
+                
+                const recipes = await response.json();
+                console.log('Received recipes:', recipes.length);
+                
+                searchResults = recipes;
                 
                 if (!recipes || recipes.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state" style="grid-column: 1 / -1;">
-                            <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 1rem;"></i>
-                            <p>No recipes found</p>
-                            <p style="font-size: 0.875rem; margin-top: 0.5rem;">Try adjusting your search terms</p>
-                        </div>
-                    `;
-                    return;
+                    // Show empty state with suggestions
+                    emptyState.style.display = 'block';
+                    loadSuggestedRecipes();
+                } else {
+                    emptyState.style.display = 'none';
+                    displayRecipes(recipes, resultsGrid);
                 }
-
-                container.innerHTML = recipes.map(recipe => this.createRecipeCard(recipe)).join('');
-                
-                // Add event listeners for expand/collapse functionality
-                this.setupStepExpansion();
-            }
-            
-            setupStepExpansion() {
-                // Remove existing listeners to avoid duplicates
-                document.querySelectorAll('.steps-expand-toggle').forEach(toggle => {
-                    const newToggle = toggle.cloneNode(true);
-                    toggle.parentNode.replaceChild(newToggle, toggle);
-                });
-                
-                // Add new listeners
-                document.querySelectorAll('.steps-expand-toggle').forEach(toggle => {
-                    toggle.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        
-                        const recipeId = toggle.dataset.recipeId;
-                        const stepsContainer = toggle.closest('.steps-container');
-                        const stepsFullDiv = stepsContainer.querySelector('.steps-full');
-                        const expandIcon = toggle.querySelector('.expand-icon');
-                        const expandText = toggle.querySelector('.expand-text');
-                        
-                        if (toggle.classList.contains('expanded')) {
-                            // Collapse
-                            toggle.classList.remove('expanded');
-                            stepsFullDiv.classList.remove('expanded');
-                            
-                            // Update text
-                            expandText.textContent = expandText.textContent.replace('Hide ', '');
-                            
-                            // Hide after animation
-                            setTimeout(() => {
-                                if (!toggle.classList.contains('expanded')) {
-                                    stepsFullDiv.style.display = 'none';
-                                }
-                            }, 400);
-                            
-                        } else {
-                            // Expand
-                            toggle.classList.add('expanded');
-                            stepsFullDiv.style.display = 'block';
-                            
-                            // Trigger reflow for animation
-                            stepsFullDiv.offsetHeight;
-                            
-                            setTimeout(() => {
-                                stepsFullDiv.classList.add('expanded');
-                            }, 10);
-                        }
-                    });
-                    
-                    // Add touch support for mobile
-                    toggle.addEventListener('touchend', (e) => {
-                        e.preventDefault();
-                        toggle.click();
-                    });
-                });
-            }
-
-            createRecipeCard(recipe) {
-                const ingredients = recipe.ingredients || [];
-                const steps = recipe.steps || [];
-                const tags = recipe.tags || [];
-                
-                return `
-                    <div class="recipe-card fade-in">
-                        <div class="recipe-header">
-                            <h3 class="recipe-title">${this.escapeHtml(this.cleanRecipeName(recipe.name))}</h3>
-                            <div class="recipe-meta">
-                                <div class="meta-item">
-                                    <i class="far fa-clock"></i>
-                                    <span>${recipe.minutes || 0} min</span>
-                                </div>
-                                <div class="meta-item">
-                                    <i class="fas fa-list-ol"></i>
-                                    <span>${recipe.n_steps || 0} steps</span>
-                                </div>
-                                <div class="meta-item">
-                                    <i class="fas fa-shopping-basket"></i>
-                                    <span>${recipe.n_ingredients || 0} items</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="recipe-content">
-                            ${ingredients.length > 0 ? `
-                                <div class="ingredients-section">
-                                    <div class="section-title">Ingredients</div>
-                                    <div class="ingredients-list">
-                                        ${ingredients.slice(0, 8).map(ing => 
-                                            `<span class="ingredient-tag">${this.escapeHtml(ing)}</span>`
-                                        ).join('')}
-                                        ${ingredients.length > 8 ? `<span class="ingredient-tag">+${ingredients.length - 8} more</span>` : ''}
-                                    </div>
-                                </div>
-                            ` : ''}
-                            
-                            ${steps.length > 0 ? `
-                                <div class="steps-section">
-                                    <div class="section-title">Instructions Preview</div>
-                                    <div class="steps-container" data-recipe-id="${recipe.id}">
-                                        <div class="steps-preview">
-                                            ${steps.slice(0, 3).map((step, i) => 
-                                                `<div class="step-item">${i + 1}. ${this.escapeHtml(this.truncateText(step, 120))}</div>`
-                                            ).join('')}
-                                        </div>
-                                        ${steps.length > 3 ? `
-                                            <div class="steps-expand-toggle" data-recipe-id="${recipe.id}">
-                                                <span class="expand-text">...and ${steps.length - 3} more steps</span>
-                                                <i class="fas fa-chevron-down expand-icon"></i>
-                                            </div>
-                                            <div class="steps-full" style="display: none;">
-                                                ${steps.slice(3).map((step, i) => 
-                                                    `<div class="step-item">${i + 4}. ${this.escapeHtml(step)}</div>`
-                                                ).join('')}
-                                            </div>
-                                        ` : ''}
-                                    </div>
-                                </div>
-                            ` : ''}
-                            
-                            ${tags.length > 0 ? `
-                                <div class="recipe-tags">
-                                    ${tags.slice(0, 6).map(tag => 
-                                        `<span class="recipe-tag">${this.escapeHtml(tag)}</span>`
-                                    ).join('')}
-                                </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                `;
-            }
-
-            escapeHtml(text) {
-                const map = {
-                    '&': '&amp;',
-                    '<': '&lt;',
-                    '>': '&gt;',
-                    '"': '&quot;',
-                    "'": '&#039;'
-                };
-                return text.replace(/[&<>"']/g, (m) => map[m]);
-            }
-
-            truncateText(text, maxLength) {
-                if (text.length <= maxLength) return text;
-                return text.substring(0, maxLength) + '...';
-            }
-            
-            cleanRecipeName(name) {
-                if (!name) return 'Unnamed Recipe';
-                
-                // Convert numbered styles to descriptive names
-                const styleVariations = [
-                    'Classic', 'Traditional', 'Modern', 'Authentic', 'Homestyle', 'Gourmet',
-                    'Quick', 'Easy', 'Healthy', 'Light', 'Hearty', 'Rustic', 'Elegant',
-                    'Spicy', 'Mild', 'Creamy', 'Crispy', 'Tender', 'Aromatic', 'Rich',
-                    'Fresh', 'Savory', 'Zesty', 'Smoky', 'Tangy', 'Sweet', 'Bold',
-                    'Delicate', 'Robust', 'Comforting', 'Restaurant-Style', 'Bistro',
-                    'Cafe', 'Street-Food', 'Fusion', 'Regional', 'Seasonal', 'Holiday',
-                    'Weekend', 'Weeknight', 'Family', 'Party', 'Casual', 'Special'
-                ];
-                
-                // Replace "Style {number}" with descriptive variations
-                const styleMatch = name.match(/^(.+?)\s+Style\s+(\d+)$/);
-                if (styleMatch) {
-                    const baseName = styleMatch[1];
-                    const number = parseInt(styleMatch[2]);
-                    const styleIndex = (number - 1) % styleVariations.length;
-                    return `${styleVariations[styleIndex]} ${baseName}`;
-                }
-                
-                return name;
+            } catch (error) {
+                console.error('Search error:', error);
+                resultsGrid.innerHTML = '<p style="text-align: center; color: red;">Error loading recipes. Please try again.</p>';
+                emptyState.style.display = 'block';
+            } finally {
+                loading.classList.remove('active');
             }
         }
 
-        // Initialize app when DOM is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            new RecipeApp();
+        // Filter tags - click to filter, click again to show all
+        document.getElementById('filterTags').addEventListener('click', function(e) {
+            if (e.target.classList.contains('tag')) {
+                // Remove active from all other tags
+                this.querySelectorAll('.tag').forEach(tag => {
+                    if (tag !== e.target) {
+                        tag.classList.remove('active');
+                    }
+                });
+                
+                // Toggle current tag
+                e.target.classList.toggle('active');
+                
+                // Get active filter
+                const activeTag = this.querySelector('.tag.active');
+                
+                if (activeTag) {
+                    // Filter by selected cuisine
+                    const filter = activeTag.dataset.filter;
+                    document.getElementById('searchInput').value = filter;
+                    searchRecipes();
+                } else {
+                    // No filter active, show all recipes
+                    document.getElementById('searchInput').value = '';
+                    searchRecipes();
+                }
+            }
         });
+
+        // AI Recipe Generation
+        async function generateRecipes() {
+            // Check for API key
+            if (!openAIKey) {
+                document.getElementById('apiKeyModal').classList.add('active');
+                return;
+            }
+            
+            const ingredients = document.getElementById('ingredientsInput').value;
+            if (!ingredients.trim()) {
+                alert('Please enter some ingredients');
+                return;
+            }
+            
+            const cuisine = document.getElementById('cuisineSelect').value;
+            const diet = document.getElementById('dietSelect').value;
+            const time = document.getElementById('timeSelect').value;
+            const count = document.getElementById('countSelect').value;
+            const vibe = document.getElementById('vibeSelect').value;
+            
+            const loading = document.getElementById('aiLoading');
+            const resultsGrid = document.getElementById('aiResults');
+            const emptyState = document.getElementById('aiEmpty');
+            const generateBtn = document.getElementById('generateBtn');
+            
+            loading.classList.add('active');
+            resultsGrid.innerHTML = '';
+            emptyState.style.display = 'none';
+            generateBtn.disabled = true;
+            
+            try {
+                const prompt = buildPrompt(ingredients, cuisine, diet, time, count, vibe);
+                
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${openAIKey}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-3.5-turbo',
+                        messages: [
+                            {
+                                role: 'system',
+                                content: 'You are a professional chef and recipe creator. You must respond ONLY with valid JSON array, no additional text or markdown formatting. Do not include ```json or ``` markers.'
+                            },
+                            {
+                                role: 'user',
+                                content: prompt
+                            }
+                        ],
+                        temperature: 0.7,
+                        max_tokens: 2000
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => null);
+                    if (response.status === 401) {
+                        throw new Error('401: Invalid API key');
+                    }
+                    throw new Error(`API request failed: ${response.status} ${errorData?.error?.message || ''}`);
+                }
+                
+                const data = await response.json();
+                if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+                    throw new Error('Invalid response from OpenAI');
+                }
+                let recipesText = data.choices[0].message.content;
+                
+                // Clean up the response - remove markdown code blocks if present
+                recipesText = recipesText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+                
+                // Try to extract JSON array if wrapped in other text
+                const jsonMatch = recipesText.match(/\[[\s\S]*\]/);
+                if (jsonMatch) {
+                    recipesText = jsonMatch[0];
+                }
+                
+                // Parse the JSON response
+                let recipes;
+                try {
+                    recipes = JSON.parse(recipesText);
+                } catch (parseError) {
+                    console.error('JSON parse error:', parseError);
+                    console.log('Raw response:', recipesText);
+                    throw new Error('Failed to parse recipe data from AI response');
+                }
+                
+                // Ensure it's an array
+                if (!Array.isArray(recipes)) {
+                    throw new Error('Expected an array of recipes');
+                }
+                
+                aiResults = recipes;
+                displayAIRecipes(recipes, resultsGrid);
+                
+            } catch (error) {
+                console.error('AI generation error:', error);
+                let errorMessage = 'Failed to generate recipes. ';
+                
+                if (error.message && error.message.includes('401')) {
+                    errorMessage = 'Invalid or expired API key. Please set a valid OpenAI API key.';
+                    localStorage.removeItem('openai_api_key'); // Clear invalid key
+                    openAIKey = '';
+                    updateApiKeyStatus();
+                    document.getElementById('apiKeyModal').classList.add('active');
+                } else if (error.message && error.message.includes('429')) {
+                    errorMessage = 'Rate limit exceeded. Please wait a moment and try again.';
+                } else if (error.message && error.message.includes('JSON')) {
+                    errorMessage = 'Failed to parse recipe data. Please try again.';
+                } else if (error.message && error.message.includes('network')) {
+                    errorMessage = 'Network error. Please check your connection and try again.';
+                } else {
+                    errorMessage += 'Error: ' + (error.message || 'Unknown error occurred');
+                }
+                
+                // Show error in a nicer way
+                resultsGrid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; background: rgba(239, 68, 68, 0.1); border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.2);">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #ef4444; margin-bottom: 1rem;"></i>
+                        <h3 style="color: #dc2626; margin-bottom: 0.5rem;">Generation Failed</h3>
+                        <p style="color: #7f1d1d;">${errorMessage}</p>
+                        <button onclick="document.getElementById('apiKeyModal').classList.add('active')" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #ef4444; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                            <i class="fas fa-key"></i> Update API Key
+                        </button>
+                    </div>
+                `;
+            } finally {
+                loading.classList.remove('active');
+                generateBtn.disabled = false;
+            }
+        }
+
+        function buildPrompt(ingredients, cuisine, diet, time, count, vibe) {
+            let prompt = `Generate exactly ${count} recipe ideas using these ingredients: ${ingredients}.`;
+            
+            if (cuisine) prompt += ` The recipes should be ${cuisine} cuisine.`;
+            if (diet) prompt += ` They should be ${diet}.`;
+            if (time) prompt += ` Cooking time should be under ${time} minutes.`;
+            
+            // Add vibe descriptions for better AI understanding
+            if (vibe) {
+                const vibeDescriptions = {
+                    'comfort': 'The recipes should be comforting, hearty, and soul-warming - like a warm hug on a plate.',
+                    'romantic': 'The recipes should be elegant and romantic, perfect for a date night or special dinner for two.',
+                    'party': 'The recipes should be fun, festive, and perfect for parties or gatherings with friends.',
+                    'bachelor': 'The recipes should be simple, no-fuss, bachelor-style meals that are easy but satisfying.',
+                    'family': 'The recipes should be family-friendly, kid-approved, and perfect for family dinners.',
+                    'fancy': 'The recipes should be sophisticated, restaurant-quality, and impressively elegant.',
+                    'adventurous': 'The recipes should be unique, adventurous, and feature unusual or exotic combinations.',
+                    'nostalgic': 'The recipes should be traditional, nostalgic, and reminiscent of childhood or grandma\'s cooking.',
+                    'healthy': 'The recipes should be fresh, healthy, nutritious, and make you feel good.',
+                    'midnight': 'The recipes should be perfect for late-night snacking or midnight cravings - quick and satisfying.'
+                };
+                
+                if (vibeDescriptions[vibe]) {
+                    prompt += ` ${vibeDescriptions[vibe]}`;
+                }
+            }
+            
+            prompt += `
+
+IMPORTANT: Return ONLY a valid JSON array, nothing else. No explanations, no markdown, just the JSON array.
+
+The JSON array must have exactly this structure:
+[
+  {
+    "name": "Recipe Name",
+    "description": "A brief 1-2 sentence description",
+    "ingredients": ["2 cups flour", "1 tsp salt", "etc"],
+    "steps": ["First, do this", "Then, do that", "Finally, do this"],
+    "minutes": 30,
+    "servings": 4,
+    "difficulty": "Easy",
+    "cuisine": ["Italian"],
+    "tags": ["quick", "healthy"]
+  }
+]
+
+Requirements:
+- Include all ${count} recipes in the array
+- Each recipe must have ALL the fields shown above
+- Ingredients should include quantities
+- Steps should be clear and numbered
+- Make recipes creative but practical`;
+            
+            return prompt;
+        }
+
+        // Display functions
+        function displayRecipes(recipes, container) {
+            if (!recipes || !Array.isArray(recipes)) {
+                console.error('Invalid recipes data:', recipes);
+                return;
+            }
+            recipes.forEach(recipe => {
+                const card = createRecipeCard(recipe, false);
+                container.appendChild(card);
+            });
+        }
+
+        function displayAIRecipes(recipes, container) {
+            recipes.forEach(recipe => {
+                const card = createRecipeCard(recipe, true);
+                container.appendChild(card);
+            });
+        }
+
+        function createRecipeCard(recipe, isAI) {
+            const card = document.createElement('div');
+            card.className = 'recipe-card';
+            card.onclick = () => showRecipeDetails(recipe, isAI);
+            
+            card.innerHTML = `
+                ${isAI ? '<div class="ai-generated-badge"><i class="fas fa-sparkles"></i> AI Generated</div>' : ''}
+                <div class="recipe-content">
+                    <h3 class="recipe-title">${recipe.name}</h3>
+                    <div class="recipe-meta">
+                        <span><i class="far fa-clock"></i> ${recipe.minutes || 30} min</span>
+                        <span><i class="far fa-user"></i> ${recipe.servings || 4} servings</span>
+                        ${recipe.difficulty ? `<span><i class="far fa-chart-bar"></i> ${recipe.difficulty}</span>` : ''}
+                    </div>
+                    <div class="recipe-tags">
+                        ${(recipe.tags || recipe.cuisine || []).slice(0, 3).map(tag => 
+                            `<span class="recipe-tag">${tag}</span>`
+                        ).join('')}
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function showRecipeDetails(recipe, isAI) {
+            const modal = document.getElementById('recipeModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            
+            modalTitle.textContent = recipe.name;
+            
+            modalBody.innerHTML = `
+                ${isAI ? '<div class="ai-generated-badge"><i class="fas fa-sparkles"></i> AI Generated Recipe</div>' : ''}
+                
+                ${recipe.description ? `<p>${recipe.description}</p>` : ''}
+                
+                <div class="recipe-meta">
+                    <span><i class="far fa-clock"></i> ${recipe.minutes || 30} minutes</span>
+                    <span><i class="far fa-user"></i> ${recipe.servings || 4} servings</span>
+                    ${recipe.difficulty ? `<span><i class="far fa-chart-bar"></i> ${recipe.difficulty}</span>` : ''}
+                </div>
+                
+                <div class="ingredients-list">
+                    <h3>Ingredients</h3>
+                    <ul>
+                        ${(recipe.ingredients || []).map(ing => `<li>${ing}</li>`).join('')}
+                    </ul>
+                </div>
+                
+                <div class="steps-list">
+                    <h3>Instructions</h3>
+                    <ol>
+                        ${(recipe.steps || []).map(step => `<li>${step}</li>`).join('')}
+                    </ol>
+                </div>
+                
+                ${recipe.nutrition ? `
+                    <div class="nutrition-info">
+                        <h3>Nutrition</h3>
+                        <p>Calories: ${recipe.nutrition.calories || 'N/A'}</p>
+                    </div>
+                ` : ''}
+            `;
+            
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('recipeModal').classList.remove('active');
+        }
+
+        // API Key Management
+        async function saveApiKey() {
+            const key = document.getElementById('apiKeyInput').value.trim();
+            if (!key) {
+                alert('Please enter a valid API key');
+                return;
+            }
+            
+            // Test the API key
+            const saveBtn = event.target;
+            const originalText = saveBtn.textContent;
+            saveBtn.textContent = 'Testing...';
+            saveBtn.disabled = true;
+            
+            try {
+                const response = await fetch('https://api.openai.com/v1/models', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${key}`
+                    }
+                });
+                
+                if (response.ok) {
+                    openAIKey = key;
+                    localStorage.setItem('openai_api_key', key);
+                    updateApiKeyStatus();
+                    closeApiKeyModal();
+                    alert('API key validated and saved successfully!');
+                } else if (response.status === 401) {
+                    alert('Invalid API key. Please check your key and try again.');
+                } else {
+                    alert('Could not validate API key. Please try again.');
+                }
+            } catch (error) {
+                console.error('API key validation error:', error);
+                alert('Failed to validate API key. Please check your connection.');
+            } finally {
+                saveBtn.textContent = originalText;
+                saveBtn.disabled = false;
+            }
+        }
+
+        function closeApiKeyModal() {
+            document.getElementById('apiKeyModal').classList.remove('active');
+        }
+
+
+        // Close modals on outside click
+        document.getElementById('recipeModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        document.getElementById('apiKeyModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeApiKeyModal();
+            }
+        });
+
+        // Initialize Ingredient Chips
+        function initIngredientChips() {
+            const chips = document.querySelectorAll('.chip');
+            const ingredientsInput = document.getElementById('ingredientsInput');
+            
+            chips.forEach(chip => {
+                chip.addEventListener('click', function() {
+                    const ingredient = this.dataset.ingredient;
+                    const currentValue = ingredientsInput.value.trim();
+                    
+                    // Toggle chip selection
+                    this.classList.toggle('selected');
+                    
+                    if (this.classList.contains('selected')) {
+                        // Add ingredient
+                        if (currentValue) {
+                            // Check if ingredient already exists
+                            const ingredients = currentValue.split(',').map(i => i.trim().toLowerCase());
+                            if (!ingredients.includes(ingredient.toLowerCase())) {
+                                ingredientsInput.value = currentValue + ', ' + ingredient;
+                            }
+                        } else {
+                            ingredientsInput.value = ingredient;
+                        }
+                    } else {
+                        // Remove ingredient
+                        const ingredients = currentValue.split(',').map(i => i.trim());
+                        const filtered = ingredients.filter(i => i.toLowerCase() !== ingredient.toLowerCase());
+                        ingredientsInput.value = filtered.join(', ');
+                    }
+                    
+                    // Trigger input event for any listeners
+                    const event = new Event('input', { bubbles: true });
+                    ingredientsInput.dispatchEvent(event);
+                });
+            });
+            
+            // Update chip states when input changes manually
+            ingredientsInput.addEventListener('input', function() {
+                const currentIngredients = this.value.toLowerCase().split(',').map(i => i.trim());
+                
+                chips.forEach(chip => {
+                    const ingredient = chip.dataset.ingredient.toLowerCase();
+                    if (currentIngredients.includes(ingredient)) {
+                        chip.classList.add('selected');
+                    } else {
+                        chip.classList.remove('selected');
+                    }
+                });
+            });
+        }
+
+        // Initialize Modern Custom Dropdowns
+        function initModernDropdowns() {
+            const dropdowns = document.querySelectorAll('.modern-dropdown');
+            
+            dropdowns.forEach(dropdown => {
+                const selected = dropdown.querySelector('.dropdown-selected');
+                const options = dropdown.querySelector('.dropdown-options');
+                const optionElements = dropdown.querySelectorAll('.dropdown-option');
+                const selectId = dropdown.dataset.select;
+                const nativeSelect = document.getElementById(selectId);
+                
+                // Toggle dropdown
+                selected.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    
+                    // Close other dropdowns
+                    document.querySelectorAll('.modern-dropdown').forEach(d => {
+                        if (d !== dropdown) {
+                            d.querySelector('.dropdown-selected').classList.remove('active');
+                            d.querySelector('.dropdown-options').classList.remove('active');
+                        }
+                    });
+                    
+                    // Toggle current dropdown
+                    selected.classList.toggle('active');
+                    options.classList.toggle('active');
+                });
+                
+                // Handle option selection
+                optionElements.forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        
+                        // Update selected display
+                        selected.querySelector('span').textContent = option.textContent;
+                        
+                        // Update selected class
+                        optionElements.forEach(o => o.classList.remove('selected'));
+                        option.classList.add('selected');
+                        
+                        // Update native select value
+                        if (nativeSelect) {
+                            nativeSelect.value = option.dataset.value;
+                            // Trigger change event
+                            const event = new Event('change', { bubbles: true });
+                            nativeSelect.dispatchEvent(event);
+                        }
+                        
+                        // Close dropdown
+                        selected.classList.remove('active');
+                        options.classList.remove('active');
+                    });
+                });
+            });
+            
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', () => {
+                document.querySelectorAll('.dropdown-selected').forEach(d => {
+                    d.classList.remove('active');
+                });
+                document.querySelectorAll('.dropdown-options').forEach(d => {
+                    d.classList.remove('active');
+                });
+            });
+        }
+
+        // Initial load - show all recipes immediately
+        window.addEventListener('DOMContentLoaded', () => {
+            try {
+                // Clear search input
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput) {
+                    searchInput.value = '';
+                }
+                // Load all recipes immediately when page loads
+                loadAllRecipes();
+                
+                // Update API key status
+                updateApiKeyStatus();
+                
+                // Initialize modern dropdowns in AI mode
+                initModernDropdowns();
+                
+                // Initialize ingredient chips
+                initIngredientChips();
+            } catch (error) {
+                console.error('Error on page load:', error);
+            }
+        });
+        
+        // Custom Dropdown Functions
+        function initializeCustomDropdowns() {
+            // Convert all selects in AI options to custom dropdowns
+            const selects = document.querySelectorAll('.ai-option select');
+            selects.forEach(select => {
+                // Skip if already converted
+                if (select.style.display === 'none' && select.nextElementSibling?.classList.contains('custom-dropdown')) {
+                    return;
+                }
+                createCustomDropdown(select);
+            });
+        }
+        
+        function createCustomDropdown(selectElement) {
+            // Hide original select
+            selectElement.style.display = 'none';
+            
+            // Create wrapper
+            const wrapper = document.createElement('div');
+            wrapper.className = 'custom-dropdown';
+            
+            // Create display button
+            const display = document.createElement('button');
+            display.className = 'dropdown-trigger';
+            display.type = 'button';
+            display.innerHTML = `
+                <span class="dropdown-value">${selectElement.options[selectElement.selectedIndex]?.text || 'Select'}</span>
+                <span class="dropdown-arrow"></span>
+            `;
+            
+            // Create options container
+            const optionsContainer = document.createElement('div');
+            optionsContainer.className = 'dropdown-menu';
+            
+            // Add all options
+            for (let i = 0; i < selectElement.options.length; i++) {
+                const option = selectElement.options[i];
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'dropdown-option';
+                optionDiv.textContent = option.text;
+                optionDiv.dataset.value = option.value;
+                
+                // Mark selected
+                if (i === selectElement.selectedIndex) {
+                    optionDiv.classList.add('selected');
+                }
+                
+                // Click handler for option
+                optionDiv.onclick = function(e) {
+                    e.stopPropagation();
+                    
+                    // Update selection
+                    selectElement.selectedIndex = i;
+                    selectElement.value = option.value;
+                    
+                    // Update display
+                    display.querySelector('.dropdown-value').textContent = option.text;
+                    
+                    // Update selected class
+                    optionsContainer.querySelectorAll('.dropdown-option').forEach(o => o.classList.remove('selected'));
+                    optionDiv.classList.add('selected');
+                    
+                    // Close dropdown
+                    display.classList.remove('active');
+                    optionsContainer.classList.remove('active');
+                    
+                    // Trigger change event
+                    const event = new Event('change', { bubbles: true });
+                    selectElement.dispatchEvent(event);
+                };
+                
+                optionsContainer.appendChild(optionDiv);
+            }
+            
+            // Toggle dropdown on click
+            display.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Close other dropdowns
+                document.querySelectorAll('.dropdown-trigger.active').forEach(d => {
+                    if (d !== display) {
+                        d.classList.remove('active');
+                        d.nextElementSibling.classList.remove('active');
+                    }
+                });
+                
+                // Toggle this dropdown
+                const isOpen = display.classList.contains('active');
+                if (isOpen) {
+                    display.classList.remove('active');
+                    optionsContainer.classList.remove('active');
+                } else {
+                    display.classList.add('active');
+                    optionsContainer.classList.add('active');
+                }
+            };
+            
+            // Add to wrapper
+            wrapper.appendChild(display);
+            wrapper.appendChild(optionsContainer);
+            
+            // Insert after select
+            selectElement.parentNode.insertBefore(wrapper, selectElement.nextSibling);
+        }
+        
+        // Global click handler to close dropdowns
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.custom-dropdown')) {
+                document.querySelectorAll('.dropdown-trigger.active').forEach(d => {
+                    d.classList.remove('active');
+                    d.nextElementSibling.classList.remove('active');
+                });
+            }
+        });
+        
+        // Update API key status display
+        function updateApiKeyStatus() {
+            const statusEl = document.getElementById('apiKeyStatus');
+            if (statusEl) {
+                if (openAIKey) {
+                    statusEl.innerHTML = '<i class="fas fa-check-circle" style="color: var(--mireva-green);"></i> API Key configured';
+                } else {
+                    statusEl.innerHTML = '<i class="fas fa-exclamation-circle" style="color: #f59e0b;"></i> No API Key set';
+                }
+            }
+        }
+        
+        // Load suggested recipes when no results found
+        async function loadSuggestedRecipes() {
+            const suggestedGrid = document.getElementById('suggestedRecipes');
+            
+            // Clear any previous suggestions
+            if (suggestedGrid) {
+                suggestedGrid.innerHTML = '';
+            }
+            
+            // Don't show suggestions for random search queries
+            // Only show them when browsing all recipes or filtering by category
+            const searchInput = document.getElementById('searchInput').value.trim();
+            const activeTag = document.querySelector('.tag.active');
+            
+            // Only show suggestions if it's a category filter or no search at all
+            if (searchInput && !activeTag) {
+                // User searched for something specific that had no results
+                // Don't show unrelated suggestions
+                return;
+            }
+            
+            try {
+                // Get random/popular recipes only when appropriate
+                const response = await fetch(`${API_BASE}/api/recipes/search?q=&limit=12`);
+                const recipes = await response.json();
+                
+                if (recipes && recipes.length > 0) {
+                    suggestedGrid.innerHTML = '<h4 style="width: 100%; margin-bottom: 1rem;">You might also like:</h4>';
+                    displayRecipes(recipes, suggestedGrid);
+                }
+            } catch (error) {
+                console.error('Error loading suggestions:', error);
+            }
+        }
+        
+        // Load all recipes without search query
+        async function loadAllRecipes() {
+            const loading = document.getElementById('searchLoading');
+            const resultsGrid = document.getElementById('searchResults');
+            const emptyState = document.getElementById('searchEmpty');
+            
+            if (!loading || !resultsGrid || !emptyState) {
+                console.error('Required elements not found');
+                return;
+            }
+            
+            console.log('Loading all recipes...');
+            
+            loading.classList.add('active');
+            resultsGrid.innerHTML = '';
+            emptyState.style.display = 'none';
+            
+            try {
+                const url = `${API_BASE}/api/recipes/search?q=&limit=48`;
+                console.log('Fetching all recipes from:', url);
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const recipes = await response.json();
+                console.log('Response received:', recipes);
+                console.log('Loaded', recipes ? recipes.length : 0, 'recipes');
+                
+                searchResults = recipes || [];
+                
+                if (!recipes || recipes.length === 0) {
+                    // Show empty state with suggestions
+                    emptyState.style.display = 'block';
+                    loadSuggestedRecipes();
+                } else {
+                    emptyState.style.display = 'none';
+                    displayRecipes(recipes, resultsGrid);
+                }
+            } catch (error) {
+                console.error('Load error:', error);
+                resultsGrid.innerHTML = '<p style="text-align: center; color: red;">Error loading recipes. Please refresh the page.</p>';
+            } finally {
+                loading.classList.remove('active');
+            }
+        }
     </script>
 </body>
 </html>

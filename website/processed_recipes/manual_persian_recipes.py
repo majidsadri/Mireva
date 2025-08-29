@@ -1,0 +1,858 @@
+#!/usr/bin/env python3
+"""
+Manual Persian Recipes - Convert text recipes to JSON format
+"""
+
+import json
+from datetime import datetime
+import hashlib
+
+def create_recipe_id(name):
+    """Generate unique ID for recipe"""
+    return f"manual_{hashlib.md5(name.encode()).hexdigest()[:8]}"
+
+# Define all recipes
+recipes = [
+    {
+        "name": "Fesenjoon - Pomegranate Walnut and Chicken Stew",
+        "description": "A rich Persian stew with pomegranate, walnuts, and chicken, creating a perfect sweet-and-sour balance",
+        "ingredients": [
+            "4 boneless, skinless chicken breasts, cut into small chunks",
+            "1 large onion, peeled, minced",
+            "2 cups shelled walnuts, finely ground",
+            "1 cup pomegranate molasses, plus more if needed",
+            "1/4 cup sugar, plus more if needed",
+            "Dash of cinnamon",
+            "Vegetable oil",
+            "Salt and pepper to taste"
+        ],
+        "steps": [
+            "Pulse the walnuts a few times in a food processor until finely ground.",
+            "In a small pan, heat 2 tablespoons of oil over medium heat. Add the walnuts and sauté them lightly for 2-3 minutes, stirring often.",
+            "Add the pomegranate molasses and 2 cups of water to the pan. Mix well, cover with the lid slightly ajar, and simmer over low heat for 30-40 minutes.",
+            "In a large heavy-bottomed pot, heat 2 tablespoons of oil over medium heat. Sauté the onions until golden brown.",
+            "Add the chicken pieces to the pot and cook until golden on all sides. Add salt, pepper, and a small dash of cinnamon. Start with 1/2 teaspoon of salt; you can adjust later.",
+            "Pour the pomegranate-walnut mixture into the pot with the chicken. Stir well, adding water if needed, so the chicken is fully covered, and brought back to a boil. Then reduce the heat to low, cover, and simmer for 2 hours. The slow cooking allows the chicken, walnuts, and pomegranate sauce to become rich and creamy.",
+            "Add sugar 1 tablespoon at a time, mixing gently without breaking up the chicken. Taste and adjust to your preference. Fesenjoon is traditionally a balanced, sweet-and-sour (malas) dish.",
+            "If the fesenjoon is too thin, leave the lid slightly ajar and simmer until it reaches a thick consistency. Fesenjoon should never be watery.",
+            "Serve hot with aromatic basmati rice."
+        ],
+        "minutes": 180,
+        "primary_category": "Stew"
+    },
+    {
+        "name": "Ghormeh Sabzi - Persian Herb Stew",
+        "description": "The king of Persian stews, made with fresh herbs, kidney beans, and tender meat",
+        "ingredients": [
+            "2 pounds lamb or beef, washed and cubed",
+            "1 cup red kidney beans or pinto beans, soaked overnight",
+            "1 large yellow onion, finely chopped",
+            "4 bunches flat-leaf parsley",
+            "1 bunch cilantro",
+            "2 large leeks or 4 scallions (green stems only)",
+            "1 small bunch fresh fenugreek, or 1 tablespoon dried fenugreek (shanbalileh)",
+            "3-4 dried lemons (limoo amani), pierce each lemon a few times with a fork",
+            "1 teaspoon turmeric",
+            "Salt and pepper, to taste",
+            "Vegetable oil"
+        ],
+        "steps": [
+            "Clean, wash, and dry the herbs. Finely chop the parsley, cilantro, leeks/scallions, and fenugreek.",
+            "Heat 1/3 cup vegetable oil in a large skillet over medium heat. Add the chopped herbs and saute for about 15 minutes, stirring frequently. Set aside.",
+            "In a large stew pot, heat 2 tablespoons of oil. Add the chopped onions and saute until golden brown.",
+            "Add cubed meat, turmeric, salt, and pepper. Cook until brown on all sides.",
+            "Add the soaked beans, sauteed herbs, and dried lemons.",
+            "Pour in enough water to cover the mixture by about 2 inches. Bring to a boil for a few minutes, then reduce the heat to medium-low. Cover, and cook on medium to low heat for 1 1/2 hours.",
+            "Taste and adjust the seasoning. Add more water if needed. Lower the heat and let the stew gently simmer for another 30 minutes.",
+            "Serve hot with basmati rice, salad shirazi, and mast o khiar."
+        ],
+        "minutes": 150,
+        "primary_category": "Stew"
+    },
+    {
+        "name": "Khoresh Bamieh Khuzestani - Southern Iranian Okra Stew",
+        "description": "A tangy Southern Iranian stew with okra and tamarind",
+        "ingredients": [
+            "1 pound meat (lamb or beef), cubed",
+            "1 pound whole baby okra (fresh or frozen), wash and trim",
+            "1 cup tamarind sauce",
+            "1 teaspoon tomato paste",
+            "1 large onion, thinly sliced",
+            "7-9 garlic cloves, minced",
+            "1 teaspoon red pepper",
+            "1/2 teaspoon ground black pepper",
+            "1/2 teaspoon turmeric",
+            "Salt to taste",
+            "Oil for frying"
+        ],
+        "steps": [
+            "Place 7 ounces of tamarind paste with pods in a bowl. Cover with 1-2 cups of hot water for an hour to soften. Separate pods from pulp and strain.",
+            "In a large stew pot, heat 3 tablespoons of oil and saute onions on medium heat until golden. Add turmeric and garlic, saute for about 5 minutes.",
+            "Add the meat and brown on all sides. Add salt and pepper to taste.",
+            "Add 5 cups of water, bring to a boil on medium-high heat. Lower heat, cover and cook for 45-50 minutes or until meat is tender.",
+            "In a separate skillet, heat 2 tablespoons of oil, saute okra lightly over medium heat for five minutes. Remove and set aside.",
+            "In the same skillet heat a tablespoon of oil, add the tomato paste and cook for a couple of minutes over medium-low heat.",
+            "Add the tomato sauce and tamarind sauce to the stew pot, simmer for another 5-7 minutes over medium-low heat.",
+            "Add the fried okras to the stew pot and cook for an additional 20 minutes to soak up the flavors.",
+            "Serve hot with rice, yogurt, herbs, and bread."
+        ],
+        "minutes": 90,
+        "primary_category": "Stew"
+    },
+    {
+        "name": "Khoresh Gheymeh",
+        "description": "A classic Persian stew with yellow split peas and dried limes",
+        "ingredients": [
+            "2 pounds of lamb or beef, rinsed and cut into small pieces",
+            "1 cup yellow split peas, picked over and washed",
+            "1 large onion, peeled and chopped",
+            "2-3 tablespoons tomato paste",
+            "4-5 dried limes (limoo amani), soaked for 5 minutes, then pierced with a fork",
+            "1/2 teaspoon turmeric",
+            "A pinch of cinnamon",
+            "1 teaspoon rosewater (optional)",
+            "Salt and pepper to taste",
+            "Vegetable oil",
+            "2 large potatoes, peeled, sliced, and fried for topping"
+        ],
+        "steps": [
+            "Heat 1 tablespoon of oil in a small saucepan over medium heat. Add tomato paste and saute for 2-3 minutes, stirring frequently, until it darkens slightly. Set aside.",
+            "In a large pot, heat 3 tablespoons of oil over medium heat. Add the onions and saute until translucent. Stir in the turmeric and cook for another minute.",
+            "Add the meat and brown it on all sides. Season with salt, pepper, and a pinch of cinnamon.",
+            "Stir in the yellow split peas and saute for about 5 minutes. Add the tomato paste and mix well.",
+            "Pour in enough water to cover the ingredients by 1-2 inches. Add the dried limes. Bring to a boil, then reduce the heat, cover, and simmer for about 1 1/2 to 2 hours or until the meat is tender.",
+            "The split peas should be tender but still hold their shape. To ensure this, you can parboil them separately until just tender and add them during the last 30-40 minutes of cooking.",
+            "In the last ten minutes, stir in the rosewater if using.",
+            "Serve the gheymeh in a large bowl, topped with the fried potato slices. Pair it with basmati rice."
+        ],
+        "minutes": 120,
+        "primary_category": "Stew"
+    },
+    {
+        "name": "Khoresh Karafs - Celery Stew",
+        "description": "A fragrant Persian stew with celery, herbs, and tender meat",
+        "ingredients": [
+            "1 pound beef or lamb, washed and cut into cubes",
+            "1 large onion, peeled and chopped",
+            "1 head of celery, washed, cut into 1-inch pieces",
+            "2 bunches fresh flat-leaf parsley, finely chopped",
+            "1 bunch fresh mint, finely chopped, or 2-3 tablespoons dried mint",
+            "2 large garlic cloves, minced",
+            "2-3 tablespoons freshly squeezed lemon juice",
+            "1/2 teaspoon turmeric",
+            "Salt and pepper, to taste",
+            "Vegetable oil"
+        ],
+        "steps": [
+            "In a large pot, heat 3 tablespoons of oil over medium-high heat. Add chopped onions and cook until golden. Stir in the minced garlic and saute for 2-3 minutes more.",
+            "Add turmeric and the meat to the pot, and brown the meat on all sides. Season with salt and pepper.",
+            "Pour in 2-3 cups of water, bring to a boil, then reduce the heat to medium-low, cover, and cook for about 30-40 minutes.",
+            "In a large frying pan, heat 2-3 tablespoons of oil over medium-high heat. Sauté the celery pieces until softened.",
+            "Add the parsley and mint; stir well and sauté for another 4-5 minutes.",
+            "Add the sauteed vegetables to the pot with the meat. Adjust seasoning and water level, if necessary. Cover and simmer for 1 1/2 hours, until the meat is tender.",
+            "Stir in lemon juice toward the end of cooking.",
+            "Serve with rice and salad."
+        ],
+        "minutes": 120,
+        "primary_category": "Stew"
+    },
+    {
+        "name": "Khoresh Rivas - Persian Rhubarb Stew",
+        "description": "A unique Persian stew with tangy rhubarb and fresh herbs",
+        "ingredients": [
+            "5 stalks of rhubarb, washed, dried and cut into small bite-sized pieces",
+            "1 1/2 pounds of meat (lamb, beef or chicken), washed and cubed",
+            "1 large onion, peeled, finely chopped",
+            "1-2 garlic cloves, minced",
+            "1 bunch of parsley, remove thick stems, wash and chop (makes about 2 cups, packed)",
+            "1 bunch of mint, leaves only, wash and chop (makes about 1 cup, packed)",
+            "1/2 teaspoon turmeric",
+            "1 tablespoon liquid saffron",
+            "Salt and pepper to taste",
+            "1 tablespoon sugar or to taste (optional)",
+            "Vegetable oil/olive oil"
+        ],
+        "steps": [
+            "In a pan, heat 2-3 tablespoons of oil, saute chopped onions until translucent. Add garlic and turmeric, stir.",
+            "Add the meat and brown on all sides. Add salt, pepper and saffron.",
+            "Pour enough water to cover the meat by couple of inches. Cover and cook for an hour on medium to low heat.",
+            "In a medium-sized frying pan, saute the chopped parsley and mint together in 2 tablespoons of oil over medium heat.",
+            "Combine the parsley and mint mixture with the meat sauce half way through the cooking. Add water if necessary.",
+            "Lightly saute sliced rhubarbs in 2 tablespoons of olive oil for 2-3 minutes on medium heat.",
+            "Add the rhubarb to the pot, lower the heat to a gentle simmer and cook for about 10 minutes.",
+            "Taste and add a tablespoon of sugar or to taste, gently stir and cook for an additional 5 minutes."
+        ],
+        "minutes": 90,
+        "primary_category": "Stew"
+    },
+    {
+        "name": "Khoresh-e Beh - Quince Stew",
+        "description": "A sweet and savory Persian stew with quince and yellow split peas",
+        "ingredients": [
+            "2 pounds meat (lamb or beef), washed and cubed",
+            "4 medium-size quince, washed, cored and sliced",
+            "1 cup yellow split peas, picked over and rinsed",
+            "1 large onion, peeled and chopped",
+            "2-3 tablespoons tomato paste",
+            "1/4 teaspoon turmeric",
+            "1/2 teaspoon liquid saffron",
+            "Salt and pepper to taste",
+            "2-3 dried lemons (limoo amani) or juice of a lime",
+            "2 tablespoons sugar",
+            "A dash of cinnamon",
+            "Vegetable oil"
+        ],
+        "steps": [
+            "Heat 3 tablespoons oil in a large heavy-bottomed pot over medium-high heat.",
+            "Add chopped onion and cook until golden brown, add turmeric powder and stir.",
+            "Place the meat in the pot and brown on all sides.",
+            "Add the tomato paste and cook for five minutes. Stir.",
+            "Add the peas to the pot and give it a gentle stir, cook for 3-5 minutes.",
+            "Add cinnamon, saffron, dried lemons salt and pepper. Pour water in the pot, bring to a boil, then lower the heat, cover and cook on a medium to low heat for an hour.",
+            "Heat 2-3 tablespoons of oil in a skillet and cook the slices of quince for 7-10 minutes over medium heat.",
+            "Sprinkle sugar over quince slices and stir well till sugar is completely dissolved. Set aside.",
+            "In an ovenproof casserole dish, pour in the meat mixture, adjust the seasoning and gently layer the cooked quince slices on top.",
+            "Cook in the 350 degrees Fahrenheit preheated oven for 50 minutes.",
+            "Serve with rice."
+        ],
+        "minutes": 120,
+        "primary_category": "Stew"
+    },
+    {
+        "name": "Persian Apple Stew with Dried Apricot",
+        "description": "A fragrant Persian stew combining apples and apricots with warm spices",
+        "ingredients": [
+            "2 pounds boneless stew beef, washed and cubed",
+            "5 Granny Smith apples, peeled, cored, sliced",
+            "1 cup dried apricots",
+            "1 large yellow onion, chopped",
+            "1 medium ripe tomato, diced",
+            "2 tablespoons all-purpose flour",
+            "3 garlic cloves, minced",
+            "2 tablespoons fresh lime juice",
+            "2 tablespoons sugar",
+            "1 teaspoon turmeric",
+            "1 teaspoon ground cinnamon",
+            "1/2 teaspoon crushed rose petals",
+            "1/3 teaspoon crushed cardamom",
+            "1/8 teaspoon ground nutmeg",
+            "1/8 teaspoon ground cloves (optional)",
+            "Salt and pepper to taste",
+            "Olive oil/vegetable oil"
+        ],
+        "steps": [
+            "In a large bowl combine the apple slices and lime juice. Set aside.",
+            "In a large stewing pot, add 2-3 tablespoons of oil, on medium-high heat, add the chopped onions, stirring occasionally, saute until soft and golden brown.",
+            "Add the turmeric powder, stir well and add the minced garlic. Saute for a couple of minutes.",
+            "Add the beef cubes and brown on all sides. Add the tomatoes, crushed rose petals, cardamom, and salt and pepper to taste.",
+            "Add enough hot water to cover all ingredients by 2-3 inches. Bring back to a boil for five minutes. Reduce the heat to medium, cover, and cook for an hour or until meat is tender.",
+            "Meanwhile, heat 2 tablespoons of oil in a large frying pan, add the apples, cinnamon, nutmeg, and cloves until the apples are just golden, and soften a little. Add the flour, stirring well to blend.",
+            "Add the apples, apricots, and sugar to the stew, cover, and cook for 15-20 minutes on low heat until the flavors come together.",
+            "Serve warm in a bowl with rice, yogurt, and salad."
+        ],
+        "minutes": 100,
+        "primary_category": "Stew"
+    },
+    {
+        "name": "Ghalieh Mahi - Southern Iranian Spicy Fish & Herb Stew",
+        "description": "A spicy and tangy fish stew from Southern Iran with fresh herbs and tamarind",
+        "ingredients": [
+            "2 pounds fish fillet (salmon, snapper, tilapia, halibut, cod), cut into small pieces",
+            "3 cups freshly chopped cilantro",
+            "1 cup freshly chopped fenugreek or 2 tablespoons dried fenugreek",
+            "7 garlic cloves, finely minced",
+            "2 medium onions, finely diced",
+            "6-ounce tamarind pulp with seeds or 2 tablespoons tamarind concentrate",
+            "1 teaspoon red pepper powder",
+            "1 teaspoon turmeric powder",
+            "2 tablespoons all-purpose flour",
+            "Salt and pepper to taste",
+            "Vegetable oil/olive oil"
+        ],
+        "steps": [
+            "Place the tamarind in a small bowl, add 1 cup of hot water and soak for 20 minutes. When cool enough to touch, separate and remove the seeds and pass the liquid through a sieve. Set aside.",
+            "In a small bowl combine the flour with 1/2 teaspoon of turmeric, 1/2 teaspoon salt, 1/4 teaspoon black pepper, and 1/2 teaspoon red pepper.",
+            "Generously coat the fish with the flour-turmeric mixture and set aside for 10-15 minutes. Dust off any excess flour before frying.",
+            "Heat 3 tablespoons of vegetable oil in a skillet and lightly saute the fish pieces on all sides on medium heat. Set aside.",
+            "In a large pan saute chopped onions in 3 tablespoons of hot oil until translucent on medium-high heat.",
+            "Stir in 1/2 teaspoon of turmeric powder and the minced garlic, and cook for another couple of minutes on medium-low heat.",
+            "Add the freshly chopped herbs to the pan, and saute along with the onion and garlic for about 10 minutes on medium heat.",
+            "Pour in the tamarind sauce, and simmer on medium-low heat until all flavors come together for about 15-20 minutes.",
+            "Gently place the fish in the stew, add salt, pepper and red pepper to taste. Add a little more hot water if needed. Cover and cook for another 20 minutes on low heat. Do not stir.",
+            "Serve warm with basmati rice."
+        ],
+        "minutes": 60,
+        "primary_category": "Stew"
+    },
+    {
+        "name": "Khoresh Kadoo Sabz - Gray Squash Lamb Stew",
+        "description": "A comforting Persian stew with gray squash or zucchini and tender lamb",
+        "ingredients": [
+            "1 1/2 pounds meat (lamb or beef), wash, cut in cubes",
+            "7 gray squash or zucchini, wash, peel, cut in half",
+            "2 large tomatoes, remove skin and finely chop",
+            "2 tablespoons tomato paste",
+            "1 large onion, peeled, thinly sliced",
+            "2-3 cloves of garlic, peeled, finely chopped",
+            "1/3 teaspoon turmeric",
+            "3-4 crushed or whole dried lemons (limoo amani) or juice of 1-2 lemons",
+            "1/3 teaspoon cinnamon",
+            "Salt and pepper to taste",
+            "Vegetable oil"
+        ],
+        "steps": [
+            "Heat 3 tablespoons oil in a frying pan, fry the squash slices over medium heat until golden brown on both sides. Set aside.",
+            "Heat 2 tablespoons oil in a pan, saute sliced onions over medium heat until translucent, add the turmeric powder and garlic, stir and saute for another 2-3 minutes.",
+            "Add the meat, brown on all sides, add cinnamon, salt and pepper.",
+            "Add the tomato paste, cook for five minutes, add the crushed tomatoes.",
+            "Add water to cover the ingredients by a couple of inches and add limoo amani. Bring to a rapid boil, lower the heat to medium low, cover and cook for an hour or until meat is tender.",
+            "Add water if needed. If you are using lemon juice, add it after the meat becomes tender.",
+            "In an oven-proof dish, place half of the meat sauce and add a layer of the fried squash, repeat.",
+            "Taste and adjust the seasoning, cover with a foil and cook for 40 minutes in the 350 degrees Fahrenheit preheated oven.",
+            "Serve warm with white basmati rice, yogurt, salad and herbs."
+        ],
+        "minutes": 120,
+        "primary_category": "Stew"
+    },
+    {
+        "name": "Kotlet - Persian Meat Patties",
+        "description": "Crispy Persian meat and potato patties, perfect as appetizer or main dish",
+        "ingredients": [
+            "1 1/2 pounds ground meat (lamb or beef)",
+            "2 large potatoes, cooked, peeled and grated",
+            "1 large onion, grated",
+            "2-3 large eggs, lightly whisked",
+            "1/2 teaspoon turmeric powder",
+            "A pinch of red pepper (optional)",
+            "Salt and pepper to taste",
+            "1/2 cup dried bread crumbs",
+            "Oil for frying"
+        ],
+        "steps": [
+            "In a large mixing bowl combine the ground beef, onion, potatoes, eggs, turmeric, salt, pepper and a pinch of red pepper, mix well by hand.",
+            "Take a handful of the mixture, flatten into an oval or a round shape.",
+            "Dip in dried breadcrumbs, making sure to cover both sides, then shake of the excess.",
+            "Heat 4 tablespoons of vegetable oil in a large frying pan over medium heat.",
+            "Fry the patties in hot oil, until brown on both sides.",
+            "Serve warm or at room temperature with salad shirazi, sabzi khordan, pickles, mast o khiar and warm bread."
+        ],
+        "minutes": 30,
+        "primary_category": "Main Course"
+    },
+    {
+        "name": "Kookoo Bademjan - Eggplant Kookoo",
+        "description": "A Persian egg and eggplant dish that can be served as appetizer or main course",
+        "ingredients": [
+            "5 medium-size eggplants, washed and wiped",
+            "1 large leek, washed, trimmed, thinly sliced into rounds",
+            "1 medium onion, peeled, thinly sliced",
+            "1 bunch of parsley, washed, chopped",
+            "1-2 garlic cloves minced",
+            "3 eggs",
+            "2 tablespoons flour",
+            "1/2 teaspoon turmeric",
+            "1/3 teaspoon red pepper",
+            "Salt and pepper to taste",
+            "3 tablespoons olive oil",
+            "1-2 tablespoons walnuts, chopped (optional)",
+            "2-3 small tomatoes, washed, sliced (optional)"
+        ],
+        "steps": [
+            "Pierce the eggplants with a fork or a sharp knife in several places.",
+            "Preheat oven to 375 degrees Fahrenheit and bake the eggplants for 30-40 minutes.",
+            "Remove from heat and place in the colander to let the eggplant's bitter liquid out.",
+            "Once the eggplants are cooled, separate the skin and chop them and set aside.",
+            "Heat oil in a skillet over medium heat and saute the onions until golden brown.",
+            "Add turmeric, stir, add garlic, saute for 2-3 more minutes and add the sliced leeks. Saute for an additional 5 more minutes or until the leeks are soft and tender.",
+            "Sprinkle a dash of salt and add the walnuts and the chopped parsley. Give it a good stir and set aside.",
+            "In a large mixing bowl, combine the eggplants, leek and parsley mixture, egg, red pepper, flour and salt. Mix thoroughly.",
+            "Lightly grease the bottom of the baking pan. Pour in the mixture and flatten the surface. Garnish with sliced tomatoes.",
+            "Cover with aluminum foil and cook in the 350 degrees Fahrenheit preheated oven for 45-50 minutes. Remove the foil for the last 20 minutes.",
+            "You may put the kookoo under the broiler for an additional 4-5 minutes to roast the top.",
+            "Serve on a platter, warm or cold, with warm bread and yogurt."
+        ],
+        "minutes": 90,
+        "primary_category": "Main Course"
+    },
+    {
+        "name": "Adas Polow - Rice with Lentils",
+        "description": "A festive Persian rice dish with lentils, raisins, and dates",
+        "ingredients": [
+            "2 cups rice",
+            "1 1/2 cups dried lentils",
+            "1/4 teaspoon ground saffron, dissolved in 3 tablespoons of hot water",
+            "1 small onion, finely chopped",
+            "Dash of cinnamon",
+            "1/4 teaspoon turmeric",
+            "1/2 cup raisins",
+            "1/2 cup chopped dates",
+            "Salt and pepper to taste",
+            "Vegetable oil or olive oil"
+        ],
+        "steps": [
+            "Pick over the lentils and rinse. Place in a pot, add 2 1/2 cups of water, and bring to a boil on medium-high heat.",
+            "Reduce heat to medium-low, add 1/4 teaspoon salt, cover, and cook for about 20 minutes, until lentils are soft. Set aside.",
+            "Rinse rice with cool water, soak in 3-4 cups of water with 2 tablespoons of salt for a couple of hours.",
+            "Saute chopped onions in 2 tablespoons of oil on medium heat until the onions begin to soften.",
+            "Add turmeric, stir, Add the raisins, dates, a dash of cinnamon, saute lightly for a couple of minutes. Set aside.",
+            "In a large non-stick pan, bring 4 cups of water to a rapid boil. Drain rice and pour into the boiling water.",
+            "Bring water back to a boil for 10 minutes on medium-high heat. Test to see if the rice is ready. Rice should be firm in the center and soft on the outside. Drain and rinse with cool water.",
+            "Wash the pot and return it to the heat. Add a couple of tablespoons of vegetable oil to the pot.",
+            "With a large spatula, place a layer of rice into the pot, place a layer of cooked lentils, then another layer of rice, continue building into a pyramid shape.",
+            "Spread the liquid saffron over the rice. Make 2-3 holes in the rice with the bottom of the spatula to release steam.",
+            "Cover and cook for 10 minutes on medium-high heat until rice is steaming, lower heat to medium-low and steam for another 45-50 minutes.",
+            "Serve rice on a large platter topped with fried onions, raisins and dates."
+        ],
+        "minutes": 90,
+        "primary_category": "Rice Dish"
+    },
+    {
+        "name": "Dami Baghali - Turmeric Rice With Yellow Fava Beans",
+        "description": "A simple and flavorful rice dish with fava beans and caramelized onions",
+        "ingredients": [
+            "1 1/2 cups dried yellow skinless fava beans",
+            "2 cups white long grain rice",
+            "2 large yellow onions, one onion diced finely, one sliced thinly",
+            "1 teaspoon turmeric",
+            "1/2 teaspoon cumin powder",
+            "A pinch of red pepper (optional)",
+            "Salt to taste",
+            "Vegetable oil or olive oil"
+        ],
+        "steps": [
+            "Rinse and soak the beans in 4 cups of cool water for a couple of hours. Drain.",
+            "Rinse the rice with cool water and soak in 4 cups of water with 2 tablespoons of salt for about an hour before cooking. Drain.",
+            "Heat about 3 tablespoons of vegetable oil in a large heavy bottom pot over medium heat.",
+            "Add the chopped onions, saute until lightly golden brown. Add turmeric, stir well.",
+            "Add the beans, cumin and red pepper. Cook over medium-low heat for 10 minutes, stirring intermittently.",
+            "Add the rice to the pot and pour enough water to cover the rice and beans about an inch above the rice.",
+            "Bring to a gentle boil over medium heat. Cover the lid with a clean kitchen towel to absorb the moisture.",
+            "Cover the pot and cook for about 45-50 minutes on low heat.",
+            "In the meantime saute the remaining sliced onions in 3 tablespoons of olive oil until soft and caramelized.",
+            "Serve rice on a platter, spoon the caramelized onions over top."
+        ],
+        "minutes": 60,
+        "primary_category": "Rice Dish"
+    },
+    {
+        "name": "Kalam Polow Shirazi - Shirazi Rice with Meatballs",
+        "description": "A festive rice dish from Shiraz with meatballs, herbs, and kohlrabi fries",
+        "ingredients": [
+            "2 cups long grain rice",
+            "1 pound ground beef",
+            "3-4 medium kohlrabi (kalam ghomri), peeled and sliced into french-fry strips",
+            "1 large onion, thinly sliced",
+            "1 large bunch of fresh basil (raihan), chopped",
+            "1 large bunch of fresh tarragon (tarkhoon), chopped",
+            "1 bunch of fresh savory (marzeh), chopped or 1/3 cup dried",
+            "1/2 teaspoon turmeric",
+            "1 tablespoon chickpea flour (optional)",
+            "A pinch of red pepper",
+            "A pinch of cumin powder",
+            "Salt and pepper to taste",
+            "Vegetable oil"
+        ],
+        "steps": [
+            "In a medium bowl combine ground beef, chickpea flour, salt and pepper. Shape into small meatballs.",
+            "Heat 3-4 tablespoons oil and saute onions until golden. Add turmeric, red pepper and cumin.",
+            "Place meatballs in pan, brown on all sides. Sprinkle 2 tablespoons chopped herbs over meatballs, reduce heat and cook 10-15 minutes.",
+            "In a skillet, heat 2 tablespoons oil and lightly saute the herbs together over medium-low heat for 2-3 minutes.",
+            "Heat 5-7 tablespoons oil on medium-high heat. Add kohlrabi fries and cook 4-5 minutes until golden. Remove and drain on paper towel.",
+            "Wash rice and soak in 8 cups water with 2 tablespoons salt for 2 hours.",
+            "Boil 3 quarts water. Drain rice and add to boiling water. Boil 7 minutes until rice is soft outside, firm inside. Drain and rinse.",
+            "Add 4 tablespoons oil to clean pot. Layer rice, herbs, meatballs and some fries, building into pyramid shape.",
+            "Make 3-4 holes in rice for steam. Cook 10 minutes until steaming.",
+            "Pour 2 tablespoons oil and 2 tablespoons water over rice, lower heat, cover and cook 45 minutes.",
+            "Serve on platter topped with remaining kohlrabi fries and fresh herbs."
+        ],
+        "minutes": 90,
+        "primary_category": "Rice Dish"
+    },
+    {
+        "name": "Shevid Baghali Polow - Dill & Lima Beans Rice",
+        "description": "A fragrant Persian rice with dill and lima beans, perfect with lamb",
+        "ingredients": [
+            "2 cups rice",
+            "2 cups frozen baby lima beans, thawed",
+            "2 cups finely chopped fresh dill or 1 1/2 cups dried dill",
+            "1/3 teaspoon turmeric",
+            "Dash of cinnamon",
+            "Salt",
+            "Butter or vegetable oil"
+        ],
+        "steps": [
+            "In a medium bowl mix dill, lima beans, a dash of salt, cinnamon and turmeric. Mix well and set aside.",
+            "Wash rice with cool water. Soak in 4 cups of water with 2-3 tablespoons of salt for a couple of hours.",
+            "In a large non-stick pot, bring 4 cups of water to a rapid boil.",
+            "Drain rice and pour into boiling water and boil uncovered for 10 minutes until rice is firm in center and soft outside.",
+            "Drain and rinse with cool water.",
+            "Wash the pot and return to heat, add 3 tablespoons of oil.",
+            "Place a layer of rice into the pot and then a layer of dill and lima beans. Continue building into pyramid shape.",
+            "Make 2-3 holes in the rice with the bottom of the spatula to release steam.",
+            "Cover and cook for 5-7 minutes on medium-high heat until rice is steaming.",
+            "Pour 2 tablespoons oil and 1/4 cup water over rice. Lower heat and steam for 45-50 minutes.",
+            "Serve on a platter with lamb shanks or chicken."
+        ],
+        "minutes": 70,
+        "primary_category": "Rice Dish"
+    },
+    {
+        "name": "Sabzi Polow Mahi - Herb Rice with Fish",
+        "description": "Traditional Persian New Year dish with fragrant herb rice",
+        "ingredients": [
+            "2 cups long grain (basmati) rice",
+            "1 cup chopped fresh parsley",
+            "1 cup chopped fresh dill",
+            "1 cup chopped fresh coriander",
+            "1 cup chopped fresh scallions (green parts only)",
+            "3-4 garlic cloves",
+            "1/2 teaspoon saffron dissolved in 4 tablespoons hot water",
+            "Salt",
+            "Vegetable oil or butter"
+        ],
+        "steps": [
+            "Clean, wash, dry and finely chop the herbs and mix them together in a large bowl.",
+            "Wash the rice with cool water. Soak in 8 cups of water with 4 tablespoons of salt for a couple of hours.",
+            "In a large non-stick pan, bring 3 quarts of water to a rapid boil.",
+            "Drain the rice and add to the pot. Bring water back to a boil for about 5-7 minutes.",
+            "Test rice - should be firm in center and soft outside. Strain and rinse with cool water.",
+            "Wash and dry the pot and return to heat, add 4 tablespoons of oil and a few drops of liquid saffron.",
+            "Place rice into pot in layers with vegetables, building into pyramid shape. Place garlic cloves between rice.",
+            "Make 4 holes in rice with spatula to release steam.",
+            "Cover and cook 7-10 minutes on medium-high heat until steaming.",
+            "Pour 2 tablespoons oil and 2-3 tablespoons water over rice, lower heat, cover and steam 50 minutes.",
+            "Take some rice from top, mix with dissolved saffron. Serve rice on platter with saffron rice on top."
+        ],
+        "minutes": 80,
+        "primary_category": "Rice Dish"
+    },
+    {
+        "name": "Tah-Chin - Upside Down Layered Saffron Rice & Chicken",
+        "description": "An elegant Persian rice cake with layers of saffron rice and chicken",
+        "ingredients": [
+            "2 1/2 cups long-grain basmati rice",
+            "2 boneless skinless chicken breasts",
+            "2 eggs, yolks only",
+            "1 1/2 cups plain yogurt",
+            "1 teaspoon ground saffron, dissolved in 4 tablespoons hot water",
+            "1 large onion, peeled, and thinly sliced",
+            "1/4 teaspoon turmeric",
+            "2 tablespoons freshly squeezed lemon juice",
+            "Salt to taste",
+            "Butter or vegetable oil",
+            "Barberries, slivered almonds, or pistachios for garnish"
+        ],
+        "steps": [
+            "Place chicken breasts in pot with sliced onions, add turmeric, 1/2 teaspoon salt, and a cup of water.",
+            "Bring to boil on medium-high heat, reduce heat, add a tablespoon of saffron water, cover, and cook 45 minutes on medium-low.",
+            "Set aside to cool slightly. Cut chicken into small pieces or shred. Add lemon juice.",
+            "Bring 6 cups water to boil. Add rice and boil 8-10 minutes until rice grains are soft on ends and firm in center.",
+            "Drain and rinse with cool water to wash away starch and separate grains.",
+            "In a large mixing bowl combine yogurt, yolks, salt, and saffron. Mix well.",
+            "Add the rice and 1-2 tablespoons of oil to yogurt mixture, blend well.",
+            "In a nonstick pan, add 3 tablespoons oil and move pan in circular motion to cover bottom uniformly.",
+            "Ladle 2/3 of rice into pan, flatten with wooden spoon, layer chicken pieces evenly.",
+            "Pour rest of rice over chicken, flatten top while pressing down.",
+            "Pour 2-3 tablespoons chicken stock or 2 tablespoons oil.",
+            "Place pot over medium heat. When steam comes up, lower heat, cover, and cook 45-50 minutes.",
+            "Let cool for a few minutes, then turn pot over onto serving platter. Garnish as desired."
+        ],
+        "minutes": 120,
+        "primary_category": "Rice Dish"
+    },
+    {
+        "name": "Salad Shirazi",
+        "description": "A refreshing Persian salad with cucumbers, tomatoes, and onions",
+        "ingredients": [
+            "6 Persian cucumbers, peeled, diced",
+            "3 medium ripe tomatoes, seeded, diced",
+            "1 medium red onion, diced",
+            "3 tablespoons olive oil",
+            "3 tablespoons freshly squeezed lime juice or verjuice",
+            "1 teaspoon dried mint",
+            "Salt and pepper to taste"
+        ],
+        "steps": [
+            "In a medium mixing bowl, whisk together olive oil, lime juice, dried mint, salt, and pepper.",
+            "Taste and adjust seasoning.",
+            "In a serving bowl, combine the diced tomatoes, cucumber, and onion.",
+            "Pour the dressing over the salad and mix well.",
+            "Serve chilled or at room temperature."
+        ],
+        "minutes": 15,
+        "primary_category": "Salad"
+    },
+    {
+        "name": "Kateh - Persian Style Plain Rice",
+        "description": "Simple Persian steamed rice with a crispy bottom",
+        "ingredients": [
+            "2 cups dry basmati rice",
+            "4 cups water",
+            "Salt to taste",
+            "Butter or vegetable oil"
+        ],
+        "steps": [
+            "Rinse the rice 2-3 times with cool water until it becomes clear, discard the water.",
+            "Place the rice in a medium-sized pot, add 4 cups of water and 1/2 teaspoon salt.",
+            "Bring to a boil on medium-high heat.",
+            "When the water starts boiling add 2 tablespoons oil or butter, gently stir once or twice with a wooden spoon.",
+            "Wrap the lid with a clean dishcloth, cover the pot and cook on low heat for about 30-40 minutes.",
+            "Serve the rice on a platter with yogurt, salad or your favorite khoresh."
+        ],
+        "minutes": 45,
+        "primary_category": "Rice Dish"
+    },
+    {
+        "name": "Zereshk Polow - Rice with Barberries",
+        "description": "Festive Persian rice with tangy barberries and saffron",
+        "ingredients": [
+            "2 cups basmati rice",
+            "1/2 cup dried barberries (zereshk)",
+            "1 teaspoon crushed saffron, dissolved in 3-4 tablespoons hot water",
+            "1-2 tablespoons sugar",
+            "Butter",
+            "Vegetable oil",
+            "Salt",
+            "Slivered almonds or pistachios for garnish"
+        ],
+        "steps": [
+            "Rinse rice with cool water. Soak in 8 cups of cool water with 4 tablespoons of salt for at least an hour.",
+            "Pick over dried barberries, wash and rinse, soak in cool water for ten minutes. Drain.",
+            "Place 2 tablespoon butter and 2 tablespoons oil in small saucepan, add zereshk, heat over medium-low for five minutes.",
+            "Add 2 tablespoons liquid saffron and 1-2 tablespoons sugar to balance the sour taste. Mix thoroughly. Set aside.",
+            "In a large non-stick pot, bring 3 quarts of water to rapid boil. Drain rice and pour into boiling water.",
+            "Bring water back to boil for about 7 minutes. Test rice - grains should be hard in center and soft outside.",
+            "Drain rice in mesh colander and rinse with cool water.",
+            "Wash pot and return to heat, add 3-4 tablespoons oil and a tablespoon of liquid saffron.",
+            "Place rice into pot, building into pyramid shape. Make 3-4 holes in rice with spatula to release steam.",
+            "Cook 7-10 minutes on medium heat until steaming. Pour 2 tablespoons oil and 1/4 cup water over rice.",
+            "Cover, lower heat and steam for 50 minutes.",
+            "Take some rice and mix with remaining saffron. Serve rice on platter, layer with barberries and saffron rice."
+        ],
+        "minutes": 80,
+        "primary_category": "Rice Dish"
+    },
+    {
+        "name": "Persian Macaroni (Spaghetti)",
+        "description": "Persian-style spaghetti with spiced meat sauce and crispy tahdig",
+        "ingredients": [
+            "1 pound lean ground beef",
+            "1 large onion, finely chopped",
+            "3 garlic cloves, minced",
+            "2 tablespoons tomato paste",
+            "1 (14-ounce) can tomato sauce",
+            "1/2 teaspoon turmeric",
+            "1/2 teaspoon dried oregano",
+            "A pinch of cayenne pepper",
+            "Salt and pepper to taste",
+            "Olive oil",
+            "1 lb thin spaghetti"
+        ],
+        "steps": [
+            "In a large skillet, heat 3 tablespoons of olive oil over medium-high heat.",
+            "Add the onion and saute until translucent. Add the garlic and cook for 2-3 minutes. Stir in the turmeric.",
+            "Add the ground meat, and brown well.",
+            "Stir in the tomato paste, cook for 2-3 minutes.",
+            "Add the tomato sauce, salt, pepper, cayenne pepper, and oregano, along with 1 cup of water.",
+            "Mix well, cover, and simmer over low heat for about 30 minutes.",
+            "Bring a large pot of salted water to a boil. Cook the pasta according to package directions until al dente. Drain.",
+            "Heat 2 tablespoons of oil in a heavy-bottomed nonstick pot.",
+            "Add a layer of pasta, then spoon over some of the meat sauce. Continue layering, building into pyramid shape.",
+            "Cover and cook for about 40 minutes over low heat to develop tahdig.",
+            "Serve with salad shirazi."
+        ],
+        "minutes": 60,
+        "primary_category": "Main Course"
+    },
+    {
+        "name": "Khorak-e Loobia - Kidney Beans Dish",
+        "description": "A hearty Persian kidney bean stew with tomatoes and lemon",
+        "ingredients": [
+            "2 cups red kidney beans",
+            "2 large onions, finely chopped",
+            "4 large cloves of garlic, minced",
+            "3-4 tablespoons olive oil",
+            "2 tablespoons tomato paste",
+            "Juice of 2-3 lemons/lime",
+            "Salt and pepper to taste"
+        ],
+        "steps": [
+            "Pick over the beans, rinse thoroughly and soak them in water overnight.",
+            "Pour the water out, rinse and place the beans in a large pot, add 6 cups of water.",
+            "Bring to a rapid boil on high heat, reduce the heat and cook for 15 minutes over medium-high heat.",
+            "Drain the beans in a colander, return them back into the pot.",
+            "Add enough water to cover the beans by two inches, cover and cook for an hour on medium heat.",
+            "In a skillet, saute the chopped onions in olive oil until golden brown.",
+            "Add garlic and saute for 2-3 minutes.",
+            "Then add the tomato paste, salt, and pepper, stir well, saute for another couple of minutes.",
+            "Add a cup of warm water, simmer on low heat for 10 minutes.",
+            "Pour the onion mixture into the pot with beans, stir.",
+            "Add lemon juice, taste and adjust the seasoning, cover and simmer for another 20-30 minutes.",
+            "Can be served warm or cold."
+        ],
+        "minutes": 120,
+        "primary_category": "Main Course"
+    },
+    {
+        "name": "Dolmeh Barg-e Kalam - Stuffed Cabbage Leaves",
+        "description": "Persian stuffed cabbage rolls with herbs, meat, and rice",
+        "ingredients": [
+            "1 large cabbage, washed, center core removed",
+            "2/3 pound lean ground beef",
+            "1/2 cup long-grain rice, rinsed",
+            "1/2 cup yellow split peas, rinsed",
+            "1 1/2 cups chopped fresh herbs (parsley, cilantro, chives, dill, basil, tarragon, mint)",
+            "1/4-1/2 cup raisins (optional)",
+            "1/4-1/2 cup barberries (optional)",
+            "1 large yellow onion, chopped",
+            "2 large garlic cloves, minced",
+            "1/2 teaspoon turmeric",
+            "A pinch of cumin",
+            "2 tablespoons liquid saffron",
+            "2 tablespoons tomato paste",
+            "1 medium onion, thinly sliced",
+            "Juice of a large lemon/lime or a tablespoon of vinegar",
+            "1 tablespoon powdered sugar (optional)",
+            "Salt and pepper to taste",
+            "Vegetable oil/olive oil"
+        ],
+        "steps": [
+            "Bring 6-8 cups water to boil, add tablespoon salt, add cabbage, cook 10 minutes. Drain. Peel each leaf, cut out hard rib.",
+            "Heat oil in skillet, saute chopped onion until golden, add garlic and turmeric. Stir and saute few more minutes.",
+            "Add ground beef, salt, pepper and brown until well done. Set aside.",
+            "In pot combine rice and split peas, add water to cover by an inch. Add salt and oil, bring to boil, reduce heat, cook until absorbed.",
+            "In large bowl, combine meat mixture, rice and peas, chopped herbs, cumin, and saffron. Mix well.",
+            "In pan, saute sliced onion in oil until translucent, add tomato paste, saute couple minutes.",
+            "Add salt and pepper. Add 3 cups water and bring to gentle simmer, cook until sauce thickened.",
+            "Place scoop of mixture in center of each cabbage leaf, fold bottom, sides, and top to complete wrap.",
+            "Arrange stuffed cabbage seam-down in large pot. Pour tomato sauce over dolmeh.",
+            "Cover and cook on medium-low heat for an hour.",
+            "In last 10-15 minutes add 2 tablespoons lemon juice and sprinkle of sugar.",
+            "Serve on platter with mast-o-khiar and sabzi khordan."
+        ],
+        "minutes": 90,
+        "primary_category": "Main Course"
+    },
+    {
+        "name": "Kabab Koobideh - Persian Grilled Ground Lamb",
+        "description": "Classic Persian ground lamb kebabs grilled on skewers",
+        "ingredients": [
+            "2 pounds finely ground lamb (grind it 2-3 times)",
+            "1 large onion, grated, squeeze out the juice",
+            "1 teaspoon salt or to taste",
+            "1 teaspoon black pepper or to taste",
+            "4 medium firm and ripe tomatoes, cut in halves (for grilling)",
+            "2 medium onions, quartered (optional, for grilling)",
+            "8 hot green peppers (optional, for grilling)"
+        ],
+        "steps": [
+            "In a large bowl combine all ingredients and mix well with hands until mixture becomes well blended and sticky.",
+            "Set aside at room temperature for at least an hour.",
+            "Leave a bowl of water next to you for dipping hands to prevent stickiness.",
+            "Take a handful and shape into oval, place on flat long metal skewer and press onto skewer.",
+            "Make sure both ends are sticking well. Set aside for at least half an hour.",
+            "Turn on gas grill and make sure it's very hot.",
+            "Place skewers on grill one by one. Turn each skewer over quickly.",
+            "Continue turning until lamb is browned on both sides and well cooked.",
+            "Place vegetables directly on hot grill or on skewers and grill over flame.",
+            "Serve with rice and grilled vegetables."
+        ],
+        "minutes": 30,
+        "primary_category": "Kebab"
+    },
+    {
+        "name": "Abdoogh Khiar",
+        "description": "A refreshing Persian cold yogurt soup with cucumbers and herbs",
+        "ingredients": [
+            "2 cups plain yogurt",
+            "4 small Persian seedless cucumbers, peeled and cut into small pieces",
+            "3 medium-sized radishes, finely chopped",
+            "1 small bunch of fresh chives, chopped",
+            "1 small bunch of fresh mint, chopped",
+            "1 small bunch of fresh basil, chopped",
+            "1 small bunch of fresh tarragon, chopped",
+            "A few sprigs of fresh dill, chopped",
+            "1/2 cup of walnuts, roughly chopped",
+            "1/2 cup of yellow raisins, rinsed",
+            "Salt and pepper to taste",
+            "1 teaspoon dried rose petals",
+            "Dried or toasted flatbread",
+            "Cold water and ice cubes"
+        ],
+        "steps": [
+            "In a large bowl, beat the yogurt with a whisk for a minute until smooth.",
+            "Add the chopped cucumbers, radishes, chives, mint, basil, tarragon, dill, raisins, and walnuts, mix well.",
+            "Add salt and pepper to taste. Refrigerate for a couple of hours.",
+            "Remove from the refrigerator and add two cups of cold water while mixing. Add a cup of crushed ice.",
+            "About 5-7 minutes before serving, add a handful of small pieces of flatbread to the soup or serve on the side.",
+            "Taste and adjust the seasoning.",
+            "To serve, ladle abdoogh khiar into bowls and garnish with dried rose petals."
+        ],
+        "minutes": 20,
+        "primary_category": "Soup"
+    },
+    {
+        "name": "Zeytoon Parvardeh",
+        "description": "Marinated Persian olives with walnuts and pomegranate",
+        "ingredients": [
+            "1 pound firm green olives, pitted",
+            "1 cup walnuts, finely chopped",
+            "1/2 cup pomegranate molasses",
+            "5-7 garlic cloves, minced",
+            "3-4 tablespoons olive oil",
+            "A handful of fresh mint, chopped or 1-2 tablespoons dried",
+            "Salt and pepper",
+            "3 tablespoons pomegranate seeds (optional)"
+        ],
+        "steps": [
+            "In a medium-sized bowl combine olives, minced garlic, pomegranate seeds, and walnuts.",
+            "Add salt and pepper to taste.",
+            "Pour in the pomegranate molasses and the olive oil.",
+            "Add fresh mint and mix thoroughly.",
+            "Refrigerate for a couple of hours.",
+            "Transfer to a serving platter and serve at room temperature or cold."
+        ],
+        "minutes": 15,
+        "primary_category": "Appetizer"
+    }
+]
+
+# Convert to JSON format for deployment
+output_recipes = []
+for recipe_data in recipes:
+    recipe = {
+        "id": create_recipe_id(recipe_data["name"]),
+        "name": recipe_data["name"],
+        "description": recipe_data["description"],
+        "ingredients": recipe_data["ingredients"],
+        "steps": recipe_data["steps"],
+        "minutes": recipe_data["minutes"],
+        "nutrition": {
+            "calories": 350,
+            "protein": 25,
+            "carbohydrates": 40,
+            "fat": 15
+        },
+        "tags": ["Persian", "Traditional", "Authentic"],
+        "cuisine": ["Persian", "Iranian", "Middle Eastern"],
+        "difficulty": "Medium",
+        "primary_category": recipe_data["primary_category"],
+        "health_score": 75
+    }
+    output_recipes.append(recipe)
+
+# Save to file
+from datetime import datetime
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+output_file = f"processed_recipes/manual_persian_recipes_{timestamp}.json"
+
+with open(output_file, 'w', encoding='utf-8') as f:
+    json.dump(output_recipes, f, indent=2, ensure_ascii=False)
+
+print(f"✨ Created {len(output_recipes)} Persian recipes")
+print(f"💾 Saved to: {output_file}")
+print(f"\n📝 Recipes included:")
+for recipe in output_recipes:
+    print(f"   - {recipe['name']}")
+print(f"\n✨ Ready for deployment!")
+print(f"📌 Next step: ./deploy-add-recipes.sh {output_file}")

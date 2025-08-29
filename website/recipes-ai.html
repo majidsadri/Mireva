@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mireva Recipes - AI-Powered Recipe Discovery</title>
+    <meta name="description" content="Discover thousands of recipes or create custom ones with AI. Search by ingredients, cuisine, or let AI generate recipes based on what you have.">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #a5b4fc;
+            --mireva-purple: #8b5cf6;
+            --mireva-blue: #3b82f6;
+            --mireva-pink: #ec4899;
+            --mireva-teal: #06b6d4;
+            --mireva-green: #059669;
+            --mireva-green-dark: #047857;
+            --mireva-green-darker: #065f46;
+            --mireva-green-darkest: #064e3b;
+            --mireva-green-light: #10b981;
+            --secondary-color: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-light: #94a3b8;
+            --border-color: #e2e8f0;
+            --white: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 10px 10px -5px rgb(0 0 0 / 0.04);
+            --border-radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f8fffe 0%, #f2faf6 25%, #ecf5f0 50%, #e6f0ea 75%, #e0ebe4 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--mireva-green-darkest) 0%, var(--mireva-green-darker) 100%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(6, 78, 59, 0.3);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 0;
+            min-height: 80px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-decoration: none;
+            color: white;
+        }
+
+        .logo-container {
+            width: 54px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 14px;
+        }
+
+        .logo {
+            width: 32px;
+            height: 32px;
+            filter: brightness(0) invert(1);
+        }
+
+        .brand-text {
+            font-weight: 700;
+            font-size: 1.875rem;
+            color: white;
+        }
+
+        .subtitle {
+            font-size: 0.8125rem;
+            color: rgba(255, 255, 255, 0.9);
+            letter-spacing: 0.075em;
+            text-transform: uppercase;
+            margin-top: -4px;
+        }
+
+        /* Mode Toggle */
+        .mode-toggle {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            padding: 4px;
+            gap: 4px;
+        }
+
+        .mode-btn {
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.7);
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mode-btn.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .mode-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem 0;
+        }
+
+        /* Search Mode */
+        .search-mode {
+            display: block;
+        }
+
+        .search-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .search-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .search-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--mireva-green);
+        }
+
+        .search-btn {
+            padding: 0.75rem 2rem;
+            background: var(--mireva-green);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .search-btn:hover {
+            background: var(--mireva-green-dark);
+            transform: translateY(-1px);
+        }
+
+        /* Filter Tags */
+        .filter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .tag {
+            padding: 0.5rem 1rem;
+            background: var(--secondary-color);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tag:hover, .tag.active {
+            background: var(--mireva-green);
+            color: white;
+            border-color: var(--mireva-green);
+        }
+
+        /* AI Mode */
+        .ai-mode {
+            display: none;
+        }
+
+        .ai-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .ai-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ai-title i {
+            color: var(--mireva-purple);
+        }
+
+        .ai-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .ingredients-input {
+            width: 100%;
+            min-height: 120px;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            resize: vertical;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .ingredients-input:focus {
+            outline: none;
+            border-color: var(--mireva-purple);
+        }
+
+        .ai-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .ai-option {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .ai-option label {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .ai-option select {
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+
+        .generate-btn {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--mireva-purple), var(--mireva-blue));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--mireva-purple);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Recipe Cards */
+        .recipes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .recipe-card {
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .recipe-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .recipe-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+        }
+
+        .recipe-content {
+            padding: 1.25rem;
+        }
+
+        .recipe-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+
+        .recipe-meta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .recipe-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .recipe-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .recipe-tag {
+            padding: 0.25rem 0.5rem;
+            background: var(--secondary-color);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .ai-generated-badge {
+            background: linear-gradient(135deg, var(--mireva-purple), var(--mireva-blue));
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        /* Recipe Modal */
+        .recipe-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 200;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .recipe-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--border-radius);
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            padding: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .close-modal {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: var(--secondary-color);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .close-modal:hover {
+            background: var(--border-color);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .ingredients-list, .steps-list {
+            margin: 1.5rem 0;
+        }
+
+        .ingredients-list h3, .steps-list h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .ingredients-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .ingredients-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ingredients-list li:before {
+            content: "✓";
+            color: var(--mireva-green);
+            font-weight: bold;
+        }
+
+        .steps-list ol {
+            padding-left: 1.5rem;
+        }
+
+        .steps-list li {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        /* API Key Modal */
+        .api-key-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 300;
+            padding: 2rem;
+        }
+
+        .api-key-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .api-key-content {
+            background: white;
+            border-radius: var(--border-radius);
+            max-width: 500px;
+            width: 100%;
+            padding: 2rem;
+        }
+
+        .api-key-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .api-key-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            margin: 1rem 0;
+        }
+
+        .api-key-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .api-key-save, .api-key-cancel {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .api-key-save {
+            background: var(--mireva-green);
+            color: white;
+        }
+
+        .api-key-save:hover {
+            background: var(--mireva-green-dark);
+        }
+
+        .api-key-cancel {
+            background: var(--secondary-color);
+            color: var(--text-primary);
+        }
+
+        .api-key-cancel:hover {
+            background: var(--border-color);
+        }
+
+        .api-key-info {
+            background: var(--secondary-color);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .search-container {
+                flex-direction: column;
+            }
+
+            .recipes-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ai-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo-section">
+                    <div class="logo-container">
+                        <img src="/mireva-logo.png" alt="Mireva" class="logo">
+                    </div>
+                    <div>
+                        <div class="brand-text">Mireva</div>
+                        <div class="subtitle">Smart Recipes</div>
+                    </div>
+                </a>
+                
+                <div class="mode-toggle">
+                    <button class="mode-btn active" data-mode="search">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                    <button class="mode-btn" data-mode="ai">
+                        <i class="fas fa-sparkles"></i> AI Create
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content container">
+        <!-- Search Mode -->
+        <div class="search-mode mode-content">
+            <div class="search-section">
+                <h2 class="search-title">Search Recipes</h2>
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search for recipes, ingredients, or cuisines..." id="searchInput">
+                    <button class="search-btn" onclick="searchRecipes()">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+                
+                <div class="filter-tags" id="filterTags">
+                    <span class="tag" data-filter="Persian">Persian</span>
+                    <span class="tag" data-filter="Italian">Italian</span>
+                    <span class="tag" data-filter="Mexican">Mexican</span>
+                    <span class="tag" data-filter="Chinese">Chinese</span>
+                    <span class="tag" data-filter="Indian">Indian</span>
+                    <span class="tag" data-filter="Vegetarian">Vegetarian</span>
+                    <span class="tag" data-filter="Vegan">Vegan</span>
+                    <span class="tag" data-filter="Gluten-Free">Gluten-Free</span>
+                    <span class="tag" data-filter="Quick">Quick & Easy</span>
+                </div>
+            </div>
+
+            <div class="loading" id="searchLoading">
+                <div class="spinner"></div>
+                <p>Searching recipes...</p>
+            </div>
+
+            <div class="recipes-grid" id="searchResults"></div>
+
+            <div class="empty-state" id="searchEmpty" style="display: none;">
+                <i class="fas fa-search"></i>
+                <h3>No recipes found</h3>
+                <p>Try different keywords or filters</p>
+            </div>
+        </div>
+
+        <!-- AI Mode -->
+        <div class="ai-mode mode-content">
+            <div class="ai-section">
+                <h2 class="ai-title">
+                    <i class="fas fa-wand-magic-sparkles"></i>
+                    AI Recipe Generator
+                </h2>
+                <p class="ai-subtitle">Enter your ingredients and let AI create custom recipes for you</p>
+                
+                <textarea 
+                    class="ingredients-input" 
+                    id="ingredientsInput"
+                    placeholder="Enter ingredients you have, separated by commas&#10;Example: chicken, rice, tomatoes, onions, garlic"></textarea>
+                
+                <div class="ai-options">
+                    <div class="ai-option">
+                        <label>Cuisine Type</label>
+                        <select id="cuisineSelect">
+                            <option value="">Any Cuisine</option>
+                            <option value="Italian">Italian</option>
+                            <option value="Mexican">Mexican</option>
+                            <option value="Chinese">Chinese</option>
+                            <option value="Indian">Indian</option>
+                            <option value="Persian">Persian</option>
+                            <option value="Thai">Thai</option>
+                            <option value="Japanese">Japanese</option>
+                            <option value="Mediterranean">Mediterranean</option>
+                            <option value="French">French</option>
+                        </select>
+                    </div>
+                    
+                    <div class="ai-option">
+                        <label>Dietary Preference</label>
+                        <select id="dietSelect">
+                            <option value="">No Preference</option>
+                            <option value="vegetarian">Vegetarian</option>
+                            <option value="vegan">Vegan</option>
+                            <option value="gluten-free">Gluten-Free</option>
+                            <option value="dairy-free">Dairy-Free</option>
+                            <option value="keto">Keto</option>
+                            <option value="paleo">Paleo</option>
+                        </select>
+                    </div>
+                    
+                    <div class="ai-option">
+                        <label>Cooking Time</label>
+                        <select id="timeSelect">
+                            <option value="">Any Time</option>
+                            <option value="15">Under 15 mins</option>
+                            <option value="30">Under 30 mins</option>
+                            <option value="60">Under 1 hour</option>
+                            <option value="120">Under 2 hours</option>
+                        </select>
+                    </div>
+                    
+                    <div class="ai-option">
+                        <label>Number of Recipes</label>
+                        <select id="countSelect">
+                            <option value="3">3 Recipes</option>
+                            <option value="5">5 Recipes</option>
+                            <option value="10">10 Recipes</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button class="generate-btn" id="generateBtn" onclick="generateRecipes()">
+                    <i class="fas fa-sparkles"></i> Generate Recipes
+                </button>
+            </div>
+
+            <div class="loading" id="aiLoading">
+                <div class="spinner"></div>
+                <p>AI is creating your recipes...</p>
+            </div>
+
+            <div class="recipes-grid" id="aiResults"></div>
+
+            <div class="empty-state" id="aiEmpty">
+                <i class="fas fa-robot"></i>
+                <h3>Ready to create recipes</h3>
+                <p>Enter your ingredients and preferences above</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Recipe Modal -->
+    <div class="recipe-modal" id="recipeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Recipe Title</h2>
+                <button class="close-modal" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Recipe details will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- API Key Modal -->
+    <div class="api-key-modal" id="apiKeyModal">
+        <div class="api-key-content">
+            <h3 class="api-key-title">OpenAI API Key Required</h3>
+            <div class="api-key-info">
+                <i class="fas fa-info-circle"></i>
+                Your API key is stored locally in your browser and never sent to our servers.
+            </div>
+            <input 
+                type="password" 
+                class="api-key-input" 
+                id="apiKeyInput" 
+                placeholder="sk-..."
+                value="">
+            <div class="api-key-actions">
+                <button class="api-key-cancel" onclick="closeApiKeyModal()">Cancel</button>
+                <button class="api-key-save" onclick="saveApiKey()">Save & Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE = window.location.hostname === 'localhost' 
+            ? 'http://localhost:5002' 
+            : 'https://mireva.life';
+        
+        // State
+        let currentMode = 'search';
+        let searchResults = [];
+        let aiResults = [];
+        let openAIKey = localStorage.getItem('openai_api_key') || '';
+
+        // Mode switching
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const mode = this.dataset.mode;
+                switchMode(mode);
+            });
+        });
+
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            // Update buttons
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === mode);
+            });
+            
+            // Update content
+            document.querySelector('.search-mode').style.display = mode === 'search' ? 'block' : 'none';
+            document.querySelector('.ai-mode').style.display = mode === 'ai' ? 'block' : 'none';
+        }
+
+        // Search functionality
+        async function searchRecipes() {
+            const query = document.getElementById('searchInput').value;
+            const loading = document.getElementById('searchLoading');
+            const resultsGrid = document.getElementById('searchResults');
+            const emptyState = document.getElementById('searchEmpty');
+            
+            loading.classList.add('active');
+            resultsGrid.innerHTML = '';
+            emptyState.style.display = 'none';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/recipes/search?q=${encodeURIComponent(query)}&limit=24`);
+                const recipes = await response.json();
+                
+                searchResults = recipes;
+                
+                if (recipes.length === 0) {
+                    emptyState.style.display = 'block';
+                } else {
+                    displayRecipes(recipes, resultsGrid);
+                }
+            } catch (error) {
+                console.error('Search error:', error);
+                emptyState.style.display = 'block';
+            } finally {
+                loading.classList.remove('active');
+            }
+        }
+
+        // Filter tags
+        document.getElementById('filterTags').addEventListener('click', function(e) {
+            if (e.target.classList.contains('tag')) {
+                e.target.classList.toggle('active');
+                const activeFilters = Array.from(this.querySelectorAll('.tag.active'))
+                    .map(tag => tag.dataset.filter);
+                
+                if (activeFilters.length > 0) {
+                    const query = activeFilters.join(' ');
+                    document.getElementById('searchInput').value = query;
+                    searchRecipes();
+                }
+            }
+        });
+
+        // AI Recipe Generation
+        async function generateRecipes() {
+            // Check for API key
+            if (!openAIKey) {
+                document.getElementById('apiKeyModal').classList.add('active');
+                return;
+            }
+            
+            const ingredients = document.getElementById('ingredientsInput').value;
+            if (!ingredients.trim()) {
+                alert('Please enter some ingredients');
+                return;
+            }
+            
+            const cuisine = document.getElementById('cuisineSelect').value;
+            const diet = document.getElementById('dietSelect').value;
+            const time = document.getElementById('timeSelect').value;
+            const count = document.getElementById('countSelect').value;
+            
+            const loading = document.getElementById('aiLoading');
+            const resultsGrid = document.getElementById('aiResults');
+            const emptyState = document.getElementById('aiEmpty');
+            const generateBtn = document.getElementById('generateBtn');
+            
+            loading.classList.add('active');
+            resultsGrid.innerHTML = '';
+            emptyState.style.display = 'none';
+            generateBtn.disabled = true;
+            
+            try {
+                const prompt = buildPrompt(ingredients, cuisine, diet, time, count);
+                
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${openAIKey}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-3.5-turbo',
+                        messages: [
+                            {
+                                role: 'system',
+                                content: 'You are a professional chef and recipe creator. Generate detailed recipes in JSON format.'
+                            },
+                            {
+                                role: 'user',
+                                content: prompt
+                            }
+                        ],
+                        temperature: 0.7,
+                        max_tokens: 2000
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('API request failed');
+                }
+                
+                const data = await response.json();
+                const recipesText = data.choices[0].message.content;
+                
+                // Parse the JSON response
+                const recipes = JSON.parse(recipesText);
+                aiResults = recipes;
+                
+                displayAIRecipes(recipes, resultsGrid);
+                
+            } catch (error) {
+                console.error('AI generation error:', error);
+                alert('Failed to generate recipes. Please check your API key and try again.');
+                emptyState.style.display = 'block';
+            } finally {
+                loading.classList.remove('active');
+                generateBtn.disabled = false;
+            }
+        }
+
+        function buildPrompt(ingredients, cuisine, diet, time, count) {
+            let prompt = `Generate ${count} recipe ideas using these ingredients: ${ingredients}.`;
+            
+            if (cuisine) prompt += ` The recipes should be ${cuisine} cuisine.`;
+            if (diet) prompt += ` They should be ${diet}.`;
+            if (time) prompt += ` Cooking time should be under ${time} minutes.`;
+            
+            prompt += `
+
+Return the recipes as a JSON array with this exact format:
+[
+  {
+    "name": "Recipe Name",
+    "description": "Brief description",
+    "ingredients": ["ingredient 1", "ingredient 2"],
+    "steps": ["Step 1", "Step 2"],
+    "minutes": 30,
+    "servings": 4,
+    "difficulty": "Easy",
+    "cuisine": ["Cuisine Type"],
+    "tags": ["tag1", "tag2"]
+  }
+]
+
+Make the recipes creative, detailed, and practical.`;
+            
+            return prompt;
+        }
+
+        // Display functions
+        function displayRecipes(recipes, container) {
+            recipes.forEach(recipe => {
+                const card = createRecipeCard(recipe, false);
+                container.appendChild(card);
+            });
+        }
+
+        function displayAIRecipes(recipes, container) {
+            recipes.forEach(recipe => {
+                const card = createRecipeCard(recipe, true);
+                container.appendChild(card);
+            });
+        }
+
+        function createRecipeCard(recipe, isAI) {
+            const card = document.createElement('div');
+            card.className = 'recipe-card';
+            card.onclick = () => showRecipeDetails(recipe, isAI);
+            
+            const imageUrl = recipe.image || `https://source.unsplash.com/400x300/?${encodeURIComponent(recipe.name || 'food')}`;
+            
+            card.innerHTML = `
+                ${isAI ? '<div class="ai-generated-badge"><i class="fas fa-sparkles"></i> AI Generated</div>' : ''}
+                <img src="${imageUrl}" alt="${recipe.name}" class="recipe-image" onerror="this.src='https://via.placeholder.com/400x300?text=Recipe'">
+                <div class="recipe-content">
+                    <h3 class="recipe-title">${recipe.name}</h3>
+                    <div class="recipe-meta">
+                        <span><i class="far fa-clock"></i> ${recipe.minutes || 30} min</span>
+                        <span><i class="far fa-user"></i> ${recipe.servings || 4} servings</span>
+                        ${recipe.difficulty ? `<span><i class="far fa-chart-bar"></i> ${recipe.difficulty}</span>` : ''}
+                    </div>
+                    <div class="recipe-tags">
+                        ${(recipe.tags || recipe.cuisine || []).slice(0, 3).map(tag => 
+                            `<span class="recipe-tag">${tag}</span>`
+                        ).join('')}
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function showRecipeDetails(recipe, isAI) {
+            const modal = document.getElementById('recipeModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            
+            modalTitle.textContent = recipe.name;
+            
+            modalBody.innerHTML = `
+                ${isAI ? '<div class="ai-generated-badge"><i class="fas fa-sparkles"></i> AI Generated Recipe</div>' : ''}
+                
+                ${recipe.description ? `<p>${recipe.description}</p>` : ''}
+                
+                <div class="recipe-meta">
+                    <span><i class="far fa-clock"></i> ${recipe.minutes || 30} minutes</span>
+                    <span><i class="far fa-user"></i> ${recipe.servings || 4} servings</span>
+                    ${recipe.difficulty ? `<span><i class="far fa-chart-bar"></i> ${recipe.difficulty}</span>` : ''}
+                </div>
+                
+                <div class="ingredients-list">
+                    <h3>Ingredients</h3>
+                    <ul>
+                        ${(recipe.ingredients || []).map(ing => `<li>${ing}</li>`).join('')}
+                    </ul>
+                </div>
+                
+                <div class="steps-list">
+                    <h3>Instructions</h3>
+                    <ol>
+                        ${(recipe.steps || []).map(step => `<li>${step}</li>`).join('')}
+                    </ol>
+                </div>
+                
+                ${recipe.nutrition ? `
+                    <div class="nutrition-info">
+                        <h3>Nutrition</h3>
+                        <p>Calories: ${recipe.nutrition.calories || 'N/A'}</p>
+                    </div>
+                ` : ''}
+            `;
+            
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('recipeModal').classList.remove('active');
+        }
+
+        // API Key Management
+        function saveApiKey() {
+            const key = document.getElementById('apiKeyInput').value.trim();
+            if (key) {
+                openAIKey = key;
+                localStorage.setItem('openai_api_key', key);
+                closeApiKeyModal();
+                generateRecipes(); // Retry generation
+            } else {
+                alert('Please enter a valid API key');
+            }
+        }
+
+        function closeApiKeyModal() {
+            document.getElementById('apiKeyModal').classList.remove('active');
+        }
+
+        // Enter key support
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchRecipes();
+            }
+        });
+
+        // Close modals on outside click
+        document.getElementById('recipeModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        document.getElementById('apiKeyModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeApiKeyModal();
+            }
+        });
+
+        // Initial load - search for random recipes
+        window.addEventListener('load', () => {
+            searchRecipes();
+        });
+    </script>
+</body>
+</html>

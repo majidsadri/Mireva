@@ -1,0 +1,3180 @@
+[
+  {
+    "id": "french_83f9148b",
+    "spoonacular_id": 715569,
+    "name": "Strawberry Cheesecake Chocolate Crepes",
+    "description": "Need a lacto ovo vegetarian breakfast? Strawberry Cheesecake Chocolate Crepes could be an excellent recipe to try. This recipe serves 4. One portion of this dish contains about 16g of protei",
+    "ingredients": [
+      "8 oz cream cheese",
+      "1 1/4 cup diced strawberries",
+      "1 tsp vanilla extract",
+      "1 tsp lemon juice",
+      "2 tbsp granulated sugar",
+      "1 1/2 cups all-purpose flour",
+      "1/4 cup cocoa powder unsweetened",
+      "1/8 tsp kosher salt",
+      "3 eggs",
+      "1 1/4 cups milk",
+      "1/4 cup water",
+      "4 tbsp unsalted butter melted",
+      "1/2 tsp vanilla extract"
+    ],
+    "steps": [
+      "How to Make Strawberry Creme Cheese Filling",
+      "Add cream cheese, strawberries, vanilla extract, lemon juice, and granulated sugar into a medium-sized mixing bowl.",
+      "Use a hand mixer, wooden spoon, or spatula to mix ingredients.",
+      "Mix until smooth.",
+      "Set aside.",
+      "How to Blend Chocolate Crepes Ingredients",
+      "Combine flour, sugar, cocoa powder, salt, and eggs to a food processor or blender.",
+      "If using a food processor, keep it running as you add milk and water. Continue to pulse intil blended well.",
+      "Pour in melted butter and vanilla extract.",
+      "Set bowl aside.",
+      "How to Make Chocolate Crepes",
+      "Heat crepe pan or 8\"-10\" omelet pan over medium heat.",
+      "Pour 1/4 cup of batter directly into the middle of the pan and swirl to cover the bottom.",
+      "Cook the crepe for 2-3 minutes or until the bottom is light brown and the edges are completely set.",
+      "Flip the crepe over and cook for an additional minute.",
+      "Transfer to a serving platter and repeat for the rest of the batter."
+    ],
+    "minutes": 40,
+    "nutrition": {
+      "calories": 618,
+      "protein": 16,
+      "carbohydrates": 55,
+      "fat": 37
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 9.0
+  },
+  {
+    "id": "french_c805be06",
+    "spoonacular_id": 716407,
+    "name": "Simple Whole Wheat Crepes",
+    "description": "Simple Whole Wheat Crepes might be just the breakfast you are searching for. This recipe makes 4 servings with 272 calories, 10g of protein, and 14g of fat each. For 54 cents p",
+    "ingredients": [
+      "3 Tablespoons butter, melted",
+      "3 eggs",
+      "1 Tablespoon maple syrup (optional)",
+      "1 cup milk",
+      "pinch of sea salt",
+      "1 cup white whole wheat flour"
+    ],
+    "steps": [
+      "Place all ingredients in a blender and mix until smooth. The batter should be thin.",
+      "Let it sit at least 30 minutes—or even overnight.When it comes time to cook your crêpes you can do it the traditional way, in a crêpe pan, or you can use an electric crêpe maker."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 272,
+      "protein": 10,
+      "carbohydrates": 27,
+      "fat": 14
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 1.0
+  },
+  {
+    "id": "french_d8c71d0c",
+    "spoonacular_id": 652651,
+    "name": "Mushroom Crepes with Vegetarian Sauce",
+    "description": "You can never have too many breakfast recipes, so give Mushroom Crepes with Vegetarian Sauce a try. This lacto ovo vegetarian recipe serves 8 and costs $1.03 per serving. One serving contains <",
+    "ingredients": [
+      "½ cup canned corn",
+      "1-2 tbsp chopped chives",
+      "1/2 cup chopped dill",
+      "2 eggs",
+      "2-3 garlic cloves, mashed",
+      "1 tsp garlic powder",
+      "1/2 tsp ground coriander",
+      "1/3 tsp ground pepper",
+      "½ cup low fat sour cream",
+      "300g mushrooms",
+      "Oil – for frying",
+      "1 big onion, chopped",
+      "1/2 cup chopped parsley",
+      "a pinch of sea salt",
+      "sea salt, to taste",
+      "1tsp sweet paprika",
+      "250 ml water",
+      "1/2 cup white wine",
+      "200g whole wheat flour"
+    ],
+    "steps": [
+      "Whisk the eggs.",
+      "Add the water and mix well (you can also use a hand-held mixer).",
+      "Sprinkle the flour while continuously whisking/mixing until it has the right consistency.",
+      "Heat some oil in a frying pan over medium-high heat. Grease the whole surface of the pan and then pour the oil in a cup. You’ll be reusing it.",
+      "Add the mushrooms and wine in your food processor. Blend until you get a thick paste.",
+      "Heat some 1 tbsp oil in a large saucepan.",
+      "Add the chopped onion. Sauté until golden, then add the mushroom paste and corn.",
+      "Add spices.Cook for 15 minutes ten add the chopped dill and parsley and cook for another 5 minutes.",
+      "Mix last four ingredients and pour sauce over the vegetarian mushroom crepes."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 184,
+      "protein": 7,
+      "carbohydrates": 24,
+      "fat": 6
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 11.0
+  },
+  {
+    "id": "french_adbf0e31",
+    "spoonacular_id": 657939,
+    "name": "Ratatouille With Brie",
+    "description": "You can never have too many main course recipes, so give Ratatouille With Brie a try. One portion of this dish contains roughly 14g of protein, 45g of fat, and a total of 490 calories",
+    "ingredients": [
+      "1 Brie Log such as Alouette",
+      "1 small eggplant",
+      "4 oz. olive oil (for sautéing and garnishing)",
+      "1 zucchini",
+      "1 yellow squash",
+      "2 ripe plum tomatoes",
+      "1 tsp. thyme (chopped)"
+    ],
+    "steps": [
+      "Remove outer peel from eggplant and dice into  inch pieces",
+      "Heat 1-2 oz. of olive oil in a heavy gauge skillet",
+      "Saut the diced eggplant for 2-3 minutes then place on a towel to drain",
+      "After draining place cooked eggplant into a small oval casserole dish",
+      "Preheat oven to 375 F",
+      "Carefully slice the zucchini , yellow squash , and tomatoes about  inch even slices",
+      "Slice the Brie also into  inch slices (utilizing a cheese wire makes simplifies this)",
+      "Begin placing sliced yellow squash , zucchini , sliced Brie and tomatoes in a shingled pattern working from the outside of the casserole towards the center",
+      "When all vegetables and cheese are placed in the casserole, drizzle with the remaining olive oil and sprinkle with chopped thyme",
+      "Season with salt and pepper and bake in the oven for 10-15 minutes until bubbly"
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 489,
+      "protein": 14,
+      "carbohydrates": 11,
+      "fat": 44
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 15.0
+  },
+  {
+    "id": "french_6e1a4671",
+    "spoonacular_id": 716272,
+    "name": "Nutella Crepes and Ice Cream",
+    "description": "The recipe Nutella Crepes and Ice Cream could satisfy your Mediterranean craving in roughly 45 minutes. For $1.09 per serving, you get a dessert that serves 6. One portion of this dish c",
+    "ingredients": [
+      "Strawberries/ bananas",
+      "1 tablespoon of melted butter or oil",
+      "1 1/4 cup of butter milk (you can use any kind of milk available )",
+      "1/2 teaspoon of cinnamon",
+      "2 eggs",
+      "1 cup of flour",
+      "Ice cream",
+      "Nutella",
+      "Oil or butter (for frying)",
+      "1/4 cup of sugar",
+      "1 tea spoon of vanilla extract"
+    ],
+    "steps": [
+      "In a dry clean bowl, mix together the dry ingredients (flour, sugar, cinnamon)In another bowl, break the eggs and whisk properly, add the milk, butter (or oil), vanilla extract and whisk properly.",
+      "Add the wet ingredients to the dry ingredients and whisk, ensuring that there are no lumps (Tip: you can use a blender in order to prevent lumps , and if normal whisk is used and you notice lumps you can sieve out the lumps)Grease (with oil or butter) a crepe pan or a big frying pan",
+      "Set to medium to low heat",
+      "Pour batter in the middle of pan and move pan around to ensure that the batter covers the entire pan ( the idea is to make the crepe as thin as possible so avoid pouring a lot of batter into the pan at once)Fry each side of the crepe for 3-4 minutes",
+      "Scoop Nutella into a bowl and microwave for 45 secs to soften it up, so that it doesn’t rip the crepes",
+      "Slice bananas or strawberry",
+      "Spread Nutella on one half of the crepe, put the strawberries/bananas and fold over"
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 632,
+      "protein": 11,
+      "carbohydrates": 94,
+      "fat": 24
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Dessert",
+    "health_score": 7.0
+  },
+  {
+    "id": "french_dcc1c33d",
+    "spoonacular_id": 640767,
+    "name": "Crepes Suzette",
+    "description": "Forget going out to eat or ordering takeout every time you crave Mediterranean food. Try making Crepes Suzette at home. This recipe serves 4 and costs 88 cents per serving. Watching your figure? This ",
+    "ingredients": [
+      "4 tablespoons butter",
+      "3 large eggs",
+      "1 1/2 cups all-purpose flour",
+      "1/4 cup freshly squeezed lemon juice",
+      "1/2 tablespoon lemon zest",
+      "3/4 cup cold milk",
+      "pinch of salt",
+      "1 tablespoon sugar",
+      "1/2 cup unsalted butter",
+      "3/4 cup cold water",
+      "1/4 cup white sugar"
+    ],
+    "steps": [
+      "Combine all liquid ingredients in a blender.",
+      "Add the dry ingredients and 1/4 cup melted butter; mix on high.",
+      "Let batter rest for 30 minutes.",
+      "Heat a nonstick 10 inch skillet over medium high heat.",
+      "Brush bottom and sides of pan with a bit of melted butter.Ladle 1/2 cup batter into skillet and swirl to coat bottom evenly. Cook until lightly browned, about 1-2 minutes. Using a spatula or your fingers, flip the crepe and cook the other side until lightly browned, about 30 seconds to 1 minute.",
+      "Transfer crepes to a platter.",
+      "Layer crepes over each other with parchment paper in between.If necessary, add more butter to the pan. Repeat with the rest of the batter.FOR THE SAUCE: Melt 1/4 cup butter in a skillet over LOW fire.",
+      "Add the sugar and allow to melt. Be patient. Make sure that the heat is at its lowest.",
+      "Add the lemon juice and mix well.",
+      "Add the lemon zest.",
+      "Add the crepes, 3-4 at a time and allow to cook in the sauce for 1 minute.",
+      "Remove from the pan. Arrange on a plate and pour the sauce over the crepes and serve warm.Makes 8 crepes. Serving size is 2 crepes."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 618,
+      "protein": 11,
+      "carbohydrates": 54,
+      "fat": 39
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 4.0
+  },
+  {
+    "id": "french_82bfc8c8",
+    "spoonacular_id": 648638,
+    "name": "Julia Child's Coq au Vin",
+    "description": "The recipe Julia Child's Coq au Vin can be made in around 45 minutes. For $3.93 per serving, you get a main course that serves 6. One portion of this dish contains approximately 35g o",
+    "ingredients": [
+      "1/2 lb bacon slices",
+      "2 bay leaves",
+      "2 Tbsp butter",
+      "1/2 lb button mushrooms, trimmed and roughly chopped",
+      "3 lbs chicken thighs and legs, excess fat trimmed, skin ON",
+      "2 cups chicken stock",
+      "Chopped fresh parsley for garnish",
+      "6 garlic cloves, peeled",
+      "Several fresh parsley sprigs",
+      "20 pearl onions, peeled, or 1 large yellow onion, sliced",
+      "2 cups red wine (pinot noir, burgundy, or zinfandel)",
+      "salt and pepper to taste",
+      "Several fresh thyme sprigs"
+    ],
+    "steps": [
+      "Blanch the bacon to remove some of its saltiness. Drop the bacon into a saucepan of cold water, covered by a couple of inches. Bring to a boil, simmer for 5 minutes, drain. Rinse in cold water, pat dry with paper towels.",
+      "Cut the bacon into 1 inch by 1/4 inch pieces.Brown bacon on medium high heat in a dutch oven big enough to hold the chicken, about 10 minutes.",
+      "Remove the cooked bacon, set aside. Keep the bacon fat in the pan. Working in batches if necessary, add onions and chicken, skin side down. Brown the chicken well, on all sides, about 10 minutes. Halfway through the browning, add the garlic and sprinkle the chicken with salt and pepper.Spoon off any excess fat.",
+      "Add the chicken stock, wine, and herbs.",
+      "Add back the bacon. Lower heat to a simmer. Cover and cook for 20 minutes, or until chicken is tender and cooked through.",
+      "Remove chicken and onions to a separate platter.",
+      "Remove the bay leaves, herb sprigs, garlic, and discard.",
+      "Add mushrooms to the remaining liquid and turn the heat to high. Boil quickly and reduce the liquid by three fourths until it becomes thick and saucy. Lower the heat, stir in the butter. Return the chicken and onions to the pan to reheat and coat with sauce. Adjust seasoning.",
+      "Garnish with parsley and serve with potatoes or egg noodles."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 778,
+      "protein": 35,
+      "carbohydrates": 55,
+      "fat": 41
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 25.0
+  },
+  {
+    "id": "french_691498b9",
+    "spoonacular_id": 637042,
+    "name": "Caramelised Onion and Mushroom Quiche",
+    "description": "Caramelised Onion and Mushroom Quiche takes approximately 45 minutes from beginning to end. For $1.35 per serving, this recipe covers 12% of your daily requirements of vitamins an",
+    "ingredients": [
+      "1 nine-inch pie shell",
+      "1 tablespoon olive oil",
+      "2 white onions, sliced finely",
+      "3 cloves of garlic, sliced finely",
+      "1/2 teaspoon dried chilli flakes",
+      "1 box mushrooms, sliced thick",
+      "1 teaspoon thyme, dried",
+      "2 eggs",
+      "3/4 cup half and half cream",
+      "100 grams Havarti cheese, grated",
+      "salt and pepper to taste"
+    ],
+    "steps": [
+      "Heat the oven to 400F. Dock the pie shell with a fork and bake for 10 to 15 minutes until lightly golden.",
+      "In the meantime, heat the olive oil.",
+      "Add the onions along with the garlic and chilli flakes and cook on high until the onion caramelise (about ten minutes).",
+      "Now add the mushrooms and continue to cook on high so the mushrooms caramelise as well, about five minutes. Take off the fire, add the thyme and salt and pepper to taste.",
+      "Beat the eggs in a large bowl with the cream and half the quantity of cheese.",
+      "Add the onion-mushroom mixture and mix well.",
+      "Place the pie shell on a cookie tray to catch any spillage.",
+      "Pour the filling into the pie shell. Top the quiche with the remaining cheese.",
+      "Drop the temperature to 375F and cook until the filling is set and golden.",
+      "Serve when still warm from the oven."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 428,
+      "protein": 13,
+      "carbohydrates": 29,
+      "fat": 28
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 4.0
+  },
+  {
+    "id": "french_35282f83",
+    "spoonacular_id": 634070,
+    "name": "Banana Creme Brulee",
+    "description": "Banana Creme Brulee might be a good recipe to expand your dessert recipe box. For $1.09 per serving, this recipe covers 5% of your daily requirements of vitamins and minerals. Watching y",
+    "ingredients": [
+      "2 Mashed bananas",
+      "1 little demerara sugar",
+      "3 egg yolks",
+      "450 ml heavy cream",
+      "1/2 cup Sugar",
+      "1 vanilla pod"
+    ],
+    "steps": [
+      "Put the cream and the vanilla in a medium saucepan and bring slowly to the boil.",
+      "Remove from the heat just before the cream boils.Split the pod in half and scrape out the seeds with the point of a knife.Slice the bananas thickly and divide between 8 small ramekins.",
+      "Put the egg yolks caster sugar and vanilla seeds in a mixing bowl and beat till thick and creamy.",
+      "Pour the hot milk on to the egg and sugar mixture and stir.Rinse out the milk pan dry and pour in the custard.",
+      "Heat stirring slowly and almost constantly until the mixture thickens.There are a couple of things to bear in mind: if you make certain that the spoon gets right into the corners of the pan you run less risk of the custard curdling and on no account let the mixture boil otherwise the custard will scramble.",
+      "Pour the custard through a sieve into the little dishes filling them right to the top.Set aside to cool then refrigerate overnight.Dust the top of each custard with a thin layer of demerara then place under a very very hot grill for a few seconds until the sugar melts to a shiny caramel.Leave to cool and harden.Makes 8"
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 290,
+      "protein": 3,
+      "carbohydrates": 21,
+      "fat": 22
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Dessert",
+    "health_score": 1.0
+  },
+  {
+    "id": "french_f60bb5c3",
+    "spoonacular_id": 643362,
+    "name": "French Onion Marsala Soup",
+    "description": "French Onion Marsala Soup is a Mediterranean main course. One serving contains 515 calories, 19g of protein, and 34g of fat. This recipe serves 4. For $2.4 per serving, thi",
+    "ingredients": [
+      "1/4 cup butter",
+      "2 tablespoons olive oil",
+      "4 cups onions, sliced",
+      "3 (14 oz) cans beef broth",
+      "1/2 cup marsala wine",
+      "1 teaspoon dried thyme",
+      "salt and pepper to taste",
+      "2 heaping tbsp sugar",
+      "2 bags Texas Toast croutons",
+      "8 slices provolone cheese",
+      "2 slices Swiss cheese, diced",
+      "1/4 cup grated Parmesan cheese"
+    ],
+    "steps": [
+      "Melt butter with olive oil in a large pot over medium heat.",
+      "Add onions and stir continually until translucent.",
+      "Add beef broth, marsala and thyme. Simmer for 30 minutes.",
+      "Add sugar and season with salt and pepper. Be careful not to over salt!",
+      "Ladle soup into oven-safe bowls and place a handful of croutons in each.",
+      "Sprinkle parmesan and swiss cheese and layer 2 slices of provolone on top.",
+      "Place bowls on cookie sheet and broil in the preheated oven until cheese bubbles and browns."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 515,
+      "protein": 19,
+      "carbohydrates": 27,
+      "fat": 33
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 4.0
+  },
+  {
+    "id": "french_764afcdd",
+    "spoonacular_id": 640730,
+    "name": "Creme Brulee",
+    "description": "Need a gluten free and lacto ovo vegetarian dessert? Creme Brulee could be an awesome recipe to try. This recipe serves 8. For 96 cents per serving, this recipe covers 4% of your ",
+    "ingredients": [
+      "1 large Egg",
+      "3 Egg yolks",
+      "120g Fresh milk",
+      "40g Caster sugar",
+      "1 Vanilla pod",
+      "250g Whipping cream"
+    ],
+    "steps": [
+      "Preheat oven to 150C.",
+      "Pour fresh milk and whipping cream into a sauce pot. Slice the vanilla pod and scrape the seeds into the cream. Chop the empty pod into small pieces, and add to the cream too.Bring the cream mixture to boiling point, then lower the heat and simmer gently for 3 minutes.Lightly beat the sugar and eggs together in a large bowl until pale and smooth.Strain the cream mixture through a fine sieve and bring back to boil. Gradually add the cream to the eggs while whisking vigorously. This will temper the eggs so that they do not curdle. Once all of the the cream has been added into the eggs, strain again and pour the mixture into 7-8 ramekins depending on size.",
+      "Put the ramekins in a large cake pan or roasting pan and pour in enough hot water to come halfway up the sides of the ramekins.Cook on the centre shelf for about 30-40 minutes, or until the custards are just set and still a bit wobbly in the middle.",
+      "Remove the ramekins from the water and allow to cool to room temperature and refrigerate for at least 3 hours or till next day.Before ready to serve, sprinkle some caster sugar evenly over the custard, then caramelise with a blowtorch."
+    ],
+    "minutes": 240,
+    "nutrition": {
+      "calories": 166,
+      "protein": 3,
+      "carbohydrates": 7,
+      "fat": 14
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Medium",
+    "primary_category": "Dessert",
+    "health_score": 0.0
+  },
+  {
+    "id": "french_cfab642c",
+    "spoonacular_id": 646348,
+    "name": "Havarti and Asparagus Quiche",
+    "description": "Havarti and Asparagus Quiche takes about 45 minutes from beginning to end. This recipe serves 8 and costs $1.05 per serving. One portion of this dish contains approximately 12g of protein</b",
+    "ingredients": [
+      "8 stalks asparagus",
+      "1 cup cream",
+      "2 Eggs",
+      "1 1/4 cups Flour",
+      "1/2 pound Havarti with Dill Cheese (approximately ½ lb.)",
+      "1/2 teaspoon Salt",
+      "1 cup Sugar",
+      "3/4 cup cold, unsalted butter cut into small cubes",
+      "2 quarts (8 c.) water"
+    ],
+    "steps": [
+      "In the bowl of a food processor, combine flour, salt, and sugar.",
+      "Add butter and pulse until the mixture resembles the size of small peas.",
+      "Add the first 5 tablespoons of water, one at a time.Check consistency - if the mixture holds together when pinched, the crust is perfect  dont add any more water.If, however, the crust still crumbles apart and wont stay together when pinched, that means it wont stay together while rolling either; go ahead and add the last tablespoon of water one teaspoon at a time, rechecking the consistency between each teaspoon.The exact amount of water you need will depend on the amount of humidity in the air and therefore in the flour.Once finished, turn the dough out onto a piece of plastic wrap.Form the dough into a disk, and refrigerate 30 minutes before rolling it out.You want that flour to relax and the butter to be nice and cold  that will ensure you have a nice flaky crust.Meanwhile, boil a pot of water large enough to fit the stalks of asparagus.Trim the ends of your asparagus making sure they will fit nicely into your quiche pan, arranged like the spokes in a bicycle wheel with the ends touching in the middle.",
+      "Place in boiling water, and blanch for 2-3 minutes.",
+      "Remove from boiling water and place in an ice bath to stop the cooking and keep the color nice and vibrant green.Set aside.Preheat oven to 350 degrees.On a lightly floured surface, roll the dough out into a circle a few inches larger than your quiche or pie pan.Fold the dough back up over the rolling pin if needed, to gently lift the crust into the dish.Once the dough is neatly into the pan, make sure it is smoothly tucked into the corners.Trim excess crust from the edges leaving about a 1 border.Fold the excess dough under itself, making sure not to fold it over the edge of the pan, to ensure a nice even border.Crimp the dough between your fingers to make little pinches.Poke a few fork holes in it to allow the steam to escape, this will prevent a soggy bottom crust.Blind bake the crust for 5 minutes.This will prevent all of the custard from getting absorbed into the crust making it soggy.",
+      "Remove crust from oven and sprinkle with Havarti with Dill cheese.  Set aside.Increase oven temperature to 375 degrees.In a large bowl, combine eggs, heavy cream, and milk and whisk thoroughly.",
+      "Pour egg mixture gently over the cheese mixture.",
+      "Place asparagus stalks, tips pointing outwards into a spoke pattern like on a bicycle wheel, making sure the ends come together in the middle.",
+      "Bake 40 minutes.Check to make sure the crust isnt getting too brown.If it is, loosely drape a piece of foil over the top, making sure you dont lay it on the actual custard mixture in the middle.",
+      "Bake 10-12 minutes longer.To test doneness, slide a butter knife under the edge of one of the asparagus stalks.The knife should come out clean.It should be moist  after all the quiche is moist, but it should be free of egg mixture.If not, put it back in the oven with your tent foil on top for 3-4 more minutes."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 536,
+      "protein": 11,
+      "carbohydrates": 41,
+      "fat": 36
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 2.0
+  },
+  {
+    "id": "french_a9506759",
+    "spoonacular_id": 649328,
+    "name": "Lavender Tea With Lemon French Macarons",
+    "description": "The recipe Lavender Tea With Lemon French Macarons can be made in approximately 45 minutes. This recipe serves 20 and costs 22 cents per serving. One serving contains 61 calories, 2g ",
+    "ingredients": [
+      "3/4 cup almond flour",
+      "1 pinch cream of tartar",
+      "4 large egg whites",
+      "2 tablespoons dried lavender",
+      "1/2 lemon, zested",
+      "1 cup powdered sugar",
+      "1/4 cup white sugar",
+      "4 drops yellow food coloring"
+    ],
+    "steps": [
+      "Pulse the almond flour and powdered sugar until blended, then sift twice to make sure all larger pieces of almond are separated out and the flour is blended well.",
+      "Add the lemon zest and lavender to the flour and set aside.Pulse the white sugar in processor until very fine.In the large bowl of a standing mixer or by hand, start whipping egg whites until foamy.",
+      "Add a pinch of cream of tartar, and whip until soft peaks form.Reduce speed to low, and add the fine white sugar one tablespoon at a time.  When fully incorporated, increase speed to medium and then to high, and whip until stiff-peaked.  Timing varies on this, and this is where practice makes perfect.",
+      "Add your food coloring gel when almost completely done whipping.Sift 1/3 of the flour into the egg and fold in completely.  Repeat until all the flour is incorporated.  You want to fold in until the batter is smooth, but still light.Spoon into pastry bag fitted with a large tip (I use between 1/2 and 1 inch, depending on what I grab first).  Pipe 1 inch rounds onto parchment lined baking sheets, pulling the tip to the side so as to not leave a peak mark.  I use very thick sheets for this recipe.  Double up if needed.Tap the pan somewhat assertively on the counter to remove any trapped air and help batter to settle.",
+      "Let sit for 1/2  2 hours, until a shell forms on the top and your finger pressed lightly doesnt leave a mark.Now, bakers are completely split on the right temperature for baking macarons.  Some bake slowly at 270-350 degrees.  I tried to keep my temperamental oven at around 300 for these, holding the door slightly ajar with a spoon.  This way I can keep them in longer to assure that the insides are cooked without browning them on top, which happened with a batch that was drier / baked higher.",
+      "Bake in fully preheated oven for 5 minutes, turn the pan, and bake for around 8 minutes more, or until the feet of the macaron are a bit sturdier than soft.Cool on sheets for two minutes, then remove to rack to cool completely.Fill with prepared lemon curd and refrigerate to harden.",
+      "Serve at room temperature with tea.  Preferably wearing a skirt.  Or at least barefoot."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 61,
+      "protein": 1,
+      "carbohydrates": 9,
+      "fat": 2
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 0.0
+  },
+  {
+    "id": "french_bc4504d6",
+    "spoonacular_id": 648641,
+    "name": "Julia Child's Ratatouille",
+    "description": "Julia Child's Ratatouille is a Mediterranean recipe that serves 6. This hor d'oeuvre has 199 calories, 2g of protein, and 17g of fat per serving. For 92 cents per serving, ",
+    "ingredients": [
+      "1 pound eggplant",
+      "2 cloves garlic, mashed",
+      "2 (about 1 cup) sliced green bell peppers",
+      "7 T olive oil, divided",
+      "3 T parsley, minced",
+      "Salt",
+      "salt and pepper to taste",
+      "1/2 pound (about 1 1/2 cups) yellow onion, thinly sliced",
+      "1 pound zucchini"
+    ],
+    "steps": [
+      "Peel the eggplant and cut into lengthwise slices 3/8 in thick, about 3 inches long, and 1 inch wide. Scrub the zucchini, slice off the two ends, and cut into slices about the same size as the eggplant.",
+      "Place the vegetables in a bowl and toss with 1 teaspoon salt.",
+      "Let stand for 30 minutes.",
+      "Drain. Dry each slice in a towel.One layer at a time, saut the eggplant, and then the zucchini in hot olive oil for about a minute on each side to brown very lightly.",
+      "Remove to a side dish.In the same skillet, cook the onions and peppers slowly in olive oil for about 10 minutes, or until tender but not browned. Stir in the garlic and season to taste.Slice the tomato pulp into 3/8-inch strips.",
+      "Lay them over the onions and peppers. Season with salt and pepper. Cover the skillet and cook over low heat for 5 minutes, or until the tomatoes have begun to render their juice. Uncover, baste the tomatoes with the juices, raise heat and boil for several minutes, until juice has almost entirely evaporated.",
+      "Place a third of the tomato mixture in the bottom of the casserole and sprinkle over it 1 tablespoon of parsley. Arrange half of the eggplant and zucchini on top, then half the remaining tomatoes and parsley. Put in the rest of the eggplant and zucchini, and finish with the remaining tomatoes and parsley.Cover the casserole and simmer over low heat for 10 minutes. Uncover, tip casserole and baste with the rendered juices. Correct seasoning, if necessary. Raise heat slightly and cook uncovered fro about 15 more, basting several times, until juices have evaporated leaving a spoonful or two of flavored olive oil.Be careful of your heat; do not let the vegetables scorch in the bottom of the casserole.Set aside uncovered. Reheat slowly at serving time, or serve cold."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 199,
+      "protein": 2,
+      "carbohydrates": 12,
+      "fat": 16
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 20.0
+  },
+  {
+    "id": "french_037e9646",
+    "spoonacular_id": 633399,
+    "name": "Bailey's Irish Cream Crepes With Creme",
+    "description": "The recipe Bailey's Irish Cream Crepes With Creme could satisfy your Mediterranean craving in about 45 minutes. This gluten free recipe serves 4 and costs $1.43 per serving. This breakfa",
+    "ingredients": [
+      "sliced bananas",
+      "brown sugar",
+      "70 grams (a bit less than 5 tablespoons) browned butter",
+      "creme fraiche (or sour cream)",
+      "2 eggs",
+      "100 milliliters (a bit less than ½ cup) Bailey's Irish Cream (or milk, if you prefer)",
+      "250 milliliters (1 cup) milk",
+      "1 teaspoon salt",
+      "1/4 cup sugar"
+    ],
+    "steps": [
+      "Brown your butter by adding slices of butter to a heavy bottomed saucepan. One melted, whisk it frequently until you see small brown specks begin to form at the bottom of the pan. The butter should have a nutty aroma.",
+      "Remove it from the pan to prevent further cooking.",
+      "Mix the browned butter with the flour, salt, sugar, eggs, milk and Bailey's. Using an immersion blender, blend the mixture until completely smooth.",
+      "Let the mixture rest for 1/2 hour.Butter a non-stick frying pan and heat over medium heat. Using a ladle, spoon in the batter and quickly pick up the pan and swish it around so that the entire pan bottom is covered with a very thin layer of batter.When the underside is golden, use your fingers or a spatula to flip the crepe over to cook the other side.",
+      "Serve with sliced bananas, creme fraiche (or sour cream) and brown sugar. We also had Dulce de Leche on the table!"
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 474,
+      "protein": 7,
+      "carbohydrates": 54,
+      "fat": 24
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 2.0
+  },
+  {
+    "id": "french_9a0b9326",
+    "spoonacular_id": 661249,
+    "name": "Spinach & Ham Quiche",
+    "description": "You can never have too many hor d'oeuvre recipes, so give Spinach & Ham Quiche a try. This recipe serves 8 and costs 54 cents per serving. One portion of this dish contains about 10g of protein",
+    "ingredients": [
+      "100 grams Cold butter",
+      "50 grams Cheddar cheese- grated",
+      "2 Large eggs",
+      "125 grams Chicken or Picnic Ham (shredded)",
+      "5 tablespoons Ice water",
+      "80 milliliters milk",
+      "dash of white pepper",
+      "200 grams Plain flour",
+      "1/8 teaspoon salt",
+      "1/2 tablespoon Shallots (sliced)",
+      "125 grams Spinach (wash& drain well, shredded)",
+      "80 milliliters Whipping cream"
+    ],
+    "steps": [
+      "With little oil, fry shallot till fragrant and golden brown.",
+      "Add ham fry for a while and add spinach and fry till spinach cooked, dish up and set aside.Measure whipping cream and milk together in measuring cup (you can omit whipping cream and use all 160ml milk) add eggs, lightly beaten and pinch of salt, mix well.",
+      "Spread ham spinach and cheddar cheese evenly over the bottom of the prepared tart pan, add a dash of pepper then gently pour egg mixture over it.",
+      "Bake at preheated 180C for 40 mins and serve hot or warm."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 304,
+      "protein": 10,
+      "carbohydrates": 20,
+      "fat": 20
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 6.0
+  },
+  {
+    "id": "french_398cf81b",
+    "spoonacular_id": 633754,
+    "name": "Baked Ratatouille",
+    "description": "Baked Ratatouille takes approximately 45 minutes from beginning to end. This recipe makes 1 servings with 1029 calories, 32g of protein, and 70g of fat each. For $8.61 p",
+    "ingredients": [
+      "1 large eggplant unpeeled, diced",
+      "4 ounces diced feta cheese (optional)",
+      "1/2 cup chopped fresh basil",
+      "5 garlic cloves chopped",
+      "2 green bell peppers diced",
+      "3 tablespoons Olive Oil",
+      "1 onion cut 1\" pieces",
+      "2 tablespoons red wine vinegar",
+      "2 large tomatoes chopped",
+      "1 large zucchini cut 1/2\" pieces"
+    ],
+    "steps": [
+      "Heat oil in a heavy, large Dutch oven over medium heat.",
+      "Add garlic; stir 1 minute.",
+      "Add eggplant, green bell peppers, tomatoes, onion, zucchini and basil.",
+      "Saute for 5 minutes. Cover and simmer until all vegetables are tender, stirring occasionally, about 25 minutes.Uncover pot and simmer until juice thickens, stirring occasionally, about 10 minutes.",
+      "Mix in vinegar; season to taste with salt and pepper.Preheat oven to 350 degrees.",
+      "Spread in 9-inch pie dish.",
+      "Sprinkle with cheese, if desired.",
+      "Bake until heated through, about 20 minutes.This recipe yields about 3 cups."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 1029,
+      "protein": 32,
+      "carbohydrates": 82,
+      "fat": 69
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 100.0
+  },
+  {
+    "id": "french_c4cefc6c",
+    "spoonacular_id": 639599,
+    "name": "Classic French Mussels",
+    "description": "You can never have too many hor d'oeuvre recipes, so give Classic French Mussels a try. This recipe serves 2 and costs $2.93 per serving. Watching your figure? This gluten free, primal, and pescataria",
+    "ingredients": [
+      "1/2 cup dry white wine",
+      "3 sprigs fresh parsley",
+      "4 garlic cloves, finely chopped",
+      "Kosher salt",
+      "1/2 cup low-fat buttermilk",
+      "2 pounds mussels, cleaned",
+      "1 Tbs olive oil",
+      "2 shallots, finely chopped",
+      "4 tablespoons unsalted light butter, cut into pieces"
+    ],
+    "steps": [
+      "Scrub mussels with a stiff brush, discard any that are open and stay that way even when you close the shell. Discard any with broken shells.Soak them in cool clean water for at least an hour. Mussels are alive and breathing and have taken in sand over time. This allows them to expel the sand.Mussels have a small fibrous \"beard\" that should be removed. Pull it out toward the hinge of the shell to keep from injuring the mussel.",
+      "Heat the olive oil in a large pot over medium-high heat.",
+      "Add the shallots and garlic and cook until soft, about 5 minutes.",
+      "Add the mussels, wine, buttermilk, butter, and parsley and season well with the kosher salt. Give it a good stir, cover the pot, and cook until mussels open and are cooked through, 10 to 15 minutes. Divide the mussels and the juices between 2 bowls and serve with a crusty whole-grain bread to sop up that wonderful sauce."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 501,
+      "protein": 31,
+      "carbohydrates": 19,
+      "fat": 28
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 45.0
+  },
+  {
+    "id": "french_c98913b2",
+    "spoonacular_id": 650650,
+    "name": "Make Ahead Quiche",
+    "description": "Make Ahead Quiche might be a good recipe to expand your main course recipe box. One portion of this dish contains approximately 14g of protein, 22g of fat, and a total of 311 calories",
+    "ingredients": [
+      "1 (9 inch) unbaked pie crust",
+      "1 cup shredded cheddar cheese",
+      "1 cup shredded Monterrey Jack cheese",
+      "1 tablespoon flour",
+      "1/2 cup cooked ham, diced",
+      "4 eggs",
+      "1 cup half and half",
+      "2 green onions, chopped",
+      "1/4 teaspoon salt",
+      "1/4 teaspoon ground dry mustard",
+      "Dash of pepper"
+    ],
+    "steps": [
+      "In a medium bowl, toss the flour with the grated cheese.  Evenly spread the cheese over the bottom of the pie crust.  Top the cheese with the diced ham.  In a medium bowl, whisk together eggs, half and half, salt, pepper and dry mustard.  Stir in the green onions.",
+      "Pour the egg mixture over the ham and cheese.",
+      "Cover the unbaked quiche with plastic wrap, then with foil, sealing the edges well.",
+      "Place the prepared quiche in the freezer.  When ready to bake, preheat the oven to 400 degrees.  Do not thaw the quiche!",
+      "Remove the foil and plastic wrap.",
+      "Place the foil around the edges of the crust to prevent burning.",
+      "Place the frozen quiche in the oven and bake for about 1 hour, or until the filling is set and the crust is golden brown.",
+      "To cook the quiche immediately (without freezing first), preheat the oven to 350 degrees and bake for 45 minutes to 1 hour."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 310,
+      "protein": 13,
+      "carbohydrates": 15,
+      "fat": 21
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 3.0
+  },
+  {
+    "id": "french_b4a575b9",
+    "spoonacular_id": 664689,
+    "name": "Vegetarian Ratatouille",
+    "description": "Vegetarian Ratatouille is a Mediterranean hor d'oeuvre. This recipe serves 6. Watching your figure? This gluten free, dairy free, paleolithic, and lacto ovo vegetarian recipe has 96 calories, <",
+    "ingredients": [
+      "1 eggplant (aubergine) or 4 cups chopped",
+      "1 zucchini (courgette) chopped",
+      "1 yellow squash chopped",
+      "2 tomato peeled and chopped",
+      "½ red bell pepper chopped",
+      "½ orange bell pepper chopped",
+      "1 onion chopped",
+      "5 cloves garlic chopped",
+      "2 Tbsp chopped fresh basil",
+      "2 sprigs of thyme",
+      "¼ tsp dried oregano",
+      "2 Tbsp extra virgin olive oil",
+      "1 tsp sea salt"
+    ],
+    "steps": [
+      "Saute onion and garlic in a large saucepan over medium low heat until onions are translucent.",
+      "Add tomatoes and stir.",
+      "Add all the remaining ingredients and cook for 30 minutes on low stirring occasionally or until eggplant is tender."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 95,
+      "protein": 2,
+      "carbohydrates": 12,
+      "fat": 5
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 26.0
+  },
+  {
+    "id": "french_0eee51ab",
+    "spoonacular_id": 642230,
+    "name": "Egg Souffle With Bacon and Asparagus",
+    "description": "Egg Souffle With Bacon and Asparagus might be just the Mediterranean recipe you are searching for. This gluten free, primal, and ketogenic recipe serves 2 and costs $2.85 per serving. Th",
+    "ingredients": [
+      "6 asparagus stalks, tips reserved and stalks cut into coins",
+      "3 strips thick cut bacon",
+      "4 large eggs",
+      "3/4 cup heavy cream",
+      "1/2 cup onion, minced",
+      "1/2 cup Parmesan cheese, shredded",
+      "1/8 teaspoon pepper",
+      "1/2 teaspoon salt"
+    ],
+    "steps": [
+      "Preheat oven to 350 degrees. Lightly grease a 16-ounce ramekin or two 8-ounce ramekins.In a nonstick frying pan, cook bacon over medium-high heat until crispy.",
+      "Place bacon strips on a paper towel-lined plate to drain. When bacon is cooled, cut into bite-sized pieces and set aside.",
+      "Drain all but 2 teaspoons of bacon fat from pan.",
+      "Add minced onion and sweat for 3 to 4 minutes, until onions are almost translucent.",
+      "Add asparagus and cook for about a minute more.",
+      "Remove pan from heat.In a small bowl, whisk together eggs, heavy cream, Parmesan, salt and pepper, until ingredients are incorporated. Stir in onions and asparagus.Line bottom of ramekin(s) with bacon pieces.",
+      "Pour egg mixture over bacon. Arrange reserved asparagus tips on top of the egg mixture and place ramekin on a parchment-lined baking sheet.",
+      "Bake in oven for 35 to 40 minutes, until center slightly jiggles and top of souffl is somewhat browned.",
+      "Serve immediately, before it falls!"
+    ],
+    "minutes": 60,
+    "nutrition": {
+      "calories": 795,
+      "protein": 32,
+      "carbohydrates": 10,
+      "fat": 69
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 13.0
+  },
+  {
+    "id": "french_36343de2",
+    "spoonacular_id": 659459,
+    "name": "Savory Carrot Souffle",
+    "description": "You can never have too many hor d'oeuvre recipes, so give Savory Carrot Souffle a try. This recipe serves 6 and costs 81 cents per serving. One portion of this dish contains roughly 12g of protein<",
+    "ingredients": [
+      "3 ounces melted butter",
+      "6 Medium Size Carrots, peeled, cored, and cut",
+      "2 large eggs",
+      "3/4 cup flour",
+      "1/4 cup Heavy Cream",
+      "1 cup milk",
+      "1/2 teaspoon Nutmeg, grated or ground",
+      "1 cup Parmesan Cheese, grated",
+      "1 teaspoon salt"
+    ],
+    "steps": [
+      "Start by cooking the carrots in salted boiling water until tender. Once tender drain all the water and pulse/blend the carrots with 1/2 of the milk till smooth. Set aside.In a small sauce pot start cooking the rest of the milk, heavy cream, flour, salt, butter, parmesan cheese, and nutmeg. Stir till thick consistency. Set aside to cool.Start  by preheating oven to 350 degrees Farenheit.",
+      "Whisk/beat the egg whites in a bowl till stiff peak. Set aside.",
+      "Mix the carrot puree and white sauce (bechamel) together and add in the yolks one at a time, then fold in the stiff egg whites.",
+      "Pour mixture in pre-greased ramekins and set in a bain-marie (water bath).",
+      "Bake for 1 hour."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 331,
+      "protein": 11,
+      "carbohydrates": 20,
+      "fat": 22
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 6.0
+  },
+  {
+    "id": "french_36938703",
+    "spoonacular_id": 644854,
+    "name": "Gluten Free Quinoa and Corn Flour Crepes",
+    "description": "If you want to add more gluten free, dairy free, lacto ovo vegetarian, and vegan recipes to your collection, Gluten Free Quinoan and Corn Flour Crepes might be a recipe you should try. For $",
+    "ingredients": [
+      "virgin coconut oil for cooking",
+      "1/2 cup corn flour (different from cornmeal)",
+      "1 tablespoon ground flax seeds (plus 3 tablespoons boiling water, whisked)",
+      "1 tablespoon pure maple syrup",
+      "1/2 cup quinoa flour",
+      "2 1/2 cups hemp, soy, almond, or rice milk",
+      "1/4 teaspoon sea salt",
+      "cup tapioca flour",
+      "1/2 teaspoon xanthan gum"
+    ],
+    "steps": [
+      "Whisk the dry ingredients together in a bowl. In a separate bowl, whisk 2 1/2 cups hemp milk, flax seed mixture, maple syrup, and the melted coconut oil together.",
+      "Add the wet ingredients to the dry ingredients and gently mix together. If the batter is too thick, add a few tablespoons of hemp milk at a time, up to 1/2 cup more hemp milk to make a pourable batter. (The batter should be thin enough to spread easily in the pan). Allow the batter rest in the refrigerator for at least 30 minutes.",
+      "Heat an 8- or 10-inch nonstick skillet over medium heat.",
+      "Add a small dab of virgin coconut oil for cooking.",
+      "Pour about 1/2 cup batter into the skillet and at the same time, rotate the pan so the batter covers a thin layer on the bottom. Use small amounts of batter to repair any holes; work quickly and keep the crepe thin.Cook until the top of the crepe is dry, after about 1 minute, loosen the edges of the crepe from the pan with a spatula. Flip with your fingers or gently toss and flip (this may take a few attempts, but works best) and cook the other side for 30 to 60 seconds. Stack the cooked crepes on a plate. Keep them warm in a low oven or fill each crepe while it's in the pan, spooning the filling across the lower third of the crepe.",
+      "Roll the crepe from the filling end or fold the bottom third over the filling, fold in the sides, then fold the crepe from the bottom up to make a pocket. Repeat the process, adding more coconut oil between crepes as needed, until all the batter is used up."
+    ],
+    "minutes": 60,
+    "nutrition": {
+      "calories": 423,
+      "protein": 4,
+      "carbohydrates": 65,
+      "fat": 17
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 0.0
+  },
+  {
+    "id": "french_718d16d1",
+    "spoonacular_id": 640869,
+    "name": "Crock Pot Shredded French Dip",
+    "description": "Crock Pot Shredded French Dip is a Mediterranean main course. One serving contains 994 calories, 97g of protein, and 53g of fat. This recipe serves 4. For $6.13 per serving",
+    "ingredients": [
+      "4 lbs chuck roast",
+      "7 cloves garlic,peeled",
+      "1 TBSP Ground Mustard",
+      "1 TBSP Italian Seasoning",
+      "32 oz low sodium beef broth",
+      "1 onion, cut into quarters",
+      "1 TBSP Pepper",
+      "4 rolls ( I used mini ciabatta rolls)"
+    ],
+    "steps": [
+      "Place beef in crock pot.",
+      "Add beef broth, garlic, onion, Italian seasoning, ground mustard, and pepper.Turn on low for 7 hours.Take out and place on cutting board. Using a fork, shred the beef. Strain au jus (broth from crock pot) so that there are no large chunks.Slice rolls in half.",
+      "Place  of the beef on each roll.",
+      "Place au jus in 4 small individual bowls.",
+      "Serve sandwiches and au jus together."
+    ],
+    "minutes": 450,
+    "nutrition": {
+      "calories": 993,
+      "protein": 96,
+      "carbohydrates": 32,
+      "fat": 53
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Medium",
+    "primary_category": "Main Course",
+    "health_score": 36.0
+  },
+  {
+    "id": "french_39464800",
+    "spoonacular_id": 1095797,
+    "name": "Lemon Rum Crêpes",
+    "description": "Lemon Rum Crêpes might be a good recipe to expand your breakfast recipe box. This recipe serves 6 and costs 58 cents per serving. One portion of this dish contains roughly 6g of protein, 17g",
+    "ingredients": [
+      "2 eggs",
+      "2 cups water",
+      "1 Tbs dark rum",
+      "1 tsp vanilla extract",
+      "2 Tbs sugar",
+      "1/3 tsp salt",
+      "2 cups flour",
+      "8 Tbs melted butter or more",
+      "Finely grated zest of 2 lemons"
+    ],
+    "steps": [
+      "For the batter, whisk together the eggs, water, rum, vanilla, sugar and salt in a large bowl, until well blended.Sift the flour, a bit at a time, whisking each addition until smooth.",
+      "Add in half the melted butter and the lemon zest, whisking until the batter has slightly thickened, with the consistency of melted ice cream.",
+      "Put the remaining butter in a small cup and keep it warm.",
+      "Heat the crepe pan or a nonstick skillet over medium heat until quite hot. Lightly brush with melted butter. Ladle in a scant  cup of batter, tilt and swirl so it coats the bottom. Lower the heat and cook the pancake until underside is golden brown, 2 to 3 minutes. Flip it over with a spatula and fry for a half minute or longer, until the second side is lightly browned. Slide the crepe out of skillet and repeat with the remaining batter. (Coat pan with butter as needed.)Fold the crepes and squeeze some lemon juice over them, sprinkle with granulated sugar or cinnamon or spread with a filling of your choice."
+    ],
+    "minutes": 40,
+    "nutrition": {
+      "calories": 332,
+      "protein": 6,
+      "carbohydrates": 36,
+      "fat": 17
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 2.0
+  },
+  {
+    "id": "french_60589393",
+    "spoonacular_id": 643372,
+    "name": "French Onion Salisbury Steak",
+    "description": "French Onion Salisbury Steak might be just the main course you are searching for. For $2.63 per serving, this recipe covers 25% of your daily requirements of vitamins and minerals. This ",
+    "ingredients": [
+      "4 slices Italian baguette, cut diagonally (1/2-inch thick)",
+      "1/2 teaspoon dried thyme",
+      "1/4 cup dry red wine",
+      "2 tablespoons all-purpose flour",
+      "1/4 cup minced fresh parsley",
+      "1/2 teaspoon minced garlic",
+      "1 tablespoon minced garlic",
+      "1 1/4 pounds ground chuck",
+      "3/4 teaspoon kosher salt",
+      "2 cups low-sodium beef broth",
+      "1 tablespoon olive oil",
+      "2 cups sliced onions",
+      "Pinch of paprika",
+      "1 tablespoon shredded Parmesan",
+      "1/2 teaspoon pepper",
+      "1 teaspoon salt",
+      "2 tablespoons minced scallions",
+      "1 teaspoon sugar",
+      "1/4 cup shredded Swiss cheese",
+      "1 tablespoon tomato paste",
+      "2 tablespoons unsalted butter, room temperature"
+    ],
+    "steps": [
+      "Combine ground chuck, 1/4 cup parsley, scallions, salt, and pepper. Divide evenly into four portions and shape each into 1/4 to 1-inch thick oval patties.",
+      "Place 2 tablespoons flour in a shallow dish; dredge each patty in flour. Reserve 1 teaspoon flour.",
+      "Heat oil in a saute pan over medium-high.",
+      "Add patties and saute 3 minutes on each side, or until browned.",
+      "Remove from pan.",
+      "Add onions and sugar to pan; saute 5 minutes. Stir in garlic and tomato paste; saute until paste begins to brown, 1 minute.",
+      "Sprinkle mixture with reserved flour, cook 1 minute. Stir in broth, wine, salt, and thyme.Return meat to pan; bring sauce to a boil. Reduce heat to medium-low, cover, and simmer 10 minutes.",
+      "Serve steaks on Cheese Toasts with onion sauce ladled over.",
+      "Garnish with parsley and Parmesan.Preheat oven to 400 degrees.",
+      "Place bread on a baking sheet.",
+      "Combine butter, garlic, and paprika; spread on one side of each slice of bread.",
+      "Combine cheeses and sprinkle evenly over butter.",
+      "Bake until bread is crisp and cheese is bubbly, 10-15 minutes."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 635,
+      "protein": 33,
+      "carbohydrates": 29,
+      "fat": 41
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 15.0
+  },
+  {
+    "id": "french_04cff3b1",
+    "spoonacular_id": 653854,
+    "name": "Orange Creme Brulee",
+    "description": "The recipe Orange Creme Brulee can be made in approximately 45 minutes. Watching your figure? This gluten free and lacto ovo vegetarian recipe has 448 calories, 5g of protein, and",
+    "ingredients": [
+      "12 large Egg yolks, lightly beaten",
+      "1/2 cup Grand Marnier",
+      "1/4 cup Light brown sugar, packed",
+      "1 cup Strained fresh orange juice",
+      "4 teaspoons Grated orange peel",
+      "1 cup Sugar",
+      "2 teaspoons Vanilla",
+      "4 cups Whipping cream"
+    ],
+    "steps": [
+      "Reduce orange juice to 1/4 cup by boiling.",
+      "Remove from heat.Cook cream and 1 cup sugar just until sugar melts.Preheat oven to 350f. and place one rack on top and one on bottom of oven.In large bowl, whisk cream mixture into egg yolks; then add Grand Marnier and reduced orange juice. Stir in orange peel and vanilla.",
+      "Pour evenly into 12 (3/4cup) ramekins; place 6 each ramekins into 2 baking pans and add boiling water to come halfway up ramekins.",
+      "Bake until custards are set in center, about 40 minutes. Cool, cover and chill overnight.Preheat broiler. On baking sheets, put ramekins and sprinkle each with 1 teaspoon brown sugar. Broil until sugar is melted and browned, about 2 minutes, taking care not to burn."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 448,
+      "protein": 5,
+      "carbohydrates": 29,
+      "fat": 33
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Dessert",
+    "health_score": 1.0
+  },
+  {
+    "id": "french_f245920e",
+    "spoonacular_id": 635207,
+    "name": "Blackberry Creme Brulee",
+    "description": "Blackberry Creme Brulee is a dessert that serves 6. Watching your figure? This gluten free recipe has 712 calories, 10g of protein, and 48g of fat per serving. For $2.16 per se",
+    "ingredients": [
+      "4 cups blackberries, fresh or frozen (thaw frozen berries in refrigerator",
+      "3/4 cup brown sugar",
+      "1/4 cup Nestle Coconut Milk Powder",
+      "3/4 cup Nestle Sweetened Condensed Milk",
+      "1 tablespoon cornflour",
+      "600 ml cream",
+      "3 egg yolks",
+      "1 tablespoon Cointreau, optional",
+      "1 tablespoon Cointreau, optional"
+    ],
+    "steps": [
+      "Divide Blackberries between 6 - 1/2 cup individual serving dishes, set aside.",
+      "Combine next 5 ingredients in a pan, bring to boil over medium heat stirring constantly.",
+      "Remove from heat, stir in yolks. Spoon mixture evenly over Blackberries, cover and refrigerate until cold. Sift brown sugar over brulee, place under hot grill until sugar is melted.Refrigerate 15 minutes before serving."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 711,
+      "protein": 9,
+      "carbohydrates": 64,
+      "fat": 48
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Dessert",
+    "health_score": 6.0
+  },
+  {
+    "id": "french_9bca5bd0",
+    "spoonacular_id": 646729,
+    "name": "Herbed Vegetables In A Feta Quiche With A Wild Rice Crust",
+    "description": "The recipe Herbed Vegetables In A Feta Quiche With A Wild Rice Crust is ready in approximately 45 minutes and is definitely a tremendous gluten free option for lovers of Mediterranean fo",
+    "ingredients": [
+      "2 cups cooked brown rice (I used wild rice)",
+      "1 egg",
+      "4 eggs",
+      "1/2 cup milk",
+      "2 (4 ounce packages) 365 Four Seasons Blend",
+      "1/4 cup herbs (such as dill, mint, parsley, chopped)",
+      "2 green onions (chopped)",
+      "1 cup feta (crumbled)",
+      "salt and pepper to taste",
+      "1/4 cup graviera (or gruyere, grated)"
+    ],
+    "steps": [
+      "Mix the rice, cheese and egg in a bowl.",
+      "Press the rice mixture into a pie plate, about 1/4 inch thick.",
+      "Bake in a preheated 450F oven until the edges and bottom just start turning golden brown, about 5-7 minutes.",
+      "Mix the eggs, milk, vegetables, dill, mint, green onions, feta, salt and pepper in a large bowl.",
+      "Pour the egg mixture into the pie crust.",
+      "Bake in a preheated 375F oven until golden brown and set in the center, about 30-35 minutes."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 328,
+      "protein": 15,
+      "carbohydrates": 43,
+      "fat": 13
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 40.0
+  },
+  {
+    "id": "french_e235721b",
+    "spoonacular_id": 1096190,
+    "name": "Leek and goat’s cheese quiche",
+    "description": "Leek and goat’s cheese quiche is a Mediterranean recipe that serves 6. One portion of this dish contains approximately 12g of protein, 15g of fat, and a total of 232 calories. For",
+    "ingredients": [
+      "1 ready-rolled pastry",
+      "1 lb leeks, sliced very thinly",
+      "2 tbsp butter",
+      "2 tbsp tarragon leaves, chopped",
+      "Freshly grated nutmeg",
+      "4 eggs",
+      "7 oz. log goat's cheese, half chopped, the rest sliced",
+      "Salt and pepper",
+      "1 tbsp chopped almonds"
+    ],
+    "steps": [
+      "Preheat your oven to 200C/400F.Line your tin with baking parchment. Unroll the pastry and fit it into the tin.Line with more baking parchment, fill with baking beans and blind bake for 15-20 minutes.",
+      "Remove the paper and beans and bake 5 minutes more to dry the base.Meanwhile, in a large non-stick frying pan, fry the leeks and tarragon in the butter until they have rendered their liquid and it has evaporated. Set aside to cool a little.Take the log of goat cheese and chop half and slice the other half.In a large bowl, whisk together the milk, eggs, nutmeg, salt &amp; pepper.",
+      "Whisk until well mixed, then stir in the chopped goat cheese.Carefully tip the leek mixture into the pastry, arrange the sliced goat cheese on top and scatter over the chopped almonds, if using.",
+      "Bake for 30-40 minutes, until golden and the filling is set.",
+      "Serve warm, cold or at room temperature."
+    ],
+    "minutes": 75,
+    "nutrition": {
+      "calories": 234,
+      "protein": 11,
+      "carbohydrates": 13,
+      "fat": 15
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Medium",
+    "primary_category": "Main Course",
+    "health_score": 6.0
+  },
+  {
+    "id": "french_a23a6e74",
+    "spoonacular_id": 645833,
+    "name": "Grilled Ratatouille",
+    "description": "Grilled Ratatouille is a Mediterranean recipe that serves 4. One portion of this dish contains roughly 25g of protein, 83g of fat, and a total of 1144 calories. For $4.95 per s",
+    "ingredients": [
+      "2 T. minced garlic",
+      "1/2 c. extra-virgin olive oil",
+      "1 lb. ripe beefsteak tomatoes",
+      "2 large globe eggplants, cut into 3/4-inch slices",
+      "2 large zucchini (about 1 1/2 lb.)",
+      "1 large onion, cut into 1/2-inch slices",
+      "salt & pepper",
+      "1 (1 lb.) loaf of rustic bread, cut into 8 thick slices",
+      "2 T. minced fresh parsley",
+      "2 T. minced fresh basil",
+      "1 T. minced fresh thyme",
+      "8 oz. container burrata cheese"
+    ],
+    "steps": [
+      "Combine the garlic and oil in a bowl.",
+      "Remove 2 T. garlic oil to a small bowl for sauteing the tomato, and another 2 T. garlic oil in another small bowl for brushing on the charred bread. Set the remaining oil aside.",
+      "Bring a big pot of water (enough to submerge the tomatoes) to a boil in a large stockpot or Dutch oven. Core the tomatoes and cut a small X on the bottoms.",
+      "Add the tomatoes briefly to the boiling water, long enough for the skins to become loose, about 1-2 minutes.",
+      "Remove the tomatoes with a slotted spoon and submerge in a bowl of cold water until cool enough to handle.",
+      "Remove from the water, remove the skins and chop the tomatoes into 1-inch pieces. Set aside.",
+      "Meanwhile preheat your grill on high heat for at least 10 minutes.",
+      "Brush the vegetables evenly with the large portion of garlic oil.",
+      "Sprinkle with salt & pepper and add to the grill. Grill the vegetables until charred and tender. Eggplant should take about 10 minutes per side and the zucchini and onion about 7-8 minutes per side (every grill is different!).",
+      "Remove veggies from the grill, add the bread and grill until charred to your liking.",
+      "Remove bread from the grill and brush with one of the reserved 2 T. portions of oil, sprinkle lightly with salt.",
+      "To finish the ratatouille, heat the remaining 2 T. garlic oil in a Dutch oven or stockpot over medium heat until the garlic is sizzling and fragrant.",
+      "Add the tomatoes and cook, stirring occasionally, until the tomatoes begin to break down and release their liquid about 5 minutes. Chop the grilled veggies into chunky pieces and add to the tomatoes along with the parsley, basil and thyme. Stir gently and cook just until everything is heated through. Check the seasoning and remove from heat.",
+      "Serve the ratatouille over the charred bread and top with some of the burrata."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 1143,
+      "protein": 25,
+      "carbohydrates": 87,
+      "fat": 82
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 23.0
+  },
+  {
+    "id": "french_24d68ff9",
+    "spoonacular_id": 658132,
+    "name": "Reduced Fat Blueberry Cheesecake Crepes",
+    "description": "If you have around 45 minutes to spend in the kitchen, Reduced Fat Blueberry Cheesecake Crepes might be a tremendous lacto ovo vegetarian recipe to try. This recipe serves 8 and costs 48",
+    "ingredients": [
+      "1 cup Fresh Blueberries",
+      "2 tablespoons butter, melted",
+      "4 oz. Fat-Free Cream Cheese- room temp",
+      "2 eggs",
+      "1 cup all-purpose flour",
+      "1/2 cup milk",
+      "½ Cup powdered sugar",
+      "1/4 teaspoon salt",
+      "½ tsp. Vanilla extract",
+      "1/2 cup water"
+    ],
+    "steps": [
+      "Cheesecake Filling:With an electric mixer mix cream cheese and butter on medium speed until smooth",
+      "Using a rubber spatula scrape the sides of the bowl to ensure complete mixing",
+      "Add vanilla",
+      "Slowly add powdered sugar",
+      "Pour in blueberries and mix well on low. Just enough to give the mixture a pink/purple tint. You want most blueberries intact.",
+      "Transfer to an air-tight container or cover with plastic wrap and refrigerate until ready to use.Crepes:In a large mixing bowl, whisk together the flour and the eggs. Gradually add in the milk and water, stirring to combine.",
+      "Add the salt and butter; beat until smooth.",
+      "Heat a lightly oiled griddle or frying pan over medium high heat.",
+      "Pour or scoop the batter onto the griddle, using approximately 1/4 cup for each crepe. Tilt the pan with a circular motion so that the batter coats the surface evenly.Cook the crepe for about 2 minutes, until the bottom is light brown. Loosen with a spatula, turn and cook the other side.",
+      "Lay crepe flat and put a small amount of Blueberry Cheesecake Filling in the center (This is rich so you don't want to over fill)",
+      "Roll Crepe and put on plate.",
+      "Serve hot."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 162,
+      "protein": 5,
+      "carbohydrates": 24,
+      "fat": 4
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 1.0
+  },
+  {
+    "id": "french_d73847ee",
+    "spoonacular_id": 1096246,
+    "name": "Apple Cinnamon Quiche",
+    "description": "Apple Cinnamon Quiche is a Mediterranean main course. One portion of this dish contains roughly 17g of protein, 49g of fat, and a total of 607 calories. This recipe serves 6. For ",
+    "ingredients": [
+      "2 apples, peeled and sliced",
+      "2 tablespoons butter",
+      "1 tablespoon white sugar",
+      "1 teaspoon cinnamon",
+      "1 unbaked 10-inch pie shell",
+      "8 ounces Cheddar cheese, grated",
+      "4 large eggs",
+      "1 1/2 cups whipping cream"
+    ],
+    "steps": [
+      "Preheat the oven to 375 degrees Fahrenheit.In a large skillet, saute the apples in the butter over medium heat for 5 minutes.",
+      "Transfer the apples into a large bowl, and toss with the sugar and cinnamon until well coated.",
+      "Layer the apples in the pastry shell.",
+      "Sprinkle the cheese evenly over the apple mixture.In a medium bowl, lightly whisk together the eggs and whipping cream until well blended.",
+      "Pour the egg mixture over the apples and cheese.",
+      "Bake for 35 minutes, or until set."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 607,
+      "protein": 16,
+      "carbohydrates": 27,
+      "fat": 48
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 4.0
+  },
+  {
+    "id": "french_faf4ca1d",
+    "spoonacular_id": 662291,
+    "name": "Sun-Dried Tomato and Leek Quiche",
+    "description": "Sun-Dried Tomato and Leek Quiche is a Mediterranean main course. This dairy free recipe serves 4 and costs $2.71 per serving. One serving contains 681 calories, 20g of protein, an",
+    "ingredients": [
+      "Crust",
+      "1 cup whole-wheat pastry flour",
+      "1/4 cup pine nuts",
+      "1/4 cup whole almonds",
+      "1/4 teaspoon baking powder",
+      "1/4 cup unsweetened almond milk",
+      "2 Tbs. olive oil",
+      "1/4 teaspoon salt",
+      "4 Tbs. olive oil, divided",
+      "1 large leek, white and light green parts chopped (about 2 cups)",
+      "12 ounces extra-firm tofu, drained and cut into 1.5-inch cubes",
+      "2 tablespoons fresh lemon juice",
+      "2 teaspoons miso paste",
+      "1 clove garlic, minced",
+      "3/4 teaspoon salt",
+      "1 cup Panko breadcrumbs",
+      "1 teaspoon Italian seasonings",
+      "1/4 cup chopped reconstituted sun-dried tomatoes, drained"
+    ],
+    "steps": [
+      "Crust",
+      "Preheat oven to 350F.",
+      "Coat four 5-inch tart pans with cooking spray.",
+      "Pulse flour, pine nuts,almonds,baking powder",
+      "In food processor until finely ground.",
+      "Whisk together almond milk, oil and salt in bowl.",
+      "Stir in flour mixture. Press into pan.",
+      "Bake 5 minutes, then cool.",
+      "Filling",
+      "Heat 1 Tbs. oil in skillet over medium heat.",
+      "Add leeks, and saute' 8 minutes, or until softened. Set aside.",
+      "Bring large saucepan of water to a boil.",
+      "Add tofu, and simmer 5 minutes.",
+      "Drain and pat dry.",
+      "Whisk 3 Tbsp. oil, lemon juice, miso, garlic and salt in bowl.",
+      "Add tofu and blend with an immersion blender.",
+      "Stir in breadcrumbs,seasonings, sun-dried tomatoes and leeks.",
+      "Spoon filling into crust.",
+      "Bake 40 minutes, or until crust is browned.",
+      "Cool 5 minutes, then unmold."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 681,
+      "protein": 20,
+      "carbohydrates": 59,
+      "fat": 42
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 41.0
+  },
+  {
+    "id": "french_16752e0e",
+    "spoonacular_id": 636392,
+    "name": "Buckwheat Crepes",
+    "description": "Buckwheat Crepes is a Mediterranean breakfast. For 92 cents per serving, this recipe covers 16% of your daily requirements of vitamins and minerals. One portion of this dish contains aro",
+    "ingredients": [
+      "3/4 cup kefir, cultured buttermilk or water minus 2 Tbsp & add 2",
+      "2 teaspoons coconut oil (or your choice of oil)",
+      "1/2 cup buckwheat flour or 1/3 cup whole buckwheat",
+      "1 egg",
+      "1/8 teaspoon salt",
+      "2 teaspoons honey (for sweet crepes)",
+      "1/4 teaspoon cinnamon (for sweet crepes)"
+    ],
+    "steps": [
+      "Combine kefir (or other), oil and grain in the blender. Blend for about 3 minutes on high or just 30 seconds if using flour. Cover blender and let batter stand overnight at room temp to break down the phytates. After soaking, add egg, salt, honey & cinnamon (if making sweet style). Blend till well mixed.",
+      "Rub your cast iron pan with oil and get it nicely hot, but not smokey. Have a napkin ready for rubbing more in between crepes.",
+      "Pour about 1/4 cup of batter into the hot pan and quickly tilt the pan to spread the batter evenly to the edges.",
+      "Mix your batter each time before making each new crepe. Cook till edges are browned and loosen along the edges with a thin table knife or spatula. Turn over crepe and cook for about 30 seconds. Turn over onto a plate and keep it warm with a light towel covering it. Rub more oil on pan and continue till batter is used up.",
+      "Top with Creamy Honey Cheese, your choice of fruit and syrup. For the blackberry syrup... I cooked the berries with a little water till they were mush, added arrowroot powder and boiled it gently till it thicken. Then I added honey and pour the mixture in my blender. Gave it a whirl till smooth and poured into a jar to serve. Simple, tart and sweet!"
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 374,
+      "protein": 13,
+      "carbohydrates": 54,
+      "fat": 13
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 8.0
+  },
+  {
+    "id": "french_b9a60a32",
+    "spoonacular_id": 647687,
+    "name": "Ratatouille",
+    "description": "Forget going out to eat or ordering takeout every time you crave Mediterranean food. Try making Ratatouille at home. Watching your figure? This lacto ovo vegetarian recipe has 634 calories, ",
+    "ingredients": [
+      "1 tbsp agave nectar",
+      "1 small to medium eggplant, sliced 1/4 inch",
+      "4-5 leaves fresh basil",
+      "8 oz fresh smoked mozzarella",
+      "2-3 tbsp fresh tarragon",
+      "1-2 garlic cloves, minced",
+      "1/4 cup fat free half & half",
+      "olive oil for drizzling and cooking",
+      "1/2 onion, chopped",
+      "1 orange bell pepper",
+      "pepper",
+      "2 puff pastry sheets",
+      "1 red bell pepper",
+      "salt",
+      "1 tbsp tomato paste",
+      "2 large tomatoes, chopped",
+      "2-3 large zucchinis, sliced 1/4 inch"
+    ],
+    "steps": [
+      "Preheat Oven to 350-37",
+      "Defrost the puff pastry sheets and spread over baking dish.Make the tomato sauce: Cook the chopped tomatoes, tomato paste, onions, and garlic over medium heat until sauce thickens.",
+      "Add water or more paste as necessary.",
+      "Add in the herbs and stir. Slowly incorporate the half &amp; half and agave and adjust until you reach the desired balance of acidity and savory.Precook the eggplant. I find this step extremely important unless youre using Japanese eggplants which cook more easily.",
+      "Saute the eggplant slices in olive oil over medium to high heat and flip on other side until cooked and soft.",
+      "Spread the tomato sauce into the baking dish on top of the puff pastry. Then layer the veggies and cheese on top (eggplant, zucchini, bell pepper, cheese, and so forth).",
+      "Bake for about 40-50 minutes until puff pastry is golden brown and vegetables and cheese are bubbly without being overcooked.Be transported into the French countryside"
+    ],
+    "minutes": 75,
+    "nutrition": {
+      "calories": 636,
+      "protein": 14,
+      "carbohydrates": 46,
+      "fat": 45
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Medium",
+    "primary_category": "Main Course",
+    "health_score": 39.0
+  },
+  {
+    "id": "french_5701dc77",
+    "spoonacular_id": 639590,
+    "name": "Classic Custard Quiche Lorraine",
+    "description": "If you want to add more Mediterranean recipes to your repertoire, Classic Custard Quiche Lorraine might be a recipe you should try. For 92 cents per serving, you get a hor d'oeuvre that ",
+    "ingredients": [
+      "3 slices thick bacon",
+      "1/4 teaspoon dried tarragon",
+      "4 Eggs",
+      "1 tablespoon all-purpose flour",
+      "1/4 teaspoon ground white pepper",
+      "3/4 cup milk",
+      "3/4 cup minced onion",
+      "1/4 cup grated Parmesan cheese",
+      "1 refrigerated pie crust dough (1/2 of a 15-ounce box), at room temperature",
+      "1/2 cup grated Swiss cheese",
+      "Pinch each of dried thyme and nutmeg",
+      "1 1/4 cups heavy or whipping cream"
+    ],
+    "steps": [
+      "Preheat oven to 325 degrees F.",
+      "Place pie crust dough onto a lightly floured surface and unroll it.Using a rolling pin, roll crust into a circle about 13 inches in diameter.",
+      "Place crust into a spring form pan and fold the edge of the crust to the outside of the pan, pressing it into the sides of pan. (This is so crust doesnt shrink in baking.)Prick crust all over bottom and sides with a fork.",
+      "Bake, uncovered, until crust begins to brown just slightly, about 7 minutes.",
+      "Remove from oven and set aside.While crust bakes, cook bacon in a medium skillet over medium heat until very crisp and brown on both sides, about 8 to 10 minutes.While bacon cooks, peel and mince onion, and set aside.When bacon is done, remove to a plate lined with paper towels, blot any extra fat, and set aside.",
+      "Remove all but about 1 teaspoon of the fat in the skillet, add onion and cook until translucent, about 4 to 5 minutes.Scatter onions and half of cheeses evenly over crust bottom. Set aside.Finely chop bacon, and scatter half of it over cheese in crust. Set remaining bacon and cheese aside.Break eggs into a blender container.",
+      "Add cream, milk, flour, pepper, tarragon, thyme and nutmeg, and process on high until very foamy, about 1 minute.",
+      "Pour half of egg mixture into pie crust.Scatter in remaining bacon and cheese.Top with remaining egg mixture.",
+      "Bake, uncovered, until top is light brown and quiche is just set (center should still jiggle very slightly) 55 to 60 minutes.",
+      "Remove from oven and cool at least 15 minutes before removing sides of spring form pan.Quiche may be cooled to room temperature and frozen, still in pan and covered tightly with both plastic wrap and foil, for up to 2 weeks. Defrost in refrigerator 2 days, bring back to room temperature and reheat 5 minutes, uncovered, in a 300-degree oven before preparing to serve. Alternately, quiche can be refrigerated for up to two days. Follow directions above for reheating.To serve, cut quiche crust away from the spring form pans side with a serrated knife, leaving about a 1-inch crust side above filling of the quiche.",
+      "Remove sides of spring form pan, slice and serve."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 352,
+      "protein": 9,
+      "carbohydrates": 15,
+      "fat": 28
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 2.0
+  },
+  {
+    "id": "french_0bf8c812",
+    "spoonacular_id": 637477,
+    "name": "Chavrie Fresh Goat Cheese Souffle",
+    "description": "Chavrie Fresh Goat Cheese Souffle requires approximately 45 minutes from start to finish. One serving contains 289 calories, 14g of protein, and 23g of fat. For $1.83 pe",
+    "ingredients": [
+      "1 tablespoon Butter to coat the ramekin (soufflé dish)",
+      "1 tablespoon All purpose flour to coat ramekin (soufflé dish)",
+      "1 package (5.3oz). Chavrie® goat cheese",
+      "2 tablespoons Butter",
+      "2 tablespoons All purpose flour",
+      "4 ounces Milk",
+      "1 tablespoon Parmesan cheese (grated)",
+      "4 ea. Egg yolks",
+      "1 teaspoon Dry mustard",
+      "3 ea. Egg whites"
+    ],
+    "steps": [
+      "Pre heat oven 400 F.",
+      "Butter and Flour a 8 oz. souffl ramekin and refrigerate until ready to use.",
+      "Melt the butter in a 1 qt. heavy gauge saucepan over medium heat add the flour and cook for 1 minute.",
+      "Add milk and simmer on low heat for 3-5 minutes stirring frequently.",
+      "Remove the saucepan from the heat and stir in the Chavrie, Parmesan cheese and dry mustard.",
+      "Season to taste with salt and white pepper.",
+      "Temper in the egg yolks mixing well and transfer the mixture to a stainless steel mixing bowl, cover with plastic wrap, set aside and keep warm.",
+      "Whip the egg whites in a mixer to a soft peak.",
+      "Gently fold  the whipped egg whites into the Chavrie mixture mixing well then repeat with the remaining half of the whipped egg whites.",
+      "Transfer into the butter floured ramekin and bake in the preheated oven for 15  20 minutes until the souffl rises and is golden brown.",
+      "Serve immediately."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 289,
+      "protein": 14,
+      "carbohydrates": 6,
+      "fat": 22
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 2.0
+  },
+  {
+    "id": "french_40072534",
+    "spoonacular_id": 643330,
+    "name": "French Dips With Au Jus",
+    "description": "You can never have too many main course recipes, so give French Dips With Au Jus a try. This recipe serves 4. For $2.91 per serving, this recipe covers 16% of your daily requirements of ",
+    "ingredients": [
+      "2 cans beef consomme",
+      "1 pinch garlic powder",
+      "1 pinch Montreal seasoning",
+      "1 tablespoon Olive oil",
+      "3 slices Provolone cheese",
+      "3/4 pound roast beef",
+      "1 whole Shallot",
+      "2 sub rolls"
+    ],
+    "steps": [
+      "Preheat the oven to 350.In a large deep skillet, heat a splash of olive oil over med-high heat.",
+      "Add the finely chopped shallott to the pan.",
+      "Saute for about three minutes, until browned. Next add the cans of beef consomme to the skillet.",
+      "Sprinkle in a small dash of garlic powder, bring to a boil and then simmer for a few minutes. Reduce the liquid by about a quarter.On a cutting board or large plate, loosely pile the roast beef.",
+      "Sprinkle the meat with the beef seasoning.Slice the sub rolls in half but not all the way through and line with provolone cheese. Put your sub rolls on a baking sheet.Using tongs, grab some roast beef and dip into the au jus. Toss the beef around to coat, then transfer into the sub roll. Repeat until youve filled your sub rolls or run out of meat. Top with more cheese if you want!",
+      "Put the sub rolls in the oven for 10 minutes to heat through, melt the cheese and toast the bread.",
+      "Cut in half and serve with a small bowl of au jus!"
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 290,
+      "protein": 27,
+      "carbohydrates": 18,
+      "fat": 11
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 13.0
+  },
+  {
+    "id": "french_05f7c52e",
+    "spoonacular_id": 659037,
+    "name": "Salmon and Broccoli Crepes",
+    "description": "Salmon and Broccoli Crepes is a pescatarian recipe with 4 servings. This breakfast has 208 calories, 17g of protein, and 9g of fat per serving. For $1.9 per serving,",
+    "ingredients": [
+      "2 cups broccoli florets, cut into small pieces",
+      "1 tablespoon butter",
+      "2 teaspoons dijon mustard",
+      "1 large egg white",
+      "2 tablespoons lemon juice",
+      "1 tablespoon lemon thyme, fresh finely chopped",
+      "1 tablespoon lemon zest",
+      "1/4 cup low fat milk",
+      "4 tablespoons reduced fat sour cream",
+      "8 ounces wild Alaskan Salmon filets, cooked and flaked into pieces",
+      "1 pinch salt",
+      "2 tablespoons shallot, finely minced",
+      "1/4 cup water",
+      "1/2 cup whole wheat pastry flour"
+    ],
+    "steps": [
+      "Combine milk, water, egg and melted butter in a small bowl.",
+      "Add flour and salt and whip until well blended. Allow to sit for 10 minutes.Steam broccoli until just tender, and combine salmon, shallot, thyme, lemon juice, dijon and 1/2 cup sour cream. Chop pieces of salmon and broccoli with a spoon if you have extra large pieces. Warm salmon mixture in the microwave for 2 minutes.",
+      "Combine remaining sour cream and lemon zest.",
+      "Heat a medium non-stick skillet over medium heat and spray with cooking spray.",
+      "Add 1/4 cup crepe batter to the pan and swirl around to create an even pancake. Cook 1  2 minutes on the first side to brown crepe, then flip and brown the other side. Crepes cook quickly because they are so thin.",
+      "Remove to a plate and keep warm.Fill a crepe with 1/4 salmon lengthwise and gently roll. Slice in half on a diagonal and top with a tablespoon of sour cream and lemon zest mixture."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 208,
+      "protein": 16,
+      "carbohydrates": 17,
+      "fat": 8
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 22.0
+  },
+  {
+    "id": "french_cbc177f4",
+    "spoonacular_id": 658641,
+    "name": "Roasted Ratatouille Gratin",
+    "description": "If you want to add more Mediterranean recipes to your repertoire, Roasted Ratatouille Gratin might be a recipe you should try. This recipe makes 4 servings with 389 calories, 14g of p",
+    "ingredients": [
+      "1 cup (28-ounce) can good-quality plum tomatoes, chopped, with their juices to make 2",
+      "1 cup sliced cremini mushrooms (about 5 medium)",
+      "1 tablespoon dry bread crumbs",
+      "1/2 cup dry white wine (sauvignon blanc is nice)",
+      "1 medium eggplant (about 1 pound), cut into 1-inch cubes",
+      "1/2 cup chopped fresh basil for garnish",
+      "1 tablespoon chopped fresh rosemary",
+      "1 tablespoon chopped fresh thyme",
+      "1 leek, white part only, thinly sliced",
+      "Olive oil",
+      "1 cup freshly grated Parmesan cheese",
+      "Dash black pepper",
+      "1/2 red pepper",
+      "1 teaspoon sea salt",
+      "1 large shallot, finely chopped",
+      "1 cup thinly sliced zucchini (about 1 medium)"
+    ],
+    "steps": [
+      "Cut up everything and set aside until needed. Do the eggplant last, as it turns brownish after being cut.Preheat oven to 425 F.",
+      "Place whole red pepper on a baking sheet and roast for 20 minutes.Spray another baking sheet with canola oil and place eggplant on it in a single layer.",
+      "Drizzle with 2 tablespoons olive oil and toss to combine.",
+      "Sprinkle with salt and pepper.Turn red pepper over after 20 minutes.",
+      "Add eggplant to oven, and roast until both are tender, about 15 minutes more.While the eggplant and pepper are roasting, heat 2 tablespoons olive oil in a large soup pot over medium heat. Stir in leek and shallot and cook until softened, about 5 minutes.Stir in zucchini and continue cooking, stirring occasionally, until zucchini is soft, 6-8 minutes.Stir in mushrooms, 1 teaspoon salt, dash black pepper, and wine.Simmer until mushrooms are soft, about 8 minutes.",
+      "Remove eggplant and pepper from oven.Turn oven down to 400.Cover pepper with aluminum foil. Covering it creates steam that will loosen its skin, making the skin easier to remove. Allow pepper to cool about 10 minutes before handling.Stir in the eggplant, tomatoes and their juices, thyme, and rosemary.Bring back up to a simmer.After pepper has cooled, remove the skin, core, and seeds. Chop flesh and add to the stockpot.Simmer, covered, for 5 minutes to combine flavors.Taste, and add salt and pepper if needed.",
+      "Pour everything into an 8x8 baking dish.Top with Parmesan and bread crumbs.",
+      "Bake until topping is browned, about 20 minutes.Allow ratatouille to stand 10 minutes before serving.",
+      "Garnish each serving with fresh basil. Make sure to have more freshly grated Parmesan on hand to pass at the table."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 388,
+      "protein": 13,
+      "carbohydrates": 34,
+      "fat": 22
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 36.0
+  },
+  {
+    "id": "french_e83556fa",
+    "spoonacular_id": 658681,
+    "name": "Roasted Tomato and Garlic Quiche",
+    "description": "Roasted Tomato and Garlic Quiche is a hor d'oeuvre that serves 8. One portion of this dish contains roughly 11g of protein, 19g of fat, and a total of 271 calories. For $1.2 pe",
+    "ingredients": [
+      "1 10oz package of cherry tomatoes – cut tomatoes in half",
+      "6 cloves garlic – peel and cut cloves in half",
+      "1 tsp dried basil",
+      "½ tsp salt",
+      "¼ tsp black pepper",
+      "¼ tsp Chipotle pepper (if not available may use same amount of hot pepper flakes).",
+      "1 refrigerated pie crust (the kind near the canned biscuits in the grocery – not the prefrozen kind)",
+      "1 ½ Cups Shredded mozzarella Cheese (may use preshredded or fresh if necessary).",
+      "½ Cup heavy Cream",
+      "½ Cup milk",
+      "4 large eggs – beaten",
+      "½ tsp each of salt and pepper",
+      "2 Tbs Parmesan cheese"
+    ],
+    "steps": [
+      "Preheat oven to 350",
+      "In a small bowl mix the tomatoes, garlic, dried basil, salt, black pepper and chipotle pepper, toss well and spread out onto a metal baking dish.",
+      "Bake for 30 mins. The tomatoes will be shriveled and the garlic should be tender when done. There may be slight darkening on the garlic cloves - but they should not be burnt. If they are burnt there will be a bitter taste",
+      "Remove tomatoes and garlic from the oven and allow to cool enough to touch. Set oven temp to 37",
+      "Press the pie shell into a deep dish pie plate. Flute the edges of the pie crust",
+      "Using a fork, poke holes into the bottom crust.",
+      "Sprinkle half of the shredded mozzarella into the bottom of the pie crust.",
+      "Cover with the tomatoe/garlic mixture and top with the remaining mozzarella cheese.",
+      "In a small bowl, mix the half and half, salt and pepper and the beaten eggs together.",
+      "Pour this mixture over the ingredients in the pie shell.",
+      "Sprinkle top with Parmesan cheese.",
+      "Bake 35-40 minutes until the center is no longer loose when the edges of the pie plate are gently shaken and the center no longer looks wet",
+      "Allow the quiche to sit on the counter top for 10 minutes before cutting (this allows the quiche to rest and keeps the insides from being too runny)"
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 271,
+      "protein": 11,
+      "carbohydrates": 14,
+      "fat": 18
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 2.0
+  },
+  {
+    "id": "french_4c5aeec7",
+    "spoonacular_id": 664585,
+    "name": "Vegetable Quiche Made With Fresh Tomatoes, Spinach, Basil and Goat Cheese",
+    "description": "The recipe Vegetable Quiche Made With Fresh Tomatoes, Spinach, Basil and Goat Cheese could satisfy your Mediterranean craving in about 1 hour and 30 minutes. This recipe makes 8 servings with <",
+    "ingredients": [
+      "2 eggs, lightly beaten",
+      "1 tablespoon of flour (I used Spelt)",
+      "1 tablespoon chopped fresh basil",
+      "1/2 cup goat cheese",
+      "1/3 cup slices green onion",
+      "pinch of ground nutmeg",
+      "1/8 teaspoon ground white pepper",
+      "1 cup spinach or kale, leaves only and chopped (no stems)",
+      "1/4 cup milk",
+      "1 10-inch pie crust",
+      "Salt to taste",
+      "2 small tomatoes, finely chopped"
+    ],
+    "steps": [
+      "Preheat the oven to 450 degrees F for pie crust. Line a 9-inch pie plate with pastry.  Cover the bottom &amp; top of the pie crust with aluminum foil and bake 8 minutes to allow the crust to cook.",
+      "Remove foil and bake another 4 minutes. While baking the crust, whisk together the milk, salt, pepper, nutmeg, flour and eggs in a bowl. Then add the tomatoes, spinach or kale, onion, basil, and goat cheese.",
+      "Remove from the crust from the oven. The crust should be light brown on the edges.Reduce oven temperature to 325 degrees F. Now, add the milk, vegetable, and cheese mixture to the cooked crust. Cover the edges of the pie crust with foil.",
+      "Bake in the oven until the middle of the quiche is set, about 50-60 minutes.",
+      "Let set 10 minutes."
+    ],
+    "minutes": 90,
+    "nutrition": {
+      "calories": 68,
+      "protein": 4,
+      "carbohydrates": 2,
+      "fat": 4
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Medium",
+    "primary_category": "Main Course",
+    "health_score": 2.0
+  },
+  {
+    "id": "french_07889344",
+    "spoonacular_id": 652652,
+    "name": "Mushroom Crepes",
+    "description": "The recipe Mushroom Crepes is ready in about 45 minutes and is definitely a great dairy free, lacto ovo vegetarian, and vegan option for lovers of Mediterranean food. This recipe makes 3",
+    "ingredients": [
+      "1 1/2 tablespoons Arrowroot or 2 tsp kudzu powder",
+      "2 Bay leaves",
+      "Cayenne to taste",
+      "2 tablespoons Dry red wine",
+      "4 cups Mushrooms, fresh, finely chopped",
+      "2 garlic cloves pressed",
+      "1 cup Onion, finely chopped",
+      "1/2 cup Shiitake mushrooms, 2 tablespoons Olive oil",
+      "1 tablespoon Tamari, or more to taste",
+      "1 teaspoon Tarragon",
+      "1 cup water or mild vegetable stock",
+      "2 tablespoons Whole wheat pastry flour",
+      "cup Dry red wine"
+    ],
+    "steps": [
+      "Prepare the crepes.",
+      "Place the shiitake mushrooms in a bowl. Cover them with water and let them soak for at least 1 hour.Discard the stems and finely chop the mushrooms. Set aside.",
+      "Heat the oil in a skillet.",
+      "Add the onion, garlic and bay leaves.",
+      "Saute over low heat until the onions are translucent.",
+      "Add the shiitake mushrooms, the fresh mushrooms, and the tarragon. Cook until the mushrooms are done.Stir in the flour and mix well.",
+      "Pour in the wine while continuing to stir.Cook until the mixture thickens.",
+      "Add the tamari and cayenne to taste. Set the filling aside while you make the sauce.Sauce: Dissolve the arrowroot or kudzu in the water.",
+      "Add the wine. Cook in small saucepan over high heat, stirring constantly, until the sauce thickens. This is not supposed to be very thick, so do not overcook it.",
+      "Add the tamari to taste and mix well.To assemble: If the filling mixture has cooled down, heat it by returning the skillet to the stove and stirring the mixture over medium-high heat until it is hot.",
+      "Place about 1/4 cup of filling in the center of each crepe and roll up the crepes.",
+      "Place the crepes on individual serving plates.",
+      "Pour some of the sauce over each crepe and serve."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 186,
+      "protein": 7,
+      "carbohydrates": 24,
+      "fat": 1
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 17.0
+  },
+  {
+    "id": "french_20532895",
+    "spoonacular_id": 637478,
+    "name": "Chavrie Spinach Quiche",
+    "description": "Chavrie Spinach Quiche is a Mediterranean hor d'oeuvre. This recipe serves 8 and costs $1.69 per serving. One portion of this dish contains approximately 10g of protein, 18g of fat, and ",
+    "ingredients": [
+      "1 package (5.3 oz.) Chavrie goat cheese",
+      "4 Eggs",
+      "6 ounces Heavy cream or Alouette crème fraiche",
+      "6 ounces Half and Half",
+      "1/2 teaspoon Cayenne",
+      "1/2 teaspoon Salt",
+      "1/4 teaspoon Ground white pepper",
+      "9 inches pie crust pre-baked",
+      "1 package Frozen spinach, thawed and drained",
+      "1 pinch Nutmeg"
+    ],
+    "steps": [
+      "Blend Chavrie with eggs and mix well.",
+      "Add cream and half and half to make custard and season with salt, pepper, cayenne and nutmeg.",
+      "Scatter the spinach evenly over the bottom of the pre-baked piecrust.",
+      "Pour custard into the shell stirring with a fork to evenly distribute the spinach.",
+      "Bake at 350 F for 45 minutes, until a knife blade inserted into it comes out clean.",
+      "Let rest and serve warm.",
+      "Substitute Spinach with 12 oz. fresh diced asparagus."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 259,
+      "protein": 10,
+      "carbohydrates": 14,
+      "fat": 18
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 11.0
+  },
+  {
+    "id": "french_ecdf70e1",
+    "spoonacular_id": 665776,
+    "name": "Zucchini Quiche & Almond Flax Crust",
+    "description": "The recipe Zucchini Quiche & Almond Flax Crust could satisfy your Mediterranean craving in about 45 minutes. This main course has 388 calories, 13g of protein, and 30g of fat</",
+    "ingredients": [
+      "1 1/3 cups almond meal",
+      "1 tsp dried thyme (or any other dried herb)",
+      "3 Eggs",
+      "1/4 cup golden flaxseed meal",
+      "1/4 cup milk",
+      "2 Tbs milk (I used 1% milk)",
+      "2 Tbs olive oil",
+      "1/4 cup chopped orange pepper (or any other bell pepper)",
+      "1 tsp dried oregano (or any other dried herb)",
+      "3 Tbs freshly grated parmesan cheese",
+      "Crust",
+      "3 Tbs chopped red onion",
+      "1/8 teaspoon salt",
+      "1/3 cup shredded mozzarella cheese",
+      "1 small zucchini (gently run a vegetable peeler the length of the zucchini to make thin “ribbons”)"
+    ],
+    "steps": [
+      "Preheat oven to 375F (~190C). Grease an 8-inch pie dish with olive oil or cooking spray.In a medium-sized bowl, mix all of the ingredients of the crust together until a crumbly dough forms.",
+      "Pour all of the dough into the pie dish.",
+      "Spread and flatten the dough on the bottom and up the sides of the pie dish. The dough reached about halfway up the sides of the pie dish for me.Chop off the ends of the zucchini and spiralize it using Blade B. Give the zucchini noodles several chops. This will make it easier to cut and serve the quiche later. Chop the part of the zucchini that did not get spiralized into small pieces. NOTE: If you do not own a spiralizer, simply grate the zucchini or create zucchini ribbons with a vegetable peeler.",
+      "Mix all the vegetables and cheese, and place them into the pie dish. I made sure that some of the zucchini noodles were on top of the quiche, but that is just for presentation.",
+      "Mix the whisked eggs, milk, thyme, and salt in a small bowl. Fill the pie dish with this egg mixture.",
+      "Bake the quiche for 30-40 minutes or until the eggs are cooked through and the quiche is browned and firm to touch.",
+      "Let the quiche cool for about 10 minutes before serving.Refrigerate any leftovers in an airtight container."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 388,
+      "protein": 13,
+      "carbohydrates": 20,
+      "fat": 29
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 4.0
+  },
+  {
+    "id": "french_96f9b9fc",
+    "spoonacular_id": 640693,
+    "name": "Creamy Ratatouille Over Penne",
+    "description": "If you have around 45 minutes to spend in the kitchen, Creamy Ratatouille Over Penne might be an excellent lacto ovo vegetarian recipe to try. This hor d'oeuvre has 308 calories, ",
+    "ingredients": [
+      "1/2 teaspoon black pepper",
+      "cooked penne",
+      "1 teaspoon dried basil",
+      "1 cup diced eggplant",
+      "2 cloves garlic, minced",
+      "1 tablespoon mascarpone cheese",
+      "1 tablespoon olive oil",
+      "1/4 cup diced onion",
+      "1 teaspoon dried oregano",
+      "1 cup diced red bell pepper",
+      "Pinch salt",
+      "1 cup tomato sauce, or ground peeled tomatoes",
+      "1/4 cup water",
+      "1 cup diced zucchini"
+    ],
+    "steps": [
+      "Heat olive oil in a large skillet over medium heat.",
+      "Add onion, bell pepper, and zucchini and saut for about 7 minutes, stirring occasionally, until slightly softened.",
+      "Add eggplant and continue to saut mixture for another 3 minutes, stirring frequently. When vegetables are softened, add garlic and cook until fragrant, about 1 minute.",
+      "Add dried spices, salt, and pepper, followed by the tomato sauce and water. Allow mixture to come to a simmer and cook for 5 minutes, until slightly thickened.Stir in mascarpone cheese and serve immediately."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 308,
+      "protein": 8,
+      "carbohydrates": 44,
+      "fat": 11
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 62.0
+  },
+  {
+    "id": "french_9837736c",
+    "spoonacular_id": 632046,
+    "name": "Alaskan Smoked Salmon Nicoise Salad With Alouette Crumbled Feta",
+    "description": "The recipe Alaskan Smoked Salmon Nicoise Salad With Alouette Crumbled Feta could satisfy your Mediterranean craving in roughly 45 minutes. For $1.63 per serving, you get a hor d'oeuvre t",
+    "ingredients": [
+      "6 canned artichokes quartered",
+      "2 sprigs basil, chopped",
+      "1 cucumber",
+      "2 eggs",
+      "1/2 container Alouette Feta or Fat Free Feta Crumbled Cheese",
+      "4 cloves garlic, minced",
+      "1 cup small green beans, cooked and cooled",
+      "4 ounces Black Kalamata olives",
+      "3 tablespoons olive oil",
+      "4 smalls red onions",
+      "6 plum tomatoes",
+      "6 ounces to 8 Smoked Salmon cut into 1 inch strips",
+      "Salt and pepper, to taste",
+      "2 tablespoons white balsamic vinegar"
+    ],
+    "steps": [
+      "Prepare the dressing with the olive oil, chopped basil, garlic, salt, pepper and vinegar, Refrigerate.Quarter the tomatoes.  Thinly slice the eggs.  Halve the cucumber and cut it into thin slices.  Slice the onion into thing rings",
+      "Instead of mixing the ingredients together, which you can do, I like to arrange them on a salad place for clor and appearance.",
+      "Sprinkle the cheese on top, drizzle with the dressing and serve."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 131,
+      "protein": 6,
+      "carbohydrates": 13,
+      "fat": 6
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 12.0
+  },
+  {
+    "id": "french_1005b010",
+    "spoonacular_id": 655003,
+    "name": "Pate De Chocolate",
+    "description": "You can never have too many Mediterranean recipes, so give Pate De Chocolate a try. For $2.62 per serving, you get a hor d'oeuvre that serves 2. One portion of this dish contains approximately ",
+    "ingredients": [
+      "1 cup Chocolate Chips",
+      "1 1/4 cups Scalded Coffee Cream",
+      "2 large Eggs",
+      "4 tablespoons Rum Or Brandy"
+    ],
+    "steps": [
+      "Combine all ingredients in a blender bowl and blend until well mixed.",
+      "Pour into dessert glasses and chill until firm. It doesn't get much easier than that."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 1096,
+      "protein": 10,
+      "carbohydrates": 62,
+      "fat": 84
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 2.0
+  },
+  {
+    "id": "french_0821d265",
+    "spoonacular_id": 657933,
+    "name": "Ratatouille Pasta",
+    "description": "Forget going out to eat or ordering takeout every time you crave Mediterranean food. Try making Ratatouille Pastan at home. This recipe serves 4 and costs $2.63 per serving. This main course has 69",
+    "ingredients": [
+      "1 large Yellow Onion, diced",
+      "Olive oil for sauteing",
+      "Sea salt and fresh pepper",
+      "4 cloves Garlic, minced",
+      "3 cups Zucchini, peeled, thinly sliced(⅛ of an inch), cut into bite size pieces",
+      "3 cups Eggplant, peeled, thinly sliced(⅛ of an inch), cut into bite size pieces",
+      "1 teaspoon Italian Seasoning",
+      "14 ounces can of Artichokes, rinsed, chopped into bite size pieces",
+      "14 ounces can Diced Tomatoes",
+      "8 ounces Spaghetti (like Barila Whole Grain)",
+      "Extra Virgin Olive oil, for serving",
+      "Fresh grated Parmesan or Romano, for serving"
+    ],
+    "steps": [
+      "Saute the yellow onion in a large skillet or saute pan with enough Olive oil to coat the bottom of the pan, over medium-low heat until tender and translucent. Season with salt and pepper.",
+      "Add garlic, saute until fragrant.",
+      "Add another tablespoon of Olive oil and the zucchini, eggplant and Italian seasoning. Continue sauteing until the zucchini and eggplant start to break down and become limp and tender.",
+      "Add the artichokes and tomatoes. Season with salt and pepper. Bring to a simmer for ten - fifteen minutes. Taste and re-season if needed.",
+      "Meanwhile cook the spaghetti to al dente according to package directions.",
+      "Toss with pasta and serve with a drizzle of extra-virgin Olive oil and Parmesan cheese."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 690,
+      "protein": 24,
+      "carbohydrates": 69,
+      "fat": 37
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 51.0
+  },
+  {
+    "id": "french_12bbf0de",
+    "spoonacular_id": 1095851,
+    "name": "Simple Broccoli Cheddar Quiche",
+    "description": "If you want to add more Mediterranean recipes to your repertoire, Simple Broccoli Cheddar Quiche might be a recipe you should try. This recipe serves 4. This main course has 442 calories",
+    "ingredients": [
+      "2 cups cooked broccoli – chopped",
+      "1 cup cheddar cheese – shredded",
+      "5 eggs",
+      "1½ cups milk",
+      "½ tsp. salt",
+      "½ tsp. black pepper",
+      "½ tsp. garlic powder",
+      "¼ cup grated Romano cheese or Parmesan cheese",
+      "6 slices white bread",
+      "2 -3 tablespoons of butter"
+    ],
+    "steps": [
+      "Preheat oven to 350 degrees F.Butter a 9 inch pie plate.  Press the bread into the plate and bake it until it becomes slightly golden, approximately, 10-11 minutes.",
+      "Remove from oven and let cool slightly before adding the quiche batter.For the quiche batter, place the cooked chopped broccoli, cheddar cheese, Romano cheese, salt and pepper, and butter in a large bowl.  Beat the milk with the eggs and add to the bowl.  Toss the mixture and pour into the baking dish.  Top the quiche with a little more grated Romano cheese.",
+      "Bake 35-40 minutes.",
+      "Let cool for at least 20 -25 minutes before serving."
+    ],
+    "minutes": 75,
+    "nutrition": {
+      "calories": 441,
+      "protein": 23,
+      "carbohydrates": 27,
+      "fat": 26
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Medium",
+    "primary_category": "Main Course",
+    "health_score": 13.0
+  },
+  {
+    "id": "french_06320813",
+    "spoonacular_id": 643400,
+    "name": "French Style Almond Saffron Cake",
+    "description": "French Style Almond Saffron Cake is a Mediterranean dessert. Watching your figure? This lacto ovo vegetarian recipe has 407 calories, 8g of protein, and 26g of fat per serving. Th",
+    "ingredients": [
+      "cup milk",
+      "1/2 teaspoon saffron",
+      "2 cups all purpose flour",
+      "1 teaspoon baking powder",
+      "1/2 teaspoon baking soda",
+      "of salt",
+      "1 cup butter- room temperature",
+      "7 ounces tube almond paste (not marzipan)/ 8 oz can almond paste",
+      "1 cup confectioners sugar",
+      "5 large eggs",
+      "8 ounces sour cream",
+      "1 Zest of orange"
+    ],
+    "steps": [
+      "Preheat oven to 350 degrees. Butter and flour 2 (8 inch) round cake pans and set aside.",
+      "Heat milk on medium heat, add orange zest and saffron, bring to a gentle simmer and take off heat.",
+      "Let cool.",
+      "Sift flour, baking soda, salt and baking powder.",
+      "Using a stand mixer cream butter and almond paste for 5 minutes. I cut up the almond paste to smaller pieces and added to mixer.",
+      "Add confectioners sugar and beat till fluffy.",
+      "Add in eggs, one at a time.",
+      "Add in flour and sour cream alternately.",
+      "Gently pour in saffron mixture and mix well.",
+      "Divide batter between both prepared pans and bake for 30/40 minutes, test for doneness with a cake tester. I baked mined for 40 minutes.",
+      "Serve with berries or dusted with confectioners sugar."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 406,
+      "protein": 7,
+      "carbohydrates": 36,
+      "fat": 26
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Dessert",
+    "health_score": 2.0
+  },
+  {
+    "id": "french_65b2792c",
+    "spoonacular_id": 1096248,
+    "name": "Easy Homemade French Onion Dip",
+    "description": "Easy Homemade French Onion Dip could be just the gluten free recipe you've been looking for. For 48 cents per serving, this recipe covers 3% of your daily requirements of vitamins",
+    "ingredients": [
+      "2 small yellow onions, grated",
+      "1 garlic clove, grated",
+      "2 tablespoons canola oil",
+      "1 sprig fresh thyme",
+      "1 cup sour cream",
+      "3 tablespoons mayonnaise",
+      "3/4 teaspoon Worcestershire sauce",
+      "1 teaspoon freshly squeezed lemon juice",
+      "1 1/2 tablespoons dried minced onion",
+      "1/4 teaspoon salt",
+      "dash black pepper",
+      "fresh chives, minced, for garnish"
+    ],
+    "steps": [
+      "Place a medium saute pan over medium heat.",
+      "Add the canola oil, when hot, but not smoking, add the grated onion, garlic and thyme sprig and saute, stirring occasionally, until the onion is soft and a nice golden brown color, about 20-25 minutes. Discard the thyme and let cool.In a small bowl add the sour cream, mayonnaise, Worcestershire sauce, lemon juice, dried onion, salt and pepper.",
+      "Mix well to incorporate.Roughly chop the caramelized onions and add to the sour cream mixture.",
+      "Mix well to incorporate.  Refrigerate for about 20 minutes.To serve, garnish with chopped chives, some additional dried onion if desired and serve with your favorite potato chip."
+    ],
+    "minutes": 40,
+    "nutrition": {
+      "calories": 180,
+      "protein": 1,
+      "carbohydrates": 5,
+      "fat": 17
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 0.0
+  },
+  {
+    "id": "french_da18433f",
+    "spoonacular_id": 649431,
+    "name": "Leek and Mushroom Quiche",
+    "description": "Leek and Mushroom Quiche might be a good recipe to expand your main course recipe box. This recipe serves 4 and costs $1.31 per serving. One portion of this dish contains approximately 18g of prote",
+    "ingredients": [
+      "1/2 cup grated tasty cheese",
+      "1/2 cup cream",
+      "1 egg yolks",
+      "4 eggs",
+      "1 Clove garlic",
+      "2 leeks",
+      "1 teaspoon lemon juice",
+      "1 cup milk",
+      "250 grams mushrooms",
+      "1 cup flour, plain",
+      "salt",
+      "1 tablespoon unsalted butter"
+    ],
+    "steps": [
+      "Pastry:Sift flour and salt into a bowl, rub in butter, add egg yolk and lemon juice and mix to a firm dough. Cover and refrigerate 20 minutes.",
+      "Roll dough out large enough to line a 25cm flan tin, trim the edges. Cover pastry with greaseproof paper and fill with dried beans or rice to hold in shape while cooking.",
+      "Bake in a moderate oven for 7 minutes, remove paper and beans and bake a furthur 7 minutes. Set aside until required.",
+      "Whisk eggs, cream, milk and cheeses together and set aside.Slice leeks and mushrooms.Melt butter in a pan and cook garlic, mushrooms and leeks about 4 minutes until tender.",
+      "Spread leek mushroom mixture evenly over pastry.",
+      "Pour over egg mixture and sprinkle with paprika.",
+      "Bake in a moderate oven for about 30 minutes or until set.",
+      "Serves 4."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 453,
+      "protein": 18,
+      "carbohydrates": 37,
+      "fat": 26
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 11.0
+  },
+  {
+    "id": "french_6d5769ed",
+    "spoonacular_id": 657511,
+    "name": "Quiche with Swiss Chard and Mushroom",
+    "description": "Quiche with Swiss Chard and Mushroom is a Mediterranean main course. Watching your figure? This lacto ovo vegetarian recipe has 393 calories, 12g of protein, and 27g of fat per se",
+    "ingredients": [
+      "3 large pastured organic eggs",
+      "1 cup heavy cream",
+      "4 ounces white or crimini mushrooms, chopped",
+      "1/4 cup finely chopped red onion or shallot",
+      "2 tablespoons butter",
+      "5 ounces Swiss chard leaves (no stems), chopped",
+      "salt and black pepper to taste",
+      "5 ounces Prima Donna aged Gouda cheese, shredded",
+      "1 tablespoon butter, cut into small pieces",
+      "dash nutmeg",
+      "1 prepared pie crust or quiche pastry dough"
+    ],
+    "steps": [
+      "Preheat oven to 350 F.",
+      "Beat room temperature eggs with heavy cream in a small bowl.",
+      "Place pie crust in a deep-dish glass pie plate and crimp edges.",
+      "Heat 2 tablespoons butter in a saute pan and cook mushroom ond shallot until browned.",
+      "Season vegetables to taste with salt and pepper and stir in chopped chard leaves, cooking only long enough to allow them to wilt; cool mixture.",
+      "Sprinkle about 2 ounces of the cheese in the bottom of the pie crust and spread vegetables over that, then top with remaining cheese.",
+      "Pour the custard (cream and egg) mixture over all.",
+      "Make sure the cheese and vegetables are covered or wet with the custard mixture.",
+      "Dot with butter pieces and sprinkle with nutmeg.",
+      "Bake quiche uncovered, in a preheated oven, for about 45 minutes or until domed and puffy and custard is set.",
+      "Allow to sit undisturbed for about 15 minutes before slicing and serving."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 392,
+      "protein": 12,
+      "carbohydrates": 24,
+      "fat": 27
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 8.0
+  },
+  {
+    "id": "french_6f5bd0dc",
+    "spoonacular_id": 652605,
+    "name": "Mushroom & Gruyere Quiche",
+    "description": "Mushroom & Gruyere Quiche is a Mediterranean hor d'oeuvre. For $1.4 per serving, this recipe covers 11% of your daily requirements of vitamins and minerals. This recipe makes 10 servings",
+    "ingredients": [
+      "1 teaspoon black pepper",
+      "3 large eggs",
+      "3 tablespoons chopped fresh basil",
+      "2 teaspoons chopped fresh thyme",
+      "2 large cloves garlic, minced",
+      "1 cup grated Gruyere",
+      "1 1/4 cups half-and-half",
+      "1 1/2 pounds assorted mushrooms, wiped clean and sliced",
+      "Store bought pie crust",
+      "salt, rice wine vinegar, soy sauce,<",
+      "2 shallots, chopped",
+      "1/2 cup diced tomatoes",
+      "2 tablespoons unsalted butter"
+    ],
+    "steps": [
+      "Preheat the oven to 375 degrees F.In a large skillet melt the butter over medium-high heat.",
+      "Add the mushroom, cook, stirring, until liquid is rendered.",
+      "Add shallots and garlic.  Cook for a few minutes.",
+      "Add the tomatoes, basil, and thyme and season lightly with salt and pepper.Cook, stirring, for 1 minute.",
+      "Remove from the heat and let cool.In a bowl, beat the eggs and half-and-half together.",
+      "Add the salt, pepper, and grated Gruyere.Spoon the vegetable mixture into the prepared piecrust, pour in the egg mixture.",
+      "Bake for 25 to 30 minutes until set.",
+      "Remove from the oven and let cool for 30 minutes before serving."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 255,
+      "protein": 10,
+      "carbohydrates": 15,
+      "fat": 17
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 4.0
+  },
+  {
+    "id": "french_bce1147e",
+    "spoonacular_id": 665672,
+    "name": "Zomppa's French Apple Tart",
+    "description": "You can never have too many Mediterranean recipes, so give Zomppa's French Apple Tart a try. One portion of this dish contains around 1g of protein, 17g of fat, and a total of 307 cal",
+    "ingredients": [
+      "6 tablespoons cold unsalted butter, diced",
+      "2 Granny Smith apples, sliced into half-moons",
+      "1/4 cup ice water, plus more if necessary",
+      "1/4 cup apricot jelly",
+      "1/2 Juice of a lemon",
+      "1/2 teaspoon kosher salt",
+      "1 zest of 1 lemon",
+      "1/4 cup sugar"
+    ],
+    "steps": [
+      "For pastry:In a food processor, add the flour, zest, sugar and salt.Pulse a couple of times until flour mixture is combined.",
+      "Add the diced butter and pulse until mixture has texture of coarse corn meal.Slowly drizzle in  cup of iced water while processor is on pulse.Stop once dough forms a solid ball.",
+      "Add more water if necessary.Flatten to about 1 inch thick and wrap in saran wrap.",
+      "Place in refrigerator for at least an hour.In the meantime, slice the apples into half moons.",
+      "Place in bowl and mix, gently, with the lemon juice.After an hour, pre-heat oven to 400 degrees.",
+      "Remove the dough from refrigerator and roll out into a rectangle approximately  inch thick.  Make sure your surface is covered in enough flour as you do not want your dough to stick.Once rolled out, move the dough onto a piece of parchment paper and place on a cookie sheet.Starting from the corner of the dough, make a row of apples on the diagonal.Cover the rest of the dough with apples on the diagonal.",
+      "Sprinkle the apples with  cup of sugar.",
+      "Place on middle rack of oven and cook for up to 45 minutes or until the apples are cooked through, juices are bubbling and crust is slightly browned.",
+      "Remove from oven and brush with apricot jelly.",
+      "Serve warm or at room temperature."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 306,
+      "protein": 0,
+      "carbohydrates": 40,
+      "fat": 17
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Dessert",
+    "health_score": 0.0
+  },
+  {
+    "id": "french_df95f82c",
+    "spoonacular_id": 656506,
+    "name": "Poached Prawns with Fettuccine and French String Beans",
+    "description": "If you have around 45 minutes to spend in the kitchen, Poached Prawns with Fettuccine and French String Beans might be an amazing pescatarian recipe to try. This recipe serves 4 and cost",
+    "ingredients": [
+      "Fettuccine",
+      "tablespoon of lemon juice",
+      "1 pound uncooked prawns",
+      "Salt and pepper",
+      "1 can French string beans",
+      "5 to 6 tablespoons unsalted butter",
+      "1 quart Water"
+    ],
+    "steps": [
+      "Cook pasta according the packaging directions.",
+      "Drain and add the string beans and 1 tablespoon butter and stir well.In a skillet add water and bring to boil point and start adding the butter, tablespoon at the time to emulsify. Once all the butter is melted add the prawns and poach  just below simmer- until the prawns are cooked and turn a nice pink color. Season with salt and pepper.",
+      "Remove the prawn leaving the juice in the skillet.",
+      "Add the pasta with the French string beans to the skillet and stir to coat the fettuccine well.",
+      "Place pasta in the middle of the plate and place the prawns over it with any juices."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 442,
+      "protein": 24,
+      "carbohydrates": 45,
+      "fat": 17
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 11.0
+  },
+  {
+    "id": "french_eb6a6b1e",
+    "spoonacular_id": 1956374,
+    "name": "French 75",
+    "description": "If you want to add more Mediterranean recipes to your recipe box, French 75 might be a recipe you should try. This recipe makes 1 servings with 265 calories, 1g of protein, and <b",
+    "ingredients": [
+      "1 1/2 oz Gin",
+      "2 tsp superfine Sugar",
+      "1 1/2 oz Lemon juice",
+      "4 oz Chilled Champagne",
+      "1 Orange",
+      "1 Maraschino cherry"
+    ],
+    "steps": [
+      "Combine gin, sugar, and lemon juice in a cocktail shaker filled with ice. Shake vigorously and strain into a chilled champagne glass. Top up with Champagne. Stir gently."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 265,
+      "protein": 1,
+      "carbohydrates": 30,
+      "fat": 0
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 3.0
+  },
+  {
+    "id": "french_6c717fa1",
+    "spoonacular_id": 632949,
+    "name": "Asparagus Quiche",
+    "description": "Asparagus Quiche might be just the Mediterranean recipe you are searching for. One portion of this dish contains approximately 9g of protein, 25g of fat, and a total of 288 cal",
+    "ingredients": [
+      "250 grams asparagus tips, tinned",
+      "2 slcs bacon",
+      "3 tablespoons butter or margarine",
+      "1 cup grated tasty cheese",
+      "1 cup cream",
+      "1 egg yolks",
+      "2 eggs beaten",
+      "2 tablespoons flour",
+      "1 teaspoon garlic, crushed",
+      "1 lemons",
+      "cup milk",
+      "1 onions, medium",
+      "2 tablespoons Parmesan cheese",
+      "1 pch salt"
+    ],
+    "steps": [
+      "Pastry:Sift flour and salt into a bowl, rub in butter, add egg yolk and lemon juice and mix to a firm dough. Cover and refrigerate 20 minutes.",
+      "Roll dough out large enough to line a 25cm flan tin, trim the edges. Cover pastry with greaseproof paper and fill with dried beans or rice to hold in shape while cooking.",
+      "Bake in a moderate oven for 7 minutes, remove paper and beans and bake a further 7 minutes. Set aside until required.",
+      "Whisk eggs, cream, milk and cheeses together and set aside.Slice onion and cut bacon into strips.Melt butter in a pan and cook onion and bacon for 2 minutes until tender.",
+      "Spread onion-bacon mixture evenly over pastry. Top with well drained asparagus spears.",
+      "Pour over egg mixture and sprinkle with paprika.",
+      "Bake in a moderate oven for about 30 minutes or until set.",
+      "Serves 4.Use commercially prepared short pastry if desired.(Available at supermarket)"
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 288,
+      "protein": 9,
+      "carbohydrates": 7,
+      "fat": 25
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 3.0
+  },
+  {
+    "id": "french_b611d3d4",
+    "spoonacular_id": 633267,
+    "name": "Bacon and Arugula Quiche",
+    "description": "Bacon and Arugula Quiche requires approximately 45 minutes from start to finish. This recipe serves 9. For 92 cents per serving, this recipe covers 14% of your daily requirements ",
+    "ingredients": [
+      "8 ounces baby arugula or baby spinach leaves, coarsely chopped",
+      "6 bacon slices, cut into 1/2-inch pieces",
+      "2 teaspoons balsamic vinegar",
+      "1/4 teaspoon Black pepper, to taste",
+      "2 Eggs, beaten",
+      "1 cup heavy cream",
+      "A 9-inch pre-baked pastry crust",
+      "1/8 teaspoon salt",
+      "1/2 cup chopped shallots",
+      "3/4 cup shredded Gruyere, Emmental or Swiss cheese"
+    ],
+    "steps": [
+      "Preheat oven to 400 F. Thaw purchased crust for 10 minutes.",
+      "Bake 10-12 minutes until golden. After pre-baking purchased crust, lower oven temperature to 375F.In a large skillet on medium heat,cook bacon pieces until crispy.",
+      "Drain on paper towels, reserving 2 tablespoons bacon drippings.",
+      "Add chopped shallots and saute until tender.",
+      "Add chopped arugula, saute until just wilted, about 1 minute.",
+      "Remove from heat, add balsamic vinegar and toss to combine.In prepared pastry, layer arugula mixture, then crispy bacon pieces. In a large measuring cup or bowl, whisk together heavy cream, eggs and salt and pepper. Stir in Gruyere cheese.",
+      "Pour this mixture over the arugula bacon layers.",
+      "Bake until puffed and golden, about 35 minutes.",
+      "Let stand at least 10 minutes before slicing."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 224,
+      "protein": 7,
+      "carbohydrates": 5,
+      "fat": 19
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 7.0
+  },
+  {
+    "id": "french_a5e3e9e5",
+    "spoonacular_id": 664533,
+    "name": "Vegetable Cheddar Quiche",
+    "description": "If you want to add more Mediterranean recipes to your collection, Vegetable Cheddar Quiche might be a recipe you should try. For 72 cents per serving, you get a hor d'oeuvre that serves ",
+    "ingredients": [
+      "1 cup Broccoli florets",
+      "⅛ tsp cayenne pepper",
+      "Cilantro for garnish",
+      "1 cup sliced fresh mushrooms",
+      "2 cloves minced garlic",
+      "1/3 cup mayonnaise",
+      "1/3 cup milk",
+      "2 Tbs olive oil",
+      "1 cup chopped onions",
+      "3 Tbs parmesan cheese – freshly grated is best.",
+      "½ tsp pepper",
+      "1 refrigerated pie crust",
+      "½ tsp salt",
+      "1 cup shredded Sharp Cheddar cheese",
+      "1 cup fresh spinach"
+    ],
+    "steps": [
+      "Preheat oven to 37",
+      "Unroll pie crust and place into pie plate, crimp edges and set aside. Cook vegetables and garlic in frying pan over medium heat on stove top for about 5 minutes until tender  stir occasionally.",
+      "Add salt, pepper and cayenne pepper while cooking. After vegetables are tender, remove pan from the heat and set aside to cool.In a bowl, beat the eggs, mayonnaise and milk with a whisk until all is blended and smooth. Once vegetables have cooled, add them to the egg mix.",
+      "Add the cheese as well and then pour the mixture into the pie crust. Top with the 3 tbs of grated parmesan cheese.",
+      "Bake for 40-45 minutes until you can jiggle the pie plate and the center of the quiche is set and not jiggly! The top should be golden brown.",
+      "Let quiche stand for 10 minutes before cutting to serve.",
+      "Garnish with cilantro"
+    ],
+    "minutes": 75,
+    "nutrition": {
+      "calories": 279,
+      "protein": 6,
+      "carbohydrates": 14,
+      "fat": 21
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Medium",
+    "primary_category": "Main Course",
+    "health_score": 3.0
+  },
+  {
+    "id": "french_b5f41a89",
+    "spoonacular_id": 643394,
+    "name": "French Silk Chocolate Cake",
+    "description": "Need a lacto ovo vegetarian dessert? French Silk Chocolate Cake could be an amazing recipe to try. One serving contains 490 calories, 7g of protein, and 25g of fat. For ",
+    "ingredients": [
+      "1/2 tsp baking powder",
+      "30 g butter,melted",
+      "caramel syrup",
+      "1/3 cup good cocoa powder",
+      "30g cocoa powder",
+      "3 large egg, seperated",
+      "4 eggs",
+      "50 ml milk",
+      "1/4 tsp salt",
+      "80g sifted self-raising flour",
+      "1 cup caster sugar",
+      "120 g caster sugar",
+      "1 cup unsalted butter",
+      "1 tsp vanilla",
+      "2 tsp. vanilla"
+    ],
+    "steps": [
+      "Make the filling, cream the butter and sugar until very fluffy and well combined. Carefully blend in the cocoa and vanilla. Beating at highest speed add one egg. Beat for about 2 minutes.Repeat with each egg, beating very well after each addition. Whip until very fluffy.Chill for 4 hours before using.Meanwhile, make the base, line the 8\" cake tin with parchment paper.Preheat the oven to 350f. Sift together the flour, cocoa powder, baking powder and salt into a bowl. Beat/whisk the egg white at a high speed of a mixer until foamy, the gradually add sugar, few tbsp at a time, then continue to beat until a peak stage.",
+      "Add the yolk, one at a time, to the white and beat until the mixture have reached a ribbon stage.",
+      "Add the vanilla and mix to incorperate. Divide the flour mixture into few portions and add a portion at a time into the egg mixture using minimun speed.",
+      "Mix until just combined, then slowly and gently pour the warm mixture of milk and melted butter into the batter. Now using spatula to gently fold everything until incorperated.",
+      "Pour the batter into the prepared tin and bake for 25-30 minutes until the top springs back when touched. Cool on a wire rack for 5-10 minutes before turning it out to cool completely.To assemble : Slice the cake into 2 layers.",
+      "Brush the top of bottom layer with the syrup, then spread about 1/3 of the filling over.",
+      "Place the top layer over and brush with the syrup before frosting the whole cake with the remaining filling. Decorate as required and leave the cake to set in the fridge for few hours before serving."
+    ],
+    "minutes": 75,
+    "nutrition": {
+      "calories": 489,
+      "protein": 7,
+      "carbohydrates": 64,
+      "fat": 25
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Medium",
+    "primary_category": "Dessert",
+    "health_score": 1.0
+  },
+  {
+    "id": "french_b2f093a8",
+    "spoonacular_id": 639597,
+    "name": "Classic French Onion Soup",
+    "description": "Classic French Onion Soup requires about 45 minutes from start to finish. One serving contains 412 calories, 18g of protein, and 24g of fat. This recipe serves 4. For $2",
+    "ingredients": [
+      "¼ cup salted butter",
+      "4-6 yellow onions, finely sliced",
+      "¼ Tsp. flour",
+      "½ cup sherry",
+      "5 cups beef broth",
+      "3 sprigs fresh thyme",
+      "3 sprigs fresh parsley",
+      "1 bay leaf",
+      "salt and pepper to taste",
+      "4 slices of a crusty French baguette",
+      "1 cup gruyere cheese, shredded"
+    ],
+    "steps": [
+      "Preheat oven to 400",
+      "In a large Dutch oven, melt butter over medium heat.",
+      "Add onions to the pot and sprinkle with flour. Reduce heat to medium low and cook for 45 minutes stirring occasionally. If the onions are cooking too quickly, reduce heat.",
+      "When the onions are tender and golden in colour, de-glaze the pan with sherry.",
+      "Pour beef broth into the pot and bring to a boil over medium heat.",
+      "Add herbs, salt and pepper to taste.",
+      "Reduce heat and simmer for 15 minutes.",
+      "Spray a cookie sheet with cooking spray. Butter slices of French bread and bake in the oven for 5-10 minutes until very dry. Set aside.",
+      "Remove herb stalks and bay leaf.",
+      "Ladle soup portions into four oven safe ramekins. Top with crusty French bread and sprinkle with cheese.",
+      "Place ramekins on a cookie sheet and bake uncovered at 400 for 5-10 minutes until cheese is bubbling. Broil for one minute more to brown the top.",
+      "Serve warm.",
+      "Serves 4"
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 412,
+      "protein": 17,
+      "carbohydrates": 27,
+      "fat": 23
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 5.0
+  },
+  {
+    "id": "french_77cf0c91",
+    "spoonacular_id": 602644,
+    "name": "Whisky Seville Marmalade Souffle",
+    "description": "If you want to add more Mediterranean recipes to your recipe box, Whisky Seville Marmalade Souffle might be a recipe you should try. This hor d'oeuvre has 123 calories, 4g of protein<",
+    "ingredients": [
+      "1 egg yolk",
+      "2 eggs",
+      "225m1 milk",
+      "1 1/2 tablespoons plain flour, sifted",
+      "50g sugar",
+      "2 tablespoons Tasmanian Gourmet Sauce's Whisky Seville Marmalade"
+    ],
+    "steps": [
+      "Visit the Tasmanian Gourmet Sauce Company recipe to see more."
+    ],
+    "minutes": 30,
+    "nutrition": {
+      "calories": 123,
+      "protein": 3,
+      "carbohydrates": 14,
+      "fat": 3
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 0.0
+  },
+  {
+    "id": "french_c3f3b390",
+    "spoonacular_id": 1697573,
+    "name": "Gougères Gruyère – French Appetizer",
+    "description": "The recipe Gougères Gruyère – French Appetizer could satisfy your Mediterranean craving in approximately 50 minutes. For 30 cents per serving, you get a hor d'oeuvre that serves 40. One ",
+    "ingredients": [
+      "1/2 c whole milk",
+      "1/2 c water",
+      "1/2 c unsalted butter",
+      "1 c all-purpose flour",
+      "4 large eggs, at room temperature",
+      "2 c coarsely grated Gruyère cheese",
+      "2 tsp Dijon mustard",
+      "1 tsp kosher salt",
+      "Pinch of black pepper",
+      "Pinch of nutmeg",
+      "Pinch of cayenne pepper"
+    ],
+    "steps": [
+      "Preheat the oven to 400°F and line baking sheets with parchment paper. ",
+      "Cut the butter into small pieces and put in a saucepan with milk, water, and kosher salt. Bring to a boil. ",
+      "Add all of the flour at once, reduce heat, and stir with a wooden spoon. After about 2 minutes, the dough will start drying out and pulling away from the pan. That’s precisely what you want. This will make your gougères crispy on the outside. ",
+      "Scrape the dough into a mixing bowl and let cool for a couple of minutes.",
+      "Add eggs one at a time and beat them into the dough.",
+      "Once the dough is mixed well, add cheese, Dijon mustard, black pepper, nutmeg, and cayenne pepper, and mix again. ",
+      "Transfer the dough into a pastry bag with a 1/2” round tip and pipe tablespoon mounds two inches apart on the baking sheets. You can also use a spoon or a cookie scoop instead. ",
+      "Bake for about 25 minutes until they’re nicely puffed up and golden brown. Gougères Gruyère are best served warm. Enjoy!"
+    ],
+    "minutes": 50,
+    "nutrition": {
+      "calories": 68,
+      "protein": 3,
+      "carbohydrates": 2,
+      "fat": 5
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 0.0
+  },
+  {
+    "id": "french_88b7bdd7",
+    "spoonacular_id": 157093,
+    "name": "Puff Paste quiche",
+    "description": "Puff Paste quiche is a Mediterranean recipe that serves 4. One portion of this dish contains around 29g of protein, 26g of fat, and a total of 541 calories. For $4.37 per servi",
+    "ingredients": [
+      "20 g butter",
+      "100 gram blue mold cheese",
+      "500 g puff paste",
+      "3 eggs",
+      "250 gram grapes",
+      "2 stems leek",
+      "250ml milk"
+    ],
+    "steps": [
+      "cut the leek in stripes and stew it for ten minutes in the buttercut the grapes to halfes and remove the coresput the milk, the eggs, the leak and the grapes together with the cheese (little pieces) in a bowl and and stir it.arrange the puff paste on two baking bowls (see photo)put the mix of leek, cheese and eggs in the bowlsbake it for 25 minutes at 200 degree Warning: don't put the eggs on the hot leek"
+    ],
+    "minutes": 30,
+    "nutrition": {
+      "calories": 541,
+      "protein": 29,
+      "carbohydrates": 53,
+      "fat": 25
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 16.0
+  },
+  {
+    "id": "french_32a8cd28",
+    "spoonacular_id": 636598,
+    "name": "Butternut Squash Souffle Side Dish",
+    "description": "Need a gluten free, lacto ovo vegetarian, and primal hor d'oeuvre? Butternut Squash Souffle Side Dish could be an amazing recipe to try. One serving contains 234 calories, 6g of prote",
+    "ingredients": [
+      "Butter to grease the ramekins",
+      "1/2 butternut squash, peeled and roasted (for instructions go here)",
+      "1/2 teaspoon cinnamon",
+      "3 egg whites",
+      "2 egg yolks",
+      "1/2 teaspoon ground ginger",
+      "1/2 cup heavy cream",
+      "1/4 teaspoon nutmeg",
+      "Splash of vanilla extract",
+      "1/4 cup whole milk"
+    ],
+    "steps": [
+      "Puree butternut squash with blender and set aside to let cool.In a small saucepan, heat cream, milk, nutmeg, cinnamon, ginger and vanilla to a simmer.Meanwhile, in a separate bowl, whisk yolks and sugar until pale yellow.",
+      "Add a cup of the hot cream mixture very slowly into yolks while continuing to whisk.Then add yolks and cream back to saucepan and keep stirring over low heat.",
+      "Mixture should thicken in a few minutes, then turn off heat and incorporate into squash puree.Preheat oven to 375 degrees, making sure the rack is near the bottom.",
+      "Place a baking sheet in the oven.Butter your ramekins and dust the insides and rims with sugar.Then take egg whites in a clean bowl and whisk until glossy. It should form stiff peaks when you remove your whisk from the bowl, and should be able to hold the weight of an egg.Use a spatula to combine the egg whites scoop by scoop into the squash mixture, making sure they form a fully homogeneous mixture, but do not overmix.Carefully scoop your mixture into the ramekins up to the rims.",
+      "Bake on lower rack for about 25 minutes, or until tops are golden brown.They should rise, but with firm tops and jiggly centers."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 234,
+      "protein": 6,
+      "carbohydrates": 13,
+      "fat": 17
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 5.0
+  },
+  {
+    "id": "french_bd1b1b79",
+    "spoonacular_id": 653098,
+    "name": "Niçoise Salad",
+    "description": "If you have around 45 minutes to spend in the kitchen, Niçoise Salad might be a super gluten free, dairy free, whole 30, and pescatarian recipe to try. This recipe makes 6 servings with ",
+    "ingredients": [
+      "6 anchovy fillets desalted",
+      "Capers as you like",
+      "6 cherry tomatoes",
+      "1 tablespoon sweet Dijon mustard",
+      "4 boiled eggs",
+      "5 tablespoons extra virgin olive oil",
+      "150 grams cooked green beans",
+      "black olives as you like",
+      "1 onion",
+      "2 large potatoes cooked",
+      "salt",
+      "2 tablespoons wine vinegar",
+      "1 yellow or red bell pepper"
+    ],
+    "steps": [
+      "Let's start with cutting the vegetables.",
+      "Cut the potatoes into chunks, green beans in half, pepper into strips, cherry tomatoes into 4 pieces, and onion into thin slices.Better put all the vegetables in a large bowl.Now cut in 4 parts the eggs, and use only  half immediately with the vegetables, the other will be used for garnishing, add the olives 3 anchovy fillets and desalted.Prepare the vinaigrette for seasoning:  with a fork dissolve in a  small bowl a pinch of salt (very little salt, there are anchovies and capers, you always have time to add salt) with the Dijon mustard and the vinegar  emulsifies all with extra virgin olive oil.Seasoning salad, taste if is enough salt and garnish with the remaining eggs anchovies and capers."
+    ],
+    "minutes": 45,
+    "nutrition": {
+      "calories": 300,
+      "protein": 8,
+      "carbohydrates": 28,
+      "fat": 18
+    },
+    "tags": [
+      "French",
+      "European",
+      "Classic"
+    ],
+    "cuisine": [
+      "French"
+    ],
+    "difficulty": "Easy",
+    "primary_category": "Main Course",
+    "health_score": 10.0
+  }
+]
